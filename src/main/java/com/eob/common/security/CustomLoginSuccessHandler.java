@@ -31,16 +31,16 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         // * - ROLE_RIDER : 배달 기사 - 배달/수령 상태 처리
         // * - ROLE_ADMIN : 관리자 - 전체 회원/상점/상품 관리, 승인/반려 처리
         switch (member.getMemberRole()) {
-            case ROLE_USER:
+            case USER:
                 response.sendRedirect("/");
                 break;
-            case ROLE_SHOP:
+            case SHOP:
                 response.sendRedirect("/shop/");
                 break;
-            case ROLE_RIDER:
+            case RIDER:
                 response.sendRedirect("/rider/");
                 break;
-            case ROLE_ADMIN:
+            case ADMIN:
                 response.sendRedirect("/admin/");
                 break;
         }

@@ -17,10 +17,10 @@ import lombok.Getter;
 @Getter
 public enum MemberRoleStatus {
 
-    ROLE_USER("일반 회원"), // 일반 소비자 권한
-    ROLE_SHOP("상점"),      // 판매자 (상점) 권한
-    ROLE_RIDER("라이더"),   // 배달 기사 권한
-    ROLE_ADMIN("관리자");   // 관리자 권한
+    USER("일반 회원"), // 일반 소비자 권한
+    SHOP("상점"),      // 판매자 (상점) 권한
+    RIDER("라이더"),   // 배달 기사 권한
+    ADMIN("관리자");   // 관리자 권한
 
     // 화면/로그에서 사용할 설명
     private final String description;
