@@ -184,8 +184,70 @@ public class SecurityConfig {
         }
 
         @Bean
+        // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
+        // @Order(999)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
-                return null;
+                http
+                        /**
+                         * Security가 적용될 URL 범위 지정
+                         * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
+                         * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
+                         */
+                        .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**", "/images/**")
+                        /**
+                         * URL 접근 허용 설정
+                         */
+                        .authorizeHttpRequests(auth -> auth
+                                /* 인증 없이 접근 가능한 요청 목록 */
+                                .requestMatchers(
+                                        "/member/login",                // 로그인 페이지(GET)
+                                        "/member/register",             // 회원가입 페이지(GET/POST)
+                                        "/member/check-id",             // 아이디 중복 체크 AJAX
+                                        "/member/check-email",         // 이메일 중복 체크 AJAX
+                                        "/member/send-auth-code",       // 문자 전송 AJAX
+                                        "/member/verify-auth-code"      // 문자 인증코드 확인 AJAX
+                                ).permitAll()
+
+                                /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
+                                .anyRequest().authenticated()
+                        )
+
+                        /* 로그인 설정 */
+                        .formLogin(login -> login
+                                /* 로그인 페이지(GET) 경로 지정 */
+                                .loginPage("/member/login")
+                                /* 로그인 요청을 처리하는 URL (POST) */
+                                .loginProcessingUrl("/member/login")
+                                /* form에서 사용하는 input name 지정 */
+                                .usernameParameter("memberId")
+                                .passwordParameter("memberPw")
+                                /* 로그인 성공/실패 시 커스텀 핸들러 호출 */
+                                .successHandler(customLoginSuccessHandler)
+                                .failureHandler(customAuthFailureHandler)
+                        )
+
+                        /* 로그아웃 설정 */
+                        .logout(logout -> logout
+                                /* 로그아웃 요청 URL (POST) */
+                                .logoutUrl("/member/logout")
+                                /* 로그아웃 성공 시 이동할 URL */
+                                .logoutSuccessUrl("/")
+                                /* 세션 완전 삭제 */
+                                .invalidateHttpSession(true)
+                                /* JSESSIONID 쿠키 삭제 */
+                                .deleteCookies("JSESSIONID")
+                        )
+
+                        /**
+                         * CSRF 설정
+                         * - 개발 중에는 disable()로 비활성화할 수 있으나, 실제 운영 시에는 반드시 복원 필요
+                         * - 정식 오픈 전 반드시 다시 켜야 함.
+                         * - 테스트 동안만 CSRF 비활성화
+                         * - 테스트 후 아래 코드 주석 해제 필요
+                         * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
+                         */
+                        .csrf(csrf -> csrf.disable());
+                return http.build();
         }
 
         // 비밀번호 인코딩(암호화) BCryptPasswordEncoder 를 사용하여 복호화되지 않는 값으로 암호화 처리해 준다.
