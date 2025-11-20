@@ -1,0 +1,59 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 14.
+*  File : admin-login.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <title>모두의 빵</title>
+
+        <style>
+            body,
+            admin-login {
+                display: flex;
+                justify-content: center; /* 가로 중앙 */
+                align-items: center; /* 세로 중앙 */
+                height: 100vh; /* 화면 전체 높이 */
+                margin: 0;
+            }
+            .admin-login {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="admin-login">
+            <a th:href="@{/}">
+                <img src="/src/main/resources/static/image/common/everyoneBread_main_logo.png" width="500px" />
+                <!-- <img th:src="@{/image/common/everyoneBread_main_logo.png}" /> -->
+            </a>
+            <br />
+            <div class="login-box">
+                <form th:action="@{/admin/login}" method="post">
+                    <table>
+                        <tr>
+                            <th colspan="3" style="text-align: center">관리자 로그인</th>
+                        </tr>
+                        <tr>
+                            <td>아이디</td>
+                            <td><input type="text" name="id" class="id" /></td>
+                            <td rowspan="2"><button type="submit" name="login" value="login">로그인</button></td>
+                        </tr>
+                        <tr>
+                            <td>비밀번호</td>
+                            <td><input type="text" name="pw" class="pw" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </body>
+</html>
