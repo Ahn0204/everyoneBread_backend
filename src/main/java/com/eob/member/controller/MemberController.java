@@ -2,21 +2,15 @@ package com.eob.member.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.eob.member.model.data.MemberEntity;
+import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
-
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +20,6 @@ public class MemberController {
     private final MemberService memberService;
 
     // 로그인 페이지
-    // localhost:8080/member/login
     @GetMapping("login")
     public String loginPage() {
         return "member/member-login";
@@ -37,29 +30,43 @@ public class MemberController {
     public String selectAccount() {
         return "member/member-select";
     }
-    
-    // 회원가입
+
+    // 회원가입 페이지
     @GetMapping("register")
-    public String register(@RequestParam(name="role", defaultValue = "USER") String role, Model model) {
-        model.addAttribute("role", role);
+    public String registerPage(@RequestParam(defaultValue = "USER") String role, Model model) {
+        RegisterRequest dto = new RegisterRequest();
+        dto.setMemberRole(role);
+        model.addAttribute("registerRequest", dto);
         return "member/member-register";
     }
 
-    // 회원가입
-    @PostMapping("register")
-    public String register(MemberEntity member) {
-        // 유효성 검사 - 추가 예정
+    // 회원가입 처리
+    @PostMapping("/register")
+    public String register(
+            @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
+            BindingResult bindingResult,
+            HttpSession session
+    ) {
 
-        // DB 저장
-        memberService.saveMember(member);
+        // 1차 DTO @Valid 검증
+        if (bindingResult.hasErrors()) {
+            return "member/member-register";
+        }
 
-        // 비즈니스 계정(SELLER)이면 상점 등록 페이지로 이동
-        if("SELLER".equals(member.getMemberRole())){
+        // 서비스 로직 실행 → bindingResult에 오류 넣을 수 있음
+        memberService.register(dto, session, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            return "member/member-register";
+        }
+
+        // 상점 회원은 shop-register로 이동
+        if ("SHOP".equals(dto.getMemberRole())) {
             return "redirect:/shop/shop-register";
         }
 
-        // 일반 계정이면 로그인 페이지로 이동
-        return "redirect:/member/member-login";
+        // 일반 회원은 로그인으로 이동
+        return "redirect:/member/login";
     }
 
     // 아이디 중복 확인
@@ -74,14 +81,5 @@ public class MemberController {
     @ResponseBody
     public boolean checkEmail(@RequestParam("memberEmail") String memberEmail){
         return memberService.isMemberEmailAvailable(memberEmail);
-    }
-
-    // 휴대폰 인증번호 발송
-    @PostMapping("send-auth-code")
-    @ResponseBody
-    public String sendAuthCode(@RequestBody String memberPhone) {
-        // 인증번호 생성 ( 6자리)
-    //    String authCode = smsService.sendAuthCode(memberPhone);
-        return "123456"; // 예시로 고정된 인증번호 반환
     }
 }
