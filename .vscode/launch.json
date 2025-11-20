@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-EveryoneBreadApplication<everyoneBread>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.eob.EveryoneBreadApplication",
+            "projectName": "everyoneBread",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,248 @@
+# Created by https://www.toptal.com/developers/gitignore/api/windows,java,intellij,eclipse,gradle
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,java,intellij,eclipse,gradle
+
+### Eclipse ###
+# Eclipse 내부 메타데이터 (공유 불필요)
+.metadata                  
+# Eclipse 빌드 출력 디렉토리
+bin/                      
+# 임시 파일 폴더
+tmp/                     
+# 임시 파일
+*.tmp                     
+# 백업 파일
+*.bak                     
+# Vim swap 파일
+*.swp                     
+# Mac용 nib 임시 파일
+*~.nib                    
+# 로컬 전용 속성 파일
+local.properties          
+# Eclipse 프로젝트 설정(개별 개발 PC 전용)
+.settings/                
+# 로컬 환경 경로 설정
+.loadpath                 
+# Eclipse Recommenders(코드 추천 캐시)
+.recommenders             
+
+# External tool builders - 외부 빌더 구성
+.externalToolBuilders/
+
+# Locally stored launch configs - 로컬 Eclipse 실행 설정
+*.launch
+
+# PyDev (Eclipse Python) 프로젝트 파일
+*.pydevproject
+
+# Eclipse CDT(C/C++) 설정 파일
+.cproject
+
+# CDT autotools 설정
+.autotools
+
+# APT(Java Annotation Processor) 설정
+.factorypath
+
+# Eclipse PDT(PHP) 설정
+.buildpath
+
+# sbteclipse 플러그인 생성 대상
+.target
+
+# Tern JavaScript 도구 설정
+.tern-project
+
+# TeXlipse LaTeX 플러그인 설정
+.texlipse
+
+# Spring Tools Suite 전용 설정
+.springBeans
+
+# Code Recommenders 캐시
+.recommenders/
+
+# Annotation Processing 생성 출력물
+.apt_generated/
+.apt_generated_test/
+
+# Scala IDE 캐시
+.cache-main
+.scala_dependencies
+.worksheet
+
+# Eclipse 프로젝트 설명 파일 무시할 때 사용
+#.project
+
+### Eclipse Patch ###
+# Spring Boot Tooling 캐시
+.sts4-cache/
+
+### Intellij ###
+# JetBrains 제품군 IDE 설정들 (VSCode와 달리 IDE별 로컬 캐시 많음)
+# → 대부분 로컬 개발 환경 전용이므로 Git에 올리면 충돌·잡음 발생
+
+# 사용자 맞춤 설정
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# AWS 관련 로컬 설정
+.idea/**/aws.xml
+
+# 자동 생성된 모델 파일
+.idea/**/contentModel.xml
+
+# DB/UX 관련 로컬 캐시
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+
+# Gradle용 IntelliJ 설정
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Maven/Gradle auto-import 시 모듈 파일 재생성됨 → 충돌 방지용
+# 필요할 경우 주석 해제
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
+# .idea/modules.xml
+# .idea/*.iml
+# .idea/modules
+# *.iml
+# *.ipr
+
+# CMake 빌드 폴더
+cmake-build-*/
+
+# Mongo Explorer 설정
+.idea/**/mongoSettings.xml
+
+# 파일 기반 프로젝트 포맷
+*.iws
+
+# IntelliJ 자체 out 디렉토리
+out/
+
+# sbt-idea 플러그인
+.idea_modules/
+
+# JIRA 플러그인 설정
+atlassian-ide-plugin.xml
+
+# Cursive(Clojure) repl 상태
+.idea/replstate.xml
+
+# SonarLint 플러그인 캐시
+.idea/sonarlint/
+
+# Crashlytics 관련 파일
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# IntelliJ 내장 REST Client 요청 기록
+.idea/httpRequests
+
+# Android Studio 빌드 체크섬 캐시
+.idea/caches/build_file_checksums.ser
+
+### Intellij Patch ###
+# IDE 캐시/플러그인 구성 변경 등
+
+# *.iml (필요 시 무시)
+# modules.xml
+# .idea/misc.xml
+# *.ipr
+
+# Sonarlint
+.idea/**/sonarlint/
+
+# SonarQube 문제 기록
+.idea/**/sonarIssues.xml
+
+# Markdown Navigator 플러그인 캐시
+.idea/**/markdown-navigator.xml
+.idea/**/markdown-navigator-enh.xml
+.idea/**/markdown-navigator/
+
+# 캐시 파일 버그 대응
+.idea/$CACHE_FILE$
+
+# CodeStream 플러그인 설정
+.idea/codestream.xml
+
+# Azure Toolkit 플러그인 설정
+.idea/**/azureSettings.xml
+
+### Java ###
+*.class              # Java 컴파일 결과 파일 → Git에 올리면 안 됨
+*.log                # 로그 파일
+*.ctxt               # BlueJ IDE 파일
+.mtj.tmp/            # J2ME 임시 파일
+
+# 설정파일
+application.properties    
+# → application.properties 파일 무시
+
+!application-sample.properties  
+# → application-sample.properties 파일 무시 예외 처리 샘플파일 생성해서 작성
+
+# 패키징 산출물 무시 (빌드 시 생성)
+*.jar                # 단, Gradle Wrapper jar는 아래에서 예외 처리함
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# JVM 크래시 로그
+hs_err_pid*
+replay_pid*
+
+### Windows ###
+Thumbs.db                 # 윈도우 이미지 캐시
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+*.stackdump               # Windows 덤프 파일
+[Dd]esktop.ini            # 폴더 설정 파일
+$RECYCLE.BIN/             # 휴지통
+*.cab                     # 설치 패키지
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk                     # Windows 바로가기
+
+### Gradle ###
+.gradle                   # Gradle 캐시 폴더
+**/build/                 # Gradle 빌드 출력물
+!src/**/build/            # 소스 내 빌드가 필요한 경우만 예외
+
+gradle-app.setting        # Gradle GUI 설정
+
+# ⚠ Gradle Wrapper는 Git에 반드시 포함해야 하므로 예외 처리
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+.gradletasknamecache      # Gradle 태스크 캐시
+
+# Eclipse Gradle 플러그인이 생성하는 파일
+.project
+.classpath
+
+### Gradle Patch ###
+*.hprof                   # Java 힙 덤프 파일 (메모리 분석용)
+
+# End of https://www.toptal.com/developers/gitignore/api/windows,java,intellij,eclipse,gradle
+
