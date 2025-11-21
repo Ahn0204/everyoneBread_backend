@@ -28,13 +28,13 @@ public class AdminLoginSuccessHandler extends SavedRequestAwareAuthenticationSuc
         // 로그인한 유저의 권한을 꺼낸다(role값)
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        if (role.equals("ROLE_ADMIN")) { // 꺼낸 권한이 ADMIN이라면
+        if (role.equals("ADMIN")) { // 꺼낸 권한이 ADMIN이라면
             response.sendRedirect("/admin"); // 로그인 성공 시 /admin으로 이동
-        } else if (role.equals("ROLE_RIDER")) {
+        } else if (role.equals("RIDER")) {
             response.sendRedirect("/rider");
-        } else if (role.equals("ROLE_SHOP")) {
+        } else if (role.equals("SHOP")) {
             response.sendRedirect("/shop");
-        } else if (role.equals("ROLE_USER")) {
+        } else if (role.equals("USER")) {
             response.sendRedirect("/");
         }
 

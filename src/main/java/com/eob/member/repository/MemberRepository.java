@@ -16,6 +16,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
     Optional<MemberEntity> findByLoginMember(@Param("username") String username);
 
     // 아이디 중복 확인
+    // memberId가 이미 DB에 있으면 true 없으면 false.
     boolean existsByMemberId(String memberId);
 
     // 이메일 중복 확인

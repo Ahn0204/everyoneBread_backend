@@ -2,14 +2,21 @@ package com.eob.admin.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import com.eob.admin.model.data.InsertAdminForm;
+import com.eob.admin.model.service.AdminService;
+
+import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/admin") // http://localhost:8080/admin으로 접속 시 매핑
+@RequiredArgsConstructor
 public class AdminController {
+
+    public final AdminService adminService;
 
     // 시큐리티 사용 시 로그인 페이지로 매핑 예정?
     @GetMapping("/login")
@@ -51,10 +58,13 @@ public class AdminController {
     public String postMethodName(InsertAdminForm insertAdminForm) {
 
         // 계정 추가
-        adminService.insertAdmin(insertAdminForm);
+        boolean insert = adminService.insertAdmin(insertAdminForm);
 
         // 성공 시 터미널에 계정이름 출력
-        System.out.println("adminName:" + insertAdminForm.getName());
+        if (insert) {
+            System.out.println("adminName:" + insertAdminForm.getName());
+        }
+        // 일단 되는지 확인, 회원가입 로직완성되면 성공 시 실패시 알림 띄우기 여부 &리다이렉트 페이지 매핑 다시
         return "redirect:/admin-list";
     }
 
