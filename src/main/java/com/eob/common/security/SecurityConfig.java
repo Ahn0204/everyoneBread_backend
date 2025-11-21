@@ -2,7 +2,6 @@ package com.eob.common.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.eob.common.security.admin.AdminLoginSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,8 @@ public class SecurityConfig {
         private final CustomAuthFailureHandler customAuthFailureHandler;
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
+
+        private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
         @Bean
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
@@ -180,7 +183,43 @@ public class SecurityConfig {
 
         @Bean
         SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
-                return null;
+                http
+                                // url이 /admin/~인 요청에 이 필터체인 적용
+                                .securityMatcher("/admin/**")
+                                .authorizeHttpRequests((auth) -> auth
+                                                // 관리자 로그인 페이지의 모든 사용자 접근 허용
+                                                .requestMatchers("/admin/login").permitAll()
+                                                // 관리자만 관리자 페이지 접근 허용
+                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                // 이외 모든 경로 관리자만 접근 허용
+                                // .anyRequest().hasRole("ADMIN"))
+                                );
+
+                http // 관리자 로그인 페이지 설정&처리
+                                .formLogin((auth) -> auth
+                                                // 관리자 로그인 페이지 설정
+                                                .loginPage("/admin/login")
+                                                // 로그인 처리 url
+                                                .loginProcessingUrl("/admin/login")
+                                                // username파라미터의 이름
+                                                .usernameParameter("id")
+                                                // password파라미터의 이름
+                                                .passwordParameter("pw")
+                                                // 로그인 성공시의 동작 정의(핸들러)
+                                                .successHandler(adminLoginSuccessHandler)
+                                                // 로그인 성공 시 리다이렉트 될 url
+                                                // .defaultSuccessUrl("/admin", true) // 항상 이 url사용함(강제이동)
+                                                // 로그인 실패시의 동작 정의(핸들러)
+                                                .failureHandler(customAuthFailureHandler)
+                                                .permitAll());
+
+                // http
+                // .logout((auth) -> auth
+                // //로그아웃 요청
+                // );
+
+                return http.build();
+
         }
 
         @Bean
@@ -190,7 +229,6 @@ public class SecurityConfig {
 
         // 비밀번호 인코딩(암호화) BCryptPasswordEncoder 를 사용하여 복호화되지 않는 값으로 암호화 처리해 준다.
         // - BCrypt는 솔트(salt)를 내부에서 자동 생성하여 해시에 포함한다.
-        // -
         // member.setMemberPw(passwordEncoder.encode(memberRegisterForm.getMemberPw()));
         @Bean
         PasswordEncoder passwordEncoder() {
