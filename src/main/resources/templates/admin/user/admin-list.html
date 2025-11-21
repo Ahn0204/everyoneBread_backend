@@ -11,20 +11,40 @@
     </head>
 
     <!--본문-->
-    <div layout:fragment="content">
-        <p>관리자 계정 추가</p>
-        <div>
-            <form th:action="@{/insertAdmin}" method="post" name="insertAdminForm">
-                이름 &nbsp;
-                <input type="text" name="adminName" class="me-1" />
-                아이디 &nbsp;
-                <input type="text" name="adminId" class="me-1" />
-                비밀번호 &nbsp;
-                <input type="password" name="adminPassword" class="me-1" />
-                <input type="button" value="계정 추가" id="btn btn-insertAdmin" />
-            </form>
+    <body>
+        <div layout:fragment="content">
+            <p>관리자 계정 추가</p>
+            <div>
+                <form th:action="@{/insertAdmin}" method="post" name="insertAdminForm">
+                    이름 &nbsp;
+                    <input type="text" name="adminName" class="me-1" />
+                    아이디 &nbsp;
+                    <input type="text" name="adminId" class="me-1" />
+                    비밀번호 &nbsp;
+                    <input type="password" name="adminPassword" class="me-1" />
+                    <input type="button" value="계정 추가" class="btn insertAdmin btn-secondary"/>
+                    <script></script>
+                </form>
+            </div>
         </div>
-    </div>
+        
+        <script layout:fragment="script">
+            $('.insertAdmin').on('click',function(){
+                //sweetAlert적용
+                showConfirmAlert(
+                    '관리자 계정을 추가하시겠습니까?', // 표시할 메시지
+                    () => {
+                        return true; //폼 제출
+                        showToast('추가 완료', 'success'); // 토스트도 같이 표시 (showSuccessAlert도 사용가능)
+                    },
+                    () => {
+                        // 사용자가 '아니오'를 눌렀을 때 실행
+                        return false; //폼 제출방지
+                        showToast('취소', 'error');
+                    }
+                ) ;
+            });
 
-    <script layout:fragment="script"></script>
+        </script>
+    </body>
 </html>

@@ -1,5 +1,6 @@
 package com.eob.admin.model.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.eob.admin.model.data.InsertAdminForm;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class AdminService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public boolean insertAdmin(InsertAdminForm form) {
 
@@ -28,7 +30,7 @@ public class AdminService {
             // 새 회원 정보 저장할 엔티티 생성
             MemberEntity member = new MemberEntity();
             member.setMemberId(form.getId());
-            member.setMemberPw(form.getPw());
+            member.setMemberPw(passwordEncoder.encode(form.getPw())); //암호화
             member.setMemberName(form.getName());
             // 이하 관리자 계정용 정보 대입
             member.setMemberJumin("000000-0000000");

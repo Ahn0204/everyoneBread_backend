@@ -188,10 +188,10 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login").permitAll()
+                                                .requestMatchers("/admin/login", "/admin/user/admin-list","/insertAdmin").permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                // 이외 모든 경로 관리자만 접근 허용
+                                                // 이외 모든 경로 관리자만 접근 허용
                                 // .anyRequest().hasRole("ADMIN"))
                                 );
 
@@ -217,6 +217,10 @@ public class SecurityConfig {
                 // .logout((auth) -> auth
                 // //로그아웃 요청
                 // );
+
+                http
+                                .securityMatcher("/admin/**")
+                                .csrf(csrf -> csrf.disable());
 
                 return http.build();
 
