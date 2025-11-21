@@ -153,7 +153,7 @@
 
             <div class="login-title">로그인</div>
 
-            <form th:action="/member/login" method="post">
+            <form th:action="@{/member/login}" method="post">
                 <input type="text" class="login-input" name="memberId" placeholder="아이디를 입력해주세요." required/>
                 <input type="password" class="login-input" name="memberPw" placeholder="비밀번호를 입력해주세요." required/>
 

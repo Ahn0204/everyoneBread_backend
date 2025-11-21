@@ -31,9 +31,9 @@ public class SecurityConfig {
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
-    SecurityConfig(CustomDetailService customDetailService) {
-        this.customDetailService = customDetailService;
-    }
+//     SecurityConfig(CustomDetailService customDetailService) {
+//         this.customDetailService = customDetailService;
+//     }
 
         @Bean
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
