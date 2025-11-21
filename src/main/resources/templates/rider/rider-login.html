@@ -274,6 +274,27 @@
             .btn-a:hover {
                 color: #8dc0ff;
             }
+
+            /*자동 로그인*/
+            /* 옵션 영역 (자동로그인, 링크들) */
+            .login-options {
+                text-align: left; /* 기본 정렬 */
+                margin-bottom: 30px;
+                font-size: 14px;
+                color: #333;
+            }
+
+            /* 자동 로그인 체크박스 영역 */
+            .auto-login-area {
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            .auto-login-area input {
+                margin-right: 8px;
+                transform: scale(1.2); /* 체크박스 크기 살짝 키움 */
+            }
         </style>
     </head>
     <body>
@@ -313,6 +334,10 @@
                         <input type="password" name="riderPw" id="riderPw" class="form-control custom-input" placeholder="비밀번호" />
                         <label for="password" class="custom-label">비밀번호</label>
                         <i class="bi bi-eye-slash-fill position-absolute top-50 end-0 translate-middle-y me-3" id="pwToggleIcon" style="cursor: pointer; font-size: 20px; color: #bdbdbd !important" title="비밀번호 보기"></i>
+                    </div>
+                    <div class="auto-login-area">
+                        <input type="checkbox" id="autoLogin" name="autoLogin" />
+                        <label for="autoLogin">자동 로그인</label>
                     </div>
                     <!-- 로그인 button-->
                     <div class="mt-4">
