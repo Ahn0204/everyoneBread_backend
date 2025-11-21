@@ -42,7 +42,7 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
             redirectURL = "/admin/login";
         } else {
             // 기본 로그인 페이지
-            redirectURL = "/login";
+            redirectURL = "/member/login";
         }
 
         // 4. 해당 URL로 이동
