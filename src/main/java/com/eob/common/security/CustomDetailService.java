@@ -72,6 +72,7 @@ public class CustomDetailService implements UserDetailsService {
             case SHOP:
                 ShopEntity shop = shopRepository.loginShop(member)
                         .orElseThrow(() -> new DisabledException("가게 정보가 없습니다."));
+                break;
             case ADMIN:
                 break;
             case USER:

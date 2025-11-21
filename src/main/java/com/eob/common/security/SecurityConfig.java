@@ -23,11 +23,17 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomDetailService customDetailService;
+
         private final CustomAuthFailureHandler customAuthFailureHandler;
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+
+    SecurityConfig(CustomDetailService customDetailService) {
+        this.customDetailService = customDetailService;
+    }
 
         @Bean
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
@@ -236,7 +242,7 @@ public class SecurityConfig {
                          * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                          * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                          */
-                        .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**", "/images/**")
+                        .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**", "/image/**")
                         /**
                          * URL 접근 허용 설정
                          */
@@ -269,6 +275,35 @@ public class SecurityConfig {
                                 .failureHandler(customAuthFailureHandler)
                         )
 
+                        /* 자동 로그인 remember-me */
+                        .rememberMe(remember -> remember
+                                /**
+                                 * remember-me 기능의 암호화 key
+                                 * - 이 값이 바뀌면 기존 remember-me 쿠키는 모두 무효가 된다.
+                                 * - 프로젝트 고유 문자열을 넣어야 하며 외부에 노출되면 안 된다.
+                                 */
+                                .key("everyoneBreadRememberKey")
+                                /**
+                                 * 사용자가 체크박스를 선택했을 때 전달되는 파라미터 이름
+                                 * - 로그인 폼 input name="autoLogin" 과 반드시 일치해야 한다.
+                                 * - 체크 시 "autoLogin=on" 값이 서버로 넘어와 remember-me가 활성화된다.
+                                 */
+                                .rememberMeParameter("autoLogin")
+                                /**
+                                 * 자동 로그인 유지 기간 설정 (초 단위)
+                                 * - 60초 * 60분 * 24시간 * 30일 = 30일 동안 로그인 유지
+                                 * - 기간 내 브라우저를 껐다 켜도 다시 자동 로그인 됨
+                                 */
+                                .tokenValiditySeconds(60 * 60 * 24 * 30)
+                                /**
+                                 * remember-me 토큰으로 자동 로그인할 때
+                                 * 사용자 정보를 불러올 customUserDetailsService 지정
+                                 * - 이 서비스가 DB에서 회원 정보를 조회하여 인증을 복원한다.
+                                 * - 반드시 설정해야 remember-me가 정상 작동한다.
+                                 */
+                                .userDetailsService(customDetailService)
+                        )
+
                         /* 로그아웃 설정 */
                         .logout(logout -> logout
                                 /* 로그아웃 요청 URL (POST) */
@@ -277,8 +312,8 @@ public class SecurityConfig {
                                 .logoutSuccessUrl("/")
                                 /* 세션 완전 삭제 */
                                 .invalidateHttpSession(true)
-                                /* JSESSIONID 쿠키 삭제 */
-                                .deleteCookies("JSESSIONID")
+                                /* JSESSIONID 쿠키 삭제 및 자동 로그인 쿠키 삭제 */
+                                .deleteCookies("JSESSIONID", "remember-me")
                         )
 
                         /**

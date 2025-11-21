@@ -1,5 +1,6 @@
 package com.eob.member.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.eob.member.model.data.MemberEntity;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입 처리 전체 로직
@@ -50,11 +52,19 @@ public class MemberService {
         MemberEntity entity = new MemberEntity();
 
         entity.setMemberId(dto.getMemberId());
-        entity.setMemberPw(dto.getMemberPw());   // TODO: 추후 암호화 적용
+        // 비밀번호 암호화
+        String encodedPw = passwordEncoder.encode(dto.getMemberPw());
+        entity.setMemberPw(encodedPw);
         entity.setMemberName(dto.getMemberName());
         entity.setMemberEmail(dto.getMemberEmail());
         entity.setMemberPhone(dto.getMemberPhone());
-        entity.setMemberAddress(dto.getMemberAddress());
+        /* 주소 조합 (기본주소 + 상세주소) */
+        String fullAddress = dto.getMemberAddress();
+        if (dto.getMemberAddressDetail() != null && !dto.getMemberAddressDetail().isBlank()) {
+            fullAddress += " " + dto.getMemberAddressDetail();
+        }
+        entity.setMemberAddress(fullAddress);
+
 
         // 주민등록번호 합치기
         entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
