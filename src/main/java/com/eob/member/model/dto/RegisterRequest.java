@@ -75,6 +75,10 @@ public class RegisterRequest {
     @Size(min = 5, message = "주소를 정확히 입력해주세요.")
     private String memberAddress;
 
+    // 상세주소 (선택 입력)
+    @Size(max = 100, message = "상세주소가 너무 깁니다.")
+    private String memberAddressDetail;
+
     //  회원 역할
     //  USER / SHOP
     @NotBlank(message = "회원 유형이 지정되지 않았습니다.")

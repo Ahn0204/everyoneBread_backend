@@ -116,37 +116,72 @@
                 background-color: #000;
                 color: #fff;
             }
+
+            /* 우측 상단 드롭다운 박스 */
+            .other-login-box {
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+
+            /* 드롭다운 select 스타일 */
+            .other-login-select {
+                padding: 8px 12px;
+                border: 2px solid #000;
+                border-radius: 5px;
+                font-size: 14px;
+                background-color: #fff;
+                cursor: pointer;
+            }
         </style>
     </head>
+
     <body>
         <div class="login-container">
-            <a th:href="@{/}">
+            <!-- <a th:href="@{/}">
                 <img src="/image/common/everyoneBread_main_logo.png" th:src="@{/image/common/everyoneBread_main_logo.png}" class="logo-img" alt="Logo" />
-            </a>
+            </a> -->
+
+            <!-- 우측 상단 드롭다운 -->
+            <div class="other-login-box">
+                <select id="otherLoginSelect" class="other-login-select">
+                    <option value="">다른 로그인</option>
+                    <option value="/shop/login">판매자 로그인</option>
+                    <option value="/rider/login">라이더 로그인</option>
+                </select>
+            </div>
 
             <div class="login-title">로그인</div>
 
-            <form action="#" method="post">
-                <input type="text" class="login-input" placeholder="아이디를 입력해주세요." />
-                <input type="password" class="login-input" placeholder="비밀번호를 입력해주세요." />
+            <form th:action="/member/login" method="post">
+                <input type="text" class="login-input" name="memberId" placeholder="아이디를 입력해주세요." required/>
+                <input type="password" class="login-input" name="memberPw" placeholder="비밀번호를 입력해주세요." required/>
 
                 <div class="login-options">
                     <div class="auto-login-area">
-                        <input type="checkbox" id="autoLogin" />
+                        <input type="checkbox" id="autoLogin" name="autoLogin" />
                         <label for="autoLogin">자동 로그인</label>
                     </div>
 
                     <div class="links-area">
-                        <a href="#">아이디 찾기</a>
+                        <a th:href="@{/member/find-modal}">아이디 찾기</a>
                         |
-                        <a href="#">비밀번호 재설정</a>
+                        <a th:href="@{/member/find-modal}">비밀번호 재설정</a>
                         |
-                        <a href="#">회원가입</a>
+                        <a th:href="@{/member/register}">회원가입</a>
                     </div>
                 </div>
 
                 <button type="submit" class="login-btn">로그인</button>
             </form>
         </div>
+        <script>
+        document.getElementById("otherLoginSelect").addEventListener("change", function () {
+            const url = this.value;
+            if (url) {
+                window.location.href = url;
+            }
+        });
+        </script>
     </body>
 </html>

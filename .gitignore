@@ -246,3 +246,4 @@ gradle-app.setting        # Gradle GUI 설정
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,java,intellij,eclipse,gradle
 
+.gradle/8.14.3/fileHashes/fileHashes.lock
