@@ -54,7 +54,7 @@ public class CustomDetailService implements UserDetailsService {
         }
 
         switch (member.getMemberRole()) {
-            case ROLE_RIDER:
+            case RIDER:
                 RiderEntity rider = riderRepository.findByMember(member)
                         .orElseThrow(() -> new DisabledException("라이더 정보가 없습니다."));
                 switch (rider.getAStatus()) {
@@ -69,12 +69,12 @@ public class CustomDetailService implements UserDetailsService {
                 }
                 break;
 
-            case ROLE_SHOP:
+            case SHOP:
                 ShopEntity shop = shopRepository.loginShop(member)
                         .orElseThrow(() -> new DisabledException("가게 정보가 없습니다."));
-            case ROLE_ADMIN:
+            case ADMIN:
                 break;
-            case ROLE_USER:
+            case USER:
                 break;
 
             default:

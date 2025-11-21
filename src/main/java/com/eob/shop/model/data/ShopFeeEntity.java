@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.member.model.data.MemberEntity;
-import com.eob.order.model.data.OrderHistoryEntity;
+// import com.eob.order.model.data.OrderHistoryEntity;
 
 @Entity
 @Table(name = "SHOP_FEE")

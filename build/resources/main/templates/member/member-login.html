@@ -1,0 +1,152 @@
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <title>모두의빵</title>
+
+        <style>
+            /* 기본 초기화 및 폰트 설정 */
+            * {
+                box-sizing: border-box;
+                font-family: 'Noto Sans KR', sans-serif;
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background-color: #fff;
+            }
+
+            /* 전체 컨테이너 */
+            .login-container {
+                width: 100%;
+                max-width: 400px; /* 너비 제한 */
+                text-align: center;
+                padding: 20px;
+            }
+
+            /* 로고 이미지 */
+            .logo-img {
+                width: 100%;
+                max-width: 250px; /* 로고 크기 조절 */
+                margin-bottom: 20px;
+            }
+
+            /* "로그인" 타이틀 */
+            .login-title {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 40px;
+                color: #000;
+            }
+
+            /* 입력창 스타일 (이미지처럼 테두리 있고 텍스트 중앙 정렬) */
+            .login-input {
+                width: 100%;
+                padding: 15px;
+                margin-bottom: 15px;
+                border: 2px solid #000; /* 진한 테두리 */
+                border-radius: 5px; /* 살짝 둥글게 */
+                font-size: 16px;
+                text-align: center; /* 텍스트 중앙 정렬 */
+                outline: none;
+            }
+
+            .login-input:focus {
+                background-color: #f9f9f9;
+            }
+
+            /* 옵션 영역 (자동로그인, 링크들) */
+            .login-options {
+                text-align: left; /* 기본 정렬 */
+                margin-bottom: 30px;
+                font-size: 14px;
+                color: #333;
+            }
+
+            /* 자동 로그인 체크박스 영역 */
+            .auto-login-area {
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            .auto-login-area input {
+                margin-right: 8px;
+                transform: scale(1.2); /* 체크박스 크기 살짝 키움 */
+            }
+
+            /* 링크 영역 (아이디 찾기 등) */
+            .links-area {
+                text-align: center;
+                margin-top: 10px;
+            }
+
+            .links-area a {
+                text-decoration: none;
+                color: #333;
+                margin: 0 5px;
+            }
+
+            .links-area a:hover {
+                text-decoration: underline;
+            }
+
+            /* 로그인 버튼 */
+            .login-btn {
+                width: 100%;
+                padding: 15px;
+                background-color: #fff;
+                border: 2px solid #000;
+                border-radius: 5px;
+                font-size: 18px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .login-btn:hover {
+                background-color: #000;
+                color: #fff;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="login-container">
+            <a th:href="@{/}">
+                <img src="/image/common/everyoneBread_main_logo.png" th:src="@{/image/common/everyoneBread_main_logo.png}" class="logo-img" alt="Logo" />
+            </a>
+
+            <div class="login-title">로그인</div>
+
+            <form action="#" method="post">
+                <input type="text" class="login-input" placeholder="아이디를 입력해주세요." />
+                <input type="password" class="login-input" placeholder="비밀번호를 입력해주세요." />
+
+                <div class="login-options">
+                    <div class="auto-login-area">
+                        <input type="checkbox" id="autoLogin" />
+                        <label for="autoLogin">자동 로그인</label>
+                    </div>
+
+                    <div class="links-area">
+                        <a href="#">아이디 찾기</a>
+                        |
+                        <a href="#">비밀번호 재설정</a>
+                        |
+                        <a href="#">회원가입</a>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">로그인</button>
+            </form>
+        </div>
+    </body>
+</html>

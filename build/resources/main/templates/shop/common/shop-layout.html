@@ -1,0 +1,35 @@
+
+<!--
+******************************************
+*  File : shop-layout.html
+*  Desc : 판매자 페이지 공통 레이아웃
+*******************************************
+-->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+
+    <!-- jQuery / SweetAlert -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- 판매자 공통 CSS (파일 만들면 활성화) -->
+    <!-- <link rel="stylesheet" th:href="@{/css/shop/shop-common.css}"> -->
+
+    <title>모두의 빵 - 판매자</title>
+</head>
+
+<body>
+
+    <!-- 판매자 공통 헤더 -->
+    <div th:insert="shop/common/shop-header :: shop-header"></div>
+
+    <!-- 개별 페이지에서 채우는 영역 -->
+    <th:block shop-layout:fragment="content"></th:block>
+
+    <!-- 판매자 공통 푸터 -->
+    <div th:insert="shop/common/shop-footer :: shop-footer"></div>
+
+</body>
+</html>

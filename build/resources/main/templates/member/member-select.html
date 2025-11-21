@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 유형 선택</title>
+</head>
+<body>
+
+<h1>회원가입 유형 선택</h1>
+<hr>
+
+<div>
+    <p>가입할 계정 유형을 선택해주세요.</p>
+</div>
+
+<!-- 일반 계정 -->
+<div>
+    <a href="/member/register?role=USER">
+        <button type="button">일반 계정</button>
+    </a>
+</div> 
+<br>
+<br>
+<!-- 비즈니스 계정 -->
+<div>
+    <a href="/member/register?role=SELLER">
+        <button type="button">비즈니스 계정</button>
+    </a>
+</div>
+
+</body>
+</html>

@@ -100,6 +100,18 @@ public class MemberEntity {
     @Column(name = "MEMBER_ROLE")
     private MemberRoleStatus memberRole;
 
+    /**
+     * 위도
+     */
+    @Column(name = "LATITUDE")
+    private Double latitude;
+
+    /**
+     * 경도
+     */
+    @Column(name = "LONGITUDE")
+    private Double longitude;
+
     // 회원가입 시 createdAt 자동 설정
     @PrePersist
     protected void onCreate() {

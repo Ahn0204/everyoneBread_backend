@@ -1,0 +1,94 @@
+package com.eob.member.service;
+
+import org.springframework.stereotype.Service;
+
+import com.eob.member.model.data.MemberEntity;
+import com.eob.member.model.data.MemberRoleStatus;
+import com.eob.member.model.dto.RegisterRequest;
+import com.eob.member.repository.MemberRepository;
+
+import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
+import org.springframework.validation.BindingResult;
+
+@Service
+@RequiredArgsConstructor
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+
+    /**
+     * 회원가입 처리 전체 로직
+     */
+    public void register(RegisterRequest dto, HttpSession session, BindingResult bindingResult) {
+
+        /* 아이디 중복 */
+        if (!isMemberIdAvailable(dto.getMemberId())) {
+            bindingResult.rejectValue("memberId", "duplicateId", "이미 사용 중인 아이디입니다.");
+            return;
+        }
+
+        /* 이메일 중복 */
+        if (!isMemberEmailAvailable(dto.getMemberEmail())) {
+            bindingResult.rejectValue("memberEmail", "duplicateEmail", "이미 사용 중인 이메일입니다.");
+            return;
+        }
+
+        /* 비밀번호 일치 확인 */
+        if (!dto.getMemberPw().equals(dto.getMemberPwConfirm())) {
+            bindingResult.rejectValue("memberPwConfirm", "pwMismatch", "비밀번호가 일치하지 않습니다.");
+            return;
+        }
+
+        /* 휴대폰 인증 여부 */
+        if (!isPhoneVerified(dto.getMemberPhone(), session)) {
+            bindingResult.rejectValue("memberPhone", "phoneNotVerified", "휴대폰 인증을 완료해주세요.");
+            return;
+        }
+
+        /* MemberEntity 생성 및 DTO → 엔티티 변환 */
+        MemberEntity entity = new MemberEntity();
+
+        entity.setMemberId(dto.getMemberId());
+        entity.setMemberPw(dto.getMemberPw());   // TODO: 추후 암호화 적용
+        entity.setMemberName(dto.getMemberName());
+        entity.setMemberEmail(dto.getMemberEmail());
+        entity.setMemberPhone(dto.getMemberPhone());
+        entity.setMemberAddress(dto.getMemberAddress());
+
+        // 주민등록번호 합치기
+        entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
+
+        // 역할 세팅
+        entity.setMemberRole(MemberRoleStatus.valueOf(dto.getMemberRole()));
+
+        /* 저장 */
+        memberRepository.save(entity);
+
+        /* 인증 세션 제거 */
+        cleanupPhoneAuth(dto.getMemberPhone(), session);
+    }
+
+    // 아이디 중복 확인
+    public boolean isMemberIdAvailable(String memberId){
+        return !memberRepository.existsByMemberId(memberId);
+    }
+
+    // 이메일 중복 확인
+    public boolean isMemberEmailAvailable(String memberEmail){
+        return !memberRepository.existsByMemberEmail(memberEmail);
+    }
+
+    // 휴대폰 인증 여부 확인
+    public boolean isPhoneVerified(String phone, HttpSession session) {
+        String verified = (String) session.getAttribute("AUTH_OK_" + phone);
+        return "OK".equals(verified);
+    }
+
+    // 휴대폰 인증 세션 정리
+    private void cleanupPhoneAuth(String phone, HttpSession session) {
+        session.removeAttribute("AUTH_CODE_" + phone);
+        session.removeAttribute("AUTH_EXPIRE_" + phone);
+        session.removeAttribute("AUTH_OK_" + phone);
+    }
+}
