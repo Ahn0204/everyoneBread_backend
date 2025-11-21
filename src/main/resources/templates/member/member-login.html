@@ -154,8 +154,8 @@
             <div class="login-title">로그인</div>
 
             <form th:action="/member/login" method="post">
-                <input type="text" class="login-input" name="memberId" placeholder="아이디를 입력해주세요." required/>
-                <input type="password" class="login-input" name="memberPw" placeholder="비밀번호를 입력해주세요." required/>
+                <input type="text" class="login-input" name="memberId" placeholder="아이디를 입력해주세요." required />
+                <input type="password" class="login-input" name="memberPw" placeholder="비밀번호를 입력해주세요." required />
 
                 <div class="login-options">
                     <div class="auto-login-area">
@@ -176,12 +176,12 @@
             </form>
         </div>
         <script>
-        document.getElementById("otherLoginSelect").addEventListener("change", function () {
-            const url = this.value;
-            if (url) {
-                window.location.href = url;
-            }
-        });
+            document.getElementById('otherLoginSelect').addEventListener('change', function () {
+                const url = this.value;
+                if (url) {
+                    window.location.href = url;
+                }
+            });
         </script>
     </body>
 </html>

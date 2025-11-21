@@ -166,16 +166,15 @@
         <!--ajax사용시 csrf헤더 생성-->
         <!--fragment로 쓰이는 script에 선언하면 덮어쓰기됨-->
         <script type="text/javascript">
-                $(function () {
-                    const token = $('meta[name="_csrf"]').attr('content');
-                    const header = $('meta[name="_csrf_header"]').attr('content');
-                    $(document).ajaxSend(function (e, xhr) {
-                        if (token && header) xhr.setRequestHeader(header, token);
-                    });
+            $(function () {
+                const token = $('meta[name="_csrf"]').attr('content');
+                const header = $('meta[name="_csrf_header"]').attr('content');
+                $(document).ajaxSend(function (e, xhr) {
+                    if (token && header) xhr.setRequestHeader(header, token);
                 });
+            });
         </script>
         <!--자식 script 삽입부-->
-        <script layout:fragment="script" type="text/javascript">
-        </script>
+        <script layout:fragment="script" type="text/javascript"></script>
     </body>
 </html>

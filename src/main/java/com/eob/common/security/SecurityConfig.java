@@ -23,17 +23,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomDetailService customDetailService;
+        private final CustomDetailService customDetailService;
 
         private final CustomAuthFailureHandler customAuthFailureHandler;
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
-
-    SecurityConfig(CustomDetailService customDetailService) {
-        this.customDetailService = customDetailService;
-    }
 
         @Bean
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
@@ -59,9 +55,12 @@ public class SecurityConfig {
                                                 // 인증 불필요한 페이지 지정
                                                 // .requestMatchers("/rider/login").permitAll()
                                                 // - /rider/login 경로에 대해서는 누구나 접근 허용(인증 불필요)하도록 설정
+                                                // - 정적리소스(css,js,image,fonts,lib 등) 정적인 리소스는 접근 가능하도록 설정
                                                 // 로그인 페이지에 접근하기 위해서는 로그인하지 않아도 접근(접속)할 수 있도록 설정하는 것.
                                                 // - permitAll()은 Security가 내부적으로 익명의 사용자(AnonymousUser)도 접근 허용하게 만들어준다.
-                                                .requestMatchers("/rider/login").permitAll()
+                                                .requestMatchers("/rider/login", "/css/**", "/js/**", "/image/**",
+                                                                "/fonts/**", "/lib/**")
+                                                .permitAll()
 
                                                 // 위에 명시하지 않은 나머지 요청에 대한 인증설정
                                                 // .anyRequest().permitAll()
@@ -194,10 +193,12 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login", "/admin/user/admin-list","/insertAdmin").permitAll()
+                                                .requestMatchers("/admin/login", "/admin/user/admin-list",
+                                                                "/insertAdmin")
+                                                .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                                // 이외 모든 경로 관리자만 접근 허용
+                                // 이외 모든 경로 관리자만 접근 허용
                                 // .anyRequest().hasRole("ADMIN"))
                                 );
 
@@ -237,94 +238,97 @@ public class SecurityConfig {
         // @Order(999)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
                 http
-                        /**
-                         * Security가 적용될 URL 범위 지정
-                         * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
-                         * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
-                         */
-                        .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**", "/image/**")
-                        /**
-                         * URL 접근 허용 설정
-                         */
-                        .authorizeHttpRequests(auth -> auth
-                                /* 인증 없이 접근 가능한 요청 목록 */
-                                .requestMatchers(
-                                        "/member/login",                // 로그인 페이지(GET)
-                                        "/member/register",             // 회원가입 페이지(GET/POST)
-                                        "/member/check-id",             // 아이디 중복 체크 AJAX
-                                        "/member/check-email",         // 이메일 중복 체크 AJAX
-                                        "/member/send-auth-code",       // 문자 전송 AJAX
-                                        "/member/verify-auth-code"      // 문자 인증코드 확인 AJAX
-                                ).permitAll()
-
-                                /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
-                                .anyRequest().authenticated()
-                        )
-
-                        /* 로그인 설정 */
-                        .formLogin(login -> login
-                                /* 로그인 페이지(GET) 경로 지정 */
-                                .loginPage("/member/login")
-                                /* 로그인 요청을 처리하는 URL (POST) */
-                                .loginProcessingUrl("/member/login")
-                                /* form에서 사용하는 input name 지정 */
-                                .usernameParameter("memberId")
-                                .passwordParameter("memberPw")
-                                /* 로그인 성공/실패 시 커스텀 핸들러 호출 */
-                                .successHandler(customLoginSuccessHandler)
-                                .failureHandler(customAuthFailureHandler)
-                        )
-
-                        /* 자동 로그인 remember-me */
-                        .rememberMe(remember -> remember
                                 /**
-                                 * remember-me 기능의 암호화 key
-                                 * - 이 값이 바뀌면 기존 remember-me 쿠키는 모두 무효가 된다.
-                                 * - 프로젝트 고유 문자열을 넣어야 하며 외부에 노출되면 안 된다.
+                                 * Security가 적용될 URL 범위 지정
+                                 * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
+                                 * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .key("everyoneBreadRememberKey")
+                                .securityMatcher("/member/**")
+                                // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
+                                // "/image/**")
                                 /**
-                                 * 사용자가 체크박스를 선택했을 때 전달되는 파라미터 이름
-                                 * - 로그인 폼 input name="autoLogin" 과 반드시 일치해야 한다.
-                                 * - 체크 시 "autoLogin=on" 값이 서버로 넘어와 remember-me가 활성화된다.
+                                 * URL 접근 허용 설정
                                  */
-                                .rememberMeParameter("autoLogin")
-                                /**
-                                 * 자동 로그인 유지 기간 설정 (초 단위)
-                                 * - 60초 * 60분 * 24시간 * 30일 = 30일 동안 로그인 유지
-                                 * - 기간 내 브라우저를 껐다 켜도 다시 자동 로그인 됨
-                                 */
-                                .tokenValiditySeconds(60 * 60 * 24 * 30)
-                                /**
-                                 * remember-me 토큰으로 자동 로그인할 때
-                                 * 사용자 정보를 불러올 customUserDetailsService 지정
-                                 * - 이 서비스가 DB에서 회원 정보를 조회하여 인증을 복원한다.
-                                 * - 반드시 설정해야 remember-me가 정상 작동한다.
-                                 */
-                                .userDetailsService(customDetailService)
-                        )
+                                .authorizeHttpRequests(auth -> auth
+                                                /* 인증 없이 접근 가능한 요청 목록 */
+                                                .requestMatchers(
+                                                                "/member/login", // 로그인 페이지(GET)
+                                                                "/member/register", // 회원가입 페이지(GET/POST)
+                                                                "/member/check-id", // 아이디 중복 체크 AJAX
+                                                                "/member/check-email", // 이메일 중복 체크 AJAX
+                                                                "/member/send-auth-code", // 문자 전송 AJAX
+                                                                "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                "/css/**",
+                                                                "/js/**",
+                                                                "/image/**",
+                                                                "/fonts/**",
+                                                                "/lib/**")
+                                                .permitAll()
 
-                        /* 로그아웃 설정 */
-                        .logout(logout -> logout
-                                /* 로그아웃 요청 URL (POST) */
-                                .logoutUrl("/member/logout")
-                                /* 로그아웃 성공 시 이동할 URL */
-                                .logoutSuccessUrl("/")
-                                /* 세션 완전 삭제 */
-                                .invalidateHttpSession(true)
-                                /* JSESSIONID 쿠키 삭제 및 자동 로그인 쿠키 삭제 */
-                                .deleteCookies("JSESSIONID", "remember-me")
-                        )
+                                                /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
+                                                .anyRequest().authenticated())
 
-                        /**
-                         * CSRF 설정
-                         * - 개발 중에는 disable()로 비활성화할 수 있으나, 실제 운영 시에는 반드시 복원 필요
-                         * - 정식 오픈 전 반드시 다시 켜야 함.
-                         * - 테스트 동안만 CSRF 비활성화
-                         * - 테스트 후 아래 코드 주석 해제 필요
-                         * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
-                         */
-                        .csrf(csrf -> csrf.disable());
+                                /* 로그인 설정 */
+                                .formLogin(login -> login
+                                                /* 로그인 페이지(GET) 경로 지정 */
+                                                .loginPage("/member/login")
+                                                /* 로그인 요청을 처리하는 URL (POST) */
+                                                .loginProcessingUrl("/member/login")
+                                                /* form에서 사용하는 input name 지정 */
+                                                .usernameParameter("memberId")
+                                                .passwordParameter("memberPw")
+                                                /* 로그인 성공/실패 시 커스텀 핸들러 호출 */
+                                                .successHandler(customLoginSuccessHandler)
+                                                .failureHandler(customAuthFailureHandler))
+
+                                /* 자동 로그인 remember-me */
+                                .rememberMe(remember -> remember
+                                                /**
+                                                 * remember-me 기능의 암호화 key
+                                                 * - 이 값이 바뀌면 기존 remember-me 쿠키는 모두 무효가 된다.
+                                                 * - 프로젝트 고유 문자열을 넣어야 하며 외부에 노출되면 안 된다.
+                                                 */
+                                                .key("everyoneBreadRememberKey")
+                                                /**
+                                                 * 사용자가 체크박스를 선택했을 때 전달되는 파라미터 이름
+                                                 * - 로그인 폼 input name="autoLogin" 과 반드시 일치해야 한다.
+                                                 * - 체크 시 "autoLogin=on" 값이 서버로 넘어와 remember-me가 활성화된다.
+                                                 */
+                                                .rememberMeParameter("autoLogin")
+                                                /**
+                                                 * 자동 로그인 유지 기간 설정 (초 단위)
+                                                 * - 60초 * 60분 * 24시간 * 30일 = 30일 동안 로그인 유지
+                                                 * - 기간 내 브라우저를 껐다 켜도 다시 자동 로그인 됨
+                                                 */
+                                                .tokenValiditySeconds(60 * 60 * 24 * 30)
+                                                /**
+                                                 * remember-me 토큰으로 자동 로그인할 때
+                                                 * 사용자 정보를 불러올 customUserDetailsService 지정
+                                                 * - 이 서비스가 DB에서 회원 정보를 조회하여 인증을 복원한다.
+                                                 * - 반드시 설정해야 remember-me가 정상 작동한다.
+                                                 */
+                                                .userDetailsService(customDetailService))
+
+                                /* 로그아웃 설정 */
+                                .logout(logout -> logout
+                                                /* 로그아웃 요청 URL (POST) */
+                                                .logoutUrl("/member/logout")
+                                                /* 로그아웃 성공 시 이동할 URL */
+                                                .logoutSuccessUrl("/")
+                                                /* 세션 완전 삭제 */
+                                                .invalidateHttpSession(true)
+                                                /* JSESSIONID 쿠키 삭제 및 자동 로그인 쿠키 삭제 */
+                                                .deleteCookies("JSESSIONID", "remember-me"))
+
+                                /**
+                                 * CSRF 설정
+                                 * - 개발 중에는 disable()로 비활성화할 수 있으나, 실제 운영 시에는 반드시 복원 필요
+                                 * - 정식 오픈 전 반드시 다시 켜야 함.
+                                 * - 테스트 동안만 CSRF 비활성화
+                                 * - 테스트 후 아래 코드 주석 해제 필요
+                                 * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
+                                 */
+                                .csrf(csrf -> csrf.disable());
                 return http.build();
         }
 
