@@ -1,0 +1,30 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 20.
+*  File : admin-list.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/common/admin-layout}">
+    <head>
+        <th:block layout:fragment="head"></th:block>
+    </head>
+
+    <!--본문-->
+    <div layout:fragment="content">
+        <p>관리자 계정 추가</p>
+        <div>
+            <form th:action="@{/insertAdmin}" method="post" name="insertAdminForm">
+                이름 &nbsp;
+                <input type="text" name="adminName" class="me-1" />
+                아이디 &nbsp;
+                <input type="text" name="adminId" class="me-1" />
+                비밀번호 &nbsp;
+                <input type="password" name="adminPassword" class="me-1" />
+                <input type="button" value="계정 추가" id="btn btn-insertAdmin" />
+            </form>
+        </div>
+    </div>
+
+    <script layout:fragment="script"></script>
+</html>

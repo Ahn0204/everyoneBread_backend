@@ -5,17 +5,158 @@
 *******************************************
  -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<!--layout:decorate 기능을 사용하기 위한 속성 추가-->
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <head>
         <meta charset="UTF-8" />
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <!--자식페이지에서 추가로 삽입될 head내용-->
+        <th:block layout:fragment="head"></th:block>
         <title>모두의 빵</title>
     </head>
-    <body>
-        <!--헤더fragment-->
 
-        <th:block admin-layout:fragment="content"></th:block>
-        <!--푸터fragment-->
+    <body class="d-flex flex-column min-vh-100">
+        <!--헤더의 태그들로 replace되는 태그-->
+        <!-- <div th:replace="~{/admin/common/admin-header}"></div> -->
+        <!--헤더-->
+        <header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
+            <nav class="navbar navbar-expand-lg bg-body-tertiary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">
+                        <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
+                        <div class="navbar-nav nav-pills">
+                            <a class="nav-link active" href="#">정산</a>
+                            <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
+                            <a class="nav-link" href="#">회원</a>
+                            <a class="nav-link" href="#">문의</a>
+                            <a class="nav-link" href="#">홈페이지 관리</a>
+                        </div>
+                        <div class="navbar-util">
+                            <!-- <span class="util-text" th:text="${session.Member.userName}"></span> -->
+                            <span class="util-text">님</span>
+                            <a class="util-logout" th:href="@{/admin/logout}">로그아웃</a>
+                            <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <div class="container-fluid flex-grow-1">
+            <div class="row">
+                <!--사이드바-->
+                <!-- 서버 켜지면 fragment태그로 대체 <div th:replace="~{/admin/common/admin-sidebar::sidebar}"></div> -->
+
+                <div id="sidebarWrapper" class="collapse show">
+                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="position: fixed; top: 100px; height: calc(100vh - 56px); overflow-y: auto">
+                        <!-- <button class="btn btn-primary m-2" data-bs-toggle="collapse" data-bs-target="#sidebarWrapper">
+                        x
+                    </button>    접기 버튼 시도...-->
+                        <div class="position-sticky pt-3" style="top: 0">
+                            <ul class="nav flex-column nav-pills">
+                                <li class="nav-item">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#menuSettlement" role="button" aria-expanded="true" aria-controls="menuSettlement">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2">
+                                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                                        </svg>
+                                        정산
+                                    </a>
+                                    <div class="collapse show" id="menuSettlement">
+                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
+                                            <li><a href="#" class="nav-link">정산 내역</a></li>
+                                            <li><a href="#" class="nav-link">수수료 변경</a></li>
+                                            <li><a href="#" class="nav-link">배송비 변경</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#menuUser" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuUser">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users" aria-hidden="true">
+                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="9" cy="7" r="4"></circle>
+                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                        </svg>
+                                        회원
+                                    </a>
+                                    <div class="collapse show" id="menuUser">
+                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
+                                            <li><a href="#" class="nav-link">입/폐점 관리</a></li>
+                                            <li><a href="#" class="nav-link">라이더 승인</a></li>
+                                            <li><a href="#" class="nav-link">관리자 계정 추가</a></li>
+                                            <li><a href="#" class="nav-link">회원 조회</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="#menuInquiry" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuInquiry">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file" aria-hidden="true">
+                                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                                            <polyline points="13 2 13 9 20 9"></polyline>
+                                        </svg>
+                                        문의
+                                    </a>
+                                    <div class="collapse show" id="menuInquiry">
+                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
+                                            <li><a href="#" class="nav-link">일반 문의</a></li>
+                                            <li><a href="#" class="nav-link">신고 문의</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" aria-current="page" href="#menuHomePage" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuHomePage">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home" aria-hidden="true">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                        </svg>
+                                        홈페이지 관리
+                                    </a>
+                                    <div class="collapse show" id="menuHomePage">
+                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
+                                            <li><a href="#" class="nav-link">공지사항</a></li>
+                                            <li><a href="#" class="nav-link">카테고리</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <!-- <li class="nav-item">
+                                <a class="nav-link" href="#">
+                                홈페이지 관리
+                                </a>
+                                <div class="collapse" id="menuHomePage" data-bs-parent="#sidebarMenu"> data-bs-parent 속성 설정 시 sidebarMenu에서 하나의 하위메뉴만 출력됨 (나머지 닫힘)
+                                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
+                                        <li><a href="#" class="nav-link">공지사항</a></li>
+                                        <li><a href="#" class="nav-link">카테고리</a></li>
+                                    </ul>
+                                </div>
+                            </li> -->
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+                <!--본문-->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                    <!--admin-layout이 적용된 페이지의 content가 출력됨-->
+                    <th:block layout:fragment="content"></th:block>
+                </main>
+            </div>
+        </div>
+
+        <!--푸터-->
+        <footer class="mt-auto py-3 bg-light text-center">
+            <p>ⓒ 2025 모두의 빵 관리자 시스템</p>
+        </footer>
+
+        <script layout:fragment="script" type="text/javascript"></script>
     </body>
 </html>

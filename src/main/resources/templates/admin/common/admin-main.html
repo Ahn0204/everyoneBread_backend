@@ -5,15 +5,23 @@
 *******************************************
  -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+layout:decorate="~{admin/common/admin-layout}">
     <head>
-        <meta charset="UTF-8" />
-        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <title>모두의 빵</title>
+        <th:block layout:fragment="head">
+            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+        </th:block>
     </head>
-    <body>
+
+    <body >
+    <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
+    <div layout:fragment="content">
         admin 메인 통계 자료 통계 자료
-        <!--<th:fragment ="content">admin 메인</th:fragment>-->
+    </div>
+
+    <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
+    <script layout:fragment="script">
+        console.log("main fragment 됨");
+    </script>
     </body>
 </html>
