@@ -200,9 +200,9 @@ public class SecurityConfig {
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 // 이외 모든 경로 관리자만 접근 허용
                                 // .anyRequest().hasRole("ADMIN"))
-                                );
+                                )
 
-                http // 관리자 로그인 페이지 설정&처리
+                                // 관리자 로그인 페이지 설정&처리
                                 .formLogin((auth) -> auth
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
@@ -218,15 +218,12 @@ public class SecurityConfig {
                                                 // .defaultSuccessUrl("/admin", true) // 항상 이 url사용함(강제이동)
                                                 // 로그인 실패시의 동작 정의(핸들러)
                                                 .failureHandler(customAuthFailureHandler)
-                                                .permitAll());
+                                                .permitAll())
 
-                // http
-                // .logout((auth) -> auth
-                // //로그아웃 요청
-                // );
-
-                http
-                                .securityMatcher("/admin/**")
+                                // http
+                                // .logout((auth) -> auth
+                                // //로그아웃 요청
+                                // );
                                 .csrf(csrf -> csrf.disable());
 
                 return http.build();
