@@ -54,7 +54,13 @@ public class MemberService {
         entity.setMemberName(dto.getMemberName());
         entity.setMemberEmail(dto.getMemberEmail());
         entity.setMemberPhone(dto.getMemberPhone());
-        entity.setMemberAddress(dto.getMemberAddress());
+        /* 주소 조합 (기본주소 + 상세주소) */
+        String fullAddress = dto.getMemberAddress();
+        if (dto.getMemberAddressDetail() != null && !dto.getMemberAddressDetail().isBlank()) {
+            fullAddress += " " + dto.getMemberAddressDetail();
+        }
+        entity.setMemberAddress(fullAddress);
+
 
         // 주민등록번호 합치기
         entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
