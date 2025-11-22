@@ -193,11 +193,12 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login", "/admin/user/admin-list",
-                                                                "/insertAdmin")
+                                                .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
+                                                                "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                //.requestMatchers("/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/admin/**").permitAll()
                                 // 이외 모든 경로 관리자만 접근 허용
                                 // .anyRequest().hasRole("ADMIN"))
                                 )
