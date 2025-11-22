@@ -1,4 +1,4 @@
-package com.eob.comm.security.admin;
+package com.eob.common.security.admin;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
