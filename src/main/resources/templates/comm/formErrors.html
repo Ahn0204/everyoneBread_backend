@@ -11,3 +11,16 @@
      <!-- 검증에 에러가 있다면, 어떤 에러가 있는지 출력 -->		
 	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
 </div>
+
+<div th:fragment="formErrorsInsertAdmin" class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}" >
+     <!-- 검증에 에러가 있다면, 어떤 에러가 있는지 출력 -->	
+        <div th:if="${#fields.hasErrors('adminName')}">
+            <p th:each="err : ${#fields.errors('adminName')}" th:text="${err}"></p>
+        </div>
+        <div th:if="${#fields.hasErrors('adminId')}">
+            <p th:each="err : ${#fields.errors('adminId')}" th:text="${err}"></p>
+        </div>
+        <div th:if="${#fields.hasErrors('adminPassword')}">
+            <p th:each="err : ${#fields.errors('adminPassword')}" th:text="${err}"></p>
+        </div>        
+</div>

@@ -1,4 +1,4 @@
-package com.eob.comm.security.shop;
+package com.eob.common.security.shop;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

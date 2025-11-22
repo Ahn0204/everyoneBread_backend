@@ -5,7 +5,7 @@
 *******************************************
  -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/common/admin-layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/comm/admin-layout}">
     <head>
         <th:block layout:fragment="head"></th:block>
     </head>
@@ -17,7 +17,7 @@
             <div>
                 <form th:action="@{/admin/user/insertAdmin}" method="post" name="insertAdminForm" th:object="${insertAdminForm}">
                     <!--유효성 검증에 에러 발생 시 에러 출력 -->
-                    <div th:replace="~{comm/formErrors :: formErrorsFragment}"></div>
+                    <div th:replace="~{comm/formErrors :: formErrorsInsertAdmin}"></div>
 
                     <label for="adminName">이름</label>&nbsp;
                     <input type="text" th:field="*{adminName}" class="me-1" placeholder="한글 2~20자"/>

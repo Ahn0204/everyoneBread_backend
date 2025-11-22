@@ -1,5 +1,8 @@
-package com.eob.comm.security;
+package com.eob.common.security.admin;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
 
@@ -8,21 +11,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.eob.member.model.data.MemberEntity;
-import com.eob.rider.model.data.RiderEntity;
-import com.eob.shop.model.data.ShopEntity;
 
 /**
  * 로그인한 회원 정보를 스프링 시큐리티 세션에 저장하고 관리하는 담당 클래스
  */
-public class CustomSecurityDetail implements UserDetails {
+public class AdminSecurityDetail implements UserDetails {
 
     // TODO: 회원 정보 객체를 해당 클래스에서 정의해줘야함
 
+    // 생성 예시
     // 실제 우리 시스템에서 사용하는 회원 정보 객체 (MemberDTO)
     private final MemberEntity member;
 
     // 생성자: 로그인한 사용자(MemberDTO)를 받아 세션에 저장
-    public CustomSecurityDetail(MemberEntity member) {
+    public AdminSecurityDetail(MemberEntity member) {
         this.member = member;
     }
 
@@ -30,15 +32,6 @@ public class CustomSecurityDetail implements UserDetails {
     public MemberEntity getMember() {
         return member;
     }
-
-    // 💡 추가: role 에 따라 rider/shop 세부 정보 접근 가능
-    public RiderEntity getRider() {
-        return member.getRider();
-    }
-
-    // public ShopEntity getShop(){
-    // return member.getShop();
-    // }
 
     // ====================== UserDetails 필수 구현 메서드 ======================
 
@@ -65,7 +58,10 @@ public class CustomSecurityDetail implements UserDetails {
     // - 현재는 null 반환 → 권한 체크가 필요한 경우 반드시 구현 필요
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole()));
+        // 'Authentication'에 담겨야 하는 값은 String타입의 role값("ADMIN" / "RIDER",..)
+        // DB의 role = enum객체 => member엔티티의.role값().의 이름 만 추출하여 '권한' 객체에 대입
+        return List.of(new SimpleGrantedAuthority(member.getMemberRole().name()));
+
     }
 
     // 계정 만료 여부
@@ -98,7 +94,7 @@ public class CustomSecurityDetail implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
+        // return member.getStatus() == MemberStatus.ACTIVE;
         return true;
     }
-
 }

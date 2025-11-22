@@ -1,4 +1,3 @@
-package com.eob.comm.security.rider;
 // package com.eob.common.security.rider;
 
 // import org.springframework.security.authentication.DisabledException;

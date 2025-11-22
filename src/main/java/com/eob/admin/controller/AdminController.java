@@ -1,6 +1,7 @@
 package com.eob.admin.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,8 +53,15 @@ public class AdminController {
 
     // 관리자 계정 내역(추가) 페이지
     @GetMapping("/user/admin-list")
-    public String getAdminList(InsertAdminForm insertAdminForm) {
-                                //뷰로 관리자계정추가폼 전달, 뷰에서 th:object로 사용
+    public String getAdminList(Model model) { //그냥 insertAdminForm만 뷰로 전달해도, 뷰에서 th:object로 사용가능
+        //redirect 시에는 flashAttribute에 insertAdminForm이 담아져옴(필드 에러 출력에 필요)
+        
+        //필드 에러로 redirect되지 않은 새 페이지라면
+        if(!model.containsAttribute("insertAdminForm")){
+            //insertAdminForm객체 생성
+            model.addAttribute("insertAdminForm", new InsertAdminForm());
+        }
+
         return "admin/user/admin-list";
     }
 
@@ -64,8 +72,13 @@ public class AdminController {
         // 입력값 유효성 검사
         // insertAdminForm에 담긴 값에 대한 유효성검사결과를 bindingResult객체로 사용
         if(bindingResult.hasErrors()){ //오류가 있다면
-            rttr.addFlashAttribute("isSucceeded",false); //실패 알림 뜰 수 있게
-            return "/admin/user/admin-list"; //입력한 값이 있는 페이지로 돌아가기(forward방식)
+            //실패 알림 뜨게 하는 파라미터
+            rttr.addFlashAttribute("isSucceeded",false); 
+            //입력했던 값
+            rttr.addFlashAttribute("insertAdminForm",insertAdminForm);
+            //필드 에러
+            rttr.addFlashAttribute("org.springframework.validation.BindingResult.insertAdminForm",bindingResult);
+            return "redirect:/admin/user/admin-list";
         }
 
         // 입력값에 오류가 없다면
