@@ -1,4 +1,4 @@
-package com.eob.common.security;
+package com.eob.comm.security;
 
 import java.io.IOException;
 import java.net.URLEncoder;

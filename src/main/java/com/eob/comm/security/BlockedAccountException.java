@@ -1,4 +1,4 @@
-package com.eob.common.security;
+package com.eob.comm.security;
 
 import org.springframework.security.core.AuthenticationException;
 

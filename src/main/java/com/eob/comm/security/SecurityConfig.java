@@ -1,4 +1,4 @@
-package com.eob.common.security;
+package com.eob.comm.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import com.eob.common.security.admin.AdminLoginSuccessHandler;
+import com.eob.comm.security.admin.AdminLoginSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
@@ -193,13 +193,13 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login", "/admin/user/admin-list",
-                                                                "/insertAdmin")
+                                                .requestMatchers("/admin/login","/image/**","/css/**","/js/**","/lib/**","/fonts/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
-                                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                //.requestMatchers("/admin/**").hasRole("ADMIN")
                                 // 이외 모든 경로 관리자만 접근 허용
-                                // .anyRequest().hasRole("ADMIN"))
+                                //.anyRequest().hasRole("ADMIN"))
+                                .anyRequest().permitAll()
                                 )
 
                                 // 관리자 로그인 페이지 설정&처리

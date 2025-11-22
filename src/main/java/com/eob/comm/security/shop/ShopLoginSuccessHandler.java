@@ -1,4 +1,4 @@
-package com.eob.common.security.shop;
+package com.eob.comm.security.shop;
 import java.io.IOException;
 
 
