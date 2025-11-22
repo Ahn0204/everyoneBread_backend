@@ -5,7 +5,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-
+import com.eob.member.model.data.MemberEntity;
+import com.eob.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +17,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminDetailService implements UserDetailsService {
     
+    private final MemberRepository memberRepository;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
       
-        throw new UnsupportedOperationException("Unimplemented method 'loadUserByUsername'");
+        //username에 해당하는 레코드 추출
+        MemberEntity user = MemberRepository.findById(username);
     }
 
 }

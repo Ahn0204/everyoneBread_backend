@@ -29,14 +29,15 @@ public class AdminLoginSuccessHandler extends SavedRequestAwareAuthenticationSuc
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
         if (role.equals("ADMIN")) { // 꺼낸 권한이 ADMIN이라면
-            response.sendRedirect("/admin"); // 로그인 성공 시 /admin으로 이동
-        } else if (role.equals("RIDER")) {
-            response.sendRedirect("/rider");
-        } else if (role.equals("SHOP")) {
-            response.sendRedirect("/shop");
-        } else if (role.equals("USER")) {
-            response.sendRedirect("/");
+            response.sendRedirect("/"); // 로그인 성공 시 /admin으로 이동
         }
+            // } else if (role.equals("RIDER")) {
+        //     response.sendRedirect("/rider");
+        // } else if (role.equals("SHOP")) {
+        //     response.sendRedirect("/shop");
+        // } else if (role.equals("USER")) {
+        //     response.sendRedirect("/");
+        // }
 
     }
 

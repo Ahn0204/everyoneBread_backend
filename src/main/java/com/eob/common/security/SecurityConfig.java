@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
+import com.eob.common.security.admin.AdminDetailService;
 import com.eob.common.security.admin.AdminLoginSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -23,13 +23,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+         private final AdminDetailService adminDetailService;
+
         private final CustomDetailService customDetailService;
 
         private final CustomAuthFailureHandler customAuthFailureHandler;
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
-        private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+        //private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+
 
         @Bean
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
@@ -193,14 +196,13 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
+                                                .requestMatchers("/admin/login","/admin/login/**", "/css/**", "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
                                                 //.requestMatchers("/admin/**").hasRole("ADMIN")
-                                                .requestMatchers("/admin/**").permitAll()
                                 // 이외 모든 경로 관리자만 접근 허용
-                                // .anyRequest().hasRole("ADMIN"))
+                                .anyRequest().permitAll()
                                 )
 
                                 // 관리자 로그인 페이지 설정&처리
@@ -208,23 +210,29 @@ public class SecurityConfig {
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
                                                 // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/login")
-                                                // username파라미터의 이름
+                                                .loginProcessingUrl("/admin/loginPro")
+                                                // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
                                                 .usernameParameter("id")
                                                 // password파라미터의 이름
                                                 .passwordParameter("pw")
                                                 // 로그인 성공시의 동작 정의(핸들러)
-                                                .successHandler(adminLoginSuccessHandler)
+                                                .successHandler(customLoginSuccessHandler)
                                                 // 로그인 성공 시 리다이렉트 될 url
                                                 // .defaultSuccessUrl("/admin", true) // 항상 이 url사용함(강제이동)
                                                 // 로그인 실패시의 동작 정의(핸들러)
-                                                .failureHandler(customAuthFailureHandler)
-                                                .permitAll())
+                                                //.failureHandler(customAuthFailureHandler)
+                                                .failureUrl("/admin/login?error=true")
+                                                .permitAll()
+                                        )
 
                                 // http
                                 // .logout((auth) -> auth
                                 // //로그아웃 요청
                                 // );
+                                
+                                //이 경로에서 사용할 userDetailsService 설정
+                                //.userDetailsService(adminDetailService)
+
                                 .csrf(csrf -> csrf.disable());
 
                 return http.build();

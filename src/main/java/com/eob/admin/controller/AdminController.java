@@ -42,14 +42,14 @@ public class AdminController {
     // return "/admin/common/admin-main";
     // }
 
-    // 시큐리티로 처리?
-    // 관리자 로그아웃 처리
-    @GetMapping("/logout")
-    public String adminLogout() { // @RequestParam String param
-        // 세션 무효화처리.. 로그아웃..
+    // // 시큐리티로 처리?
+    // // 관리자 로그아웃 처리
+    // @GetMapping("/logout")
+    // public String adminLogout() { // @RequestParam String param
+    //     // 세션 무효화처리.. 로그아웃..
 
-        return "admin/comm/admin-login";
-    }
+    //     return "admin/comm/admin-login";
+    // }
 
     // 관리자 계정 내역(추가) 페이지
     @GetMapping("/user/admin-list")
