@@ -1,4 +1,4 @@
-package com.eob.comm.security;
+package com.eob.common.security;
 
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UserDetails;
