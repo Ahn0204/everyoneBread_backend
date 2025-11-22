@@ -1,4 +1,4 @@
-package com.eob.common.security.admin;
+package com.eob.comm.security.admin;
 
 import java.io.IOException;
 

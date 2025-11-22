@@ -1,6 +1,7 @@
 package com.eob.admin.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -22,7 +24,7 @@ public class AdminController {
     // 시큐리티 사용 시 로그인 페이지로 매핑 예정?
     @GetMapping("/login")
     public String getAdminLoginP() {
-        return "admin/common/admin-login";
+        return "admin/comm/admin-login";
     }
 
     // 관리자 로그인 처리
@@ -30,7 +32,7 @@ public class AdminController {
     public String adminLogin(@RequestParam(name = "id") String id, @RequestParam(name = "pw") String pw) {
         // 시큐리티 적용 후 아이디 비번 비교..로그인 처리
 
-        return "admin/common/admin-main";
+        return "admin/comm/admin-main";
     }
 
     // // 로그인 성공 후 메인 페이지
@@ -45,29 +47,39 @@ public class AdminController {
     public String adminLogout() { // @RequestParam String param
         // 세션 무효화처리.. 로그아웃..
 
-        return "admin/common/admin-login";
+        return "admin/comm/admin-login";
     }
 
     // 관리자 계정 내역(추가) 페이지
     @GetMapping("/user/admin-list")
-    public String getAdminList() {
+    public String getAdminList(InsertAdminForm insertAdminForm) {
+                                //뷰로 관리자계정추가폼 전달, 뷰에서 th:object로 사용
         return "admin/user/admin-list";
     }
 
     // 관리자 계정 추가 처리
-    @PostMapping("/insertAdmin")
-    public String postMethodName(InsertAdminForm insertAdminForm, RedirectAttributes rttr) {
+    @PostMapping("/user/insertAdmin")
+    public String postMethodName(@Valid InsertAdminForm insertAdminForm, BindingResult bindingResult, RedirectAttributes rttr) {
 
+        // 입력값 유효성 검사
+        // insertAdminForm에 담긴 값에 대한 유효성검사결과를 bindingResult객체로 사용
+        if(bindingResult.hasErrors()){ //오류가 있다면
+            rttr.addFlashAttribute("isSucceeded",false); //실패 알림 뜰 수 있게
+            return "/admin/user/admin-list"; //입력한 값이 있는 페이지로 돌아가기(forward방식)
+        }
+
+        // 입력값에 오류가 없다면
         // 계정 추가
         boolean insert = adminService.insertAdmin(insertAdminForm);
 
-        // 성공 시 터미널에 계정이름 출력
-        if (insert) {
-            System.out.println("adminName:" + insertAdminForm.getName());
-            rttr.addFlashAttribute("success");
+        if (insert) {// 성공 시 
+            System.out.println("adminName:" + insertAdminForm.getAdminName()); //터미널에 계정이름 출력
+            rttr.addFlashAttribute("isSucceeded",true); //뷰로 success(ture) 전달
+        } else{ //실패시
+            rttr.addFlashAttribute("isSucceeded",false);
         }
-        // 일단 되는지 확인, 회원가입 로직완성되면 성공 시 실패시 알림 띄우기 여부 &리다이렉트 페이지 매핑 다시
-        return "redirect:/admin/user/admin-list";
+
+        return "redirect:/admin/user/admin-list"; //새 admin-list 페이지가 다시 요청됨(redirect)
     }
 
 }

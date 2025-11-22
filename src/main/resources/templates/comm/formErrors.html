@@ -1,0 +1,13 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 22.
+*  File : formErrors.html
+*******************************************
+ -->
+
+<!-- 내장객체로 에러가 있는지 확인 :true이면 검증에 에러가 난 것. -->
+<!--템플릿으로 만들어 fragment로 가져다 사용-->
+ <div th:fragment="formErrorsFragment" class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}" >
+     <!-- 검증에 에러가 있다면, 어떤 에러가 있는지 출력 -->		
+	<div th:each="err : ${#fields.allErrors()}" th:text="${err}"></div>
+</div>
