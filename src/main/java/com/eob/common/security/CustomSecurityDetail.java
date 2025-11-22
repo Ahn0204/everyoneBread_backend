@@ -1,4 +1,4 @@
-package com.eob.comm.security;
+package com.eob.common.security;
 
 import java.util.Collection;
 import java.util.List;
