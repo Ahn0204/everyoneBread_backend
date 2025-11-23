@@ -29,14 +29,20 @@ public class RiderController {
     // 회원가입 이동 메서드
     // Member 객체 정보만 입력 받는 페이지
     @GetMapping("/register/start")
-    public String registerStart() {
+    public String registerStart(MemberRegisterForm form) {
         return "rider/rider-register-start";
     }
 
     @PostMapping("/register/start")
-    public String registerStart(@RequestParam String param) {
+    public String registerStart(@Valid MemberRegisterForm form, BindingResult bindingResult, HttpSession session) {
+        if(bindingResult.hasErrors()) {
+            return "rider/rider-register-start";
+        }
 
-        return new String();
+        session.setAttribute("registerMember", form);
+        session.setMaxInactiveInterval(10 * 60);
+
+        return "rider/rider-register-step";
     }
 
     // Rider 객체 정보만 입력 받는 페이지

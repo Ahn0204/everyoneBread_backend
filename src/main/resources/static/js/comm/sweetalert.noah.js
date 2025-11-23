@@ -97,12 +97,22 @@ function waitForSwal(callback) {
 }
 
 // 포커스용 알림창
-function focusAlert(msg = '성공하였습니다', icon = 'success') {
-    return Swal.fire({
-        icon: icon, // 아이콘
-        title: msg, // 알림 메시지
-        confirmButtonText: '확인', // 확인 버튼 텍스트
-        confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+function focusAlert(icon = 'success', title = '', html = '', element = null) {
+    Swal.fire({
+        icon: icon, // 'error' | 'success' | 'warning' | 'info' | 'question'
+        title: title,
+        html: html,
+        confirmButtonText: '확인',
+        confirmButtonColor: '#6494ed', // 강조 버튼 (주황)
+        didClose: () => {
+            if (element) {
+                // jQuery 객체면 DOM element로 변환
+                // if (element instanceof jQuery) {
+                //     element = element[0];
+                // }
+                element.focus();
+            }
+        },
     });
 }
 
@@ -113,7 +123,7 @@ function showSuccessAlert(msg = '성공하였습니다.', redirectUrl = null) {
             icon: 'success', // 성공 아이콘
             title: msg, // 알림 메시지
             confirmButtonText: '확인', // 확인 버튼 텍스트
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl; // URL이 있으면 이동
         });
@@ -127,7 +137,7 @@ function showErrorAlert(msg = '오류가 발생했습니다.', redirectUrl = nul
             icon: 'error', // 오류 아이콘
             title: msg,
             confirmButtonText: '닫기',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -141,7 +151,7 @@ function showWarningAlert(msg = '주의가 필요합니다.', redirectUrl = null
             icon: 'warning', // 경고 아이콘
             title: msg,
             confirmButtonText: '확인',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -155,7 +165,7 @@ function showCostomWarningAlert(msg = '주의가 필요합니다.', redirectUrl 
             icon: 'warning', // 경고 아이콘
             title: msg,
             confirmButtonText: '확인',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
             customClass: {
                 container: 'my-swal-container',
             },
@@ -172,7 +182,7 @@ function showInfoAlert(msg = '안내 메시지입니다.', redirectUrl = null) {
             icon: 'info', // 정보 아이콘
             title: msg,
             confirmButtonText: '확인',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -191,7 +201,7 @@ function showConfirmAlert(
             title: msg,
             showCancelButton: true, // 취소 버튼 표시
             confirmButtonText: '예',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
             cancelButtonText: '아니오',
         }).then((result) => {
             if (result.isConfirmed) {
@@ -250,7 +260,7 @@ function showSuccessTitleAlert(title = '제목입니다.', msg = '성공하였�
             title: title, // 알림 제목
             text: msg, // 알림 메시지
             confirmButtonText: '확인', // 확인 버튼 텍스트
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl; // URL이 있으면 이동
         });
@@ -265,7 +275,7 @@ function showErrorTitleAlert(title = '제목입니다.', msg = '오류가 발생
             title: title, // 알림 제목
             text: msg, // 알림 메시지
             confirmButtonText: '닫기',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -280,7 +290,7 @@ function showWarningTitleAlert(title = '제목입니다.', msg = '주의가 필�
             title: title, // 알림 제목
             text: msg, // 알림 메시지
             confirmButtonText: '확인',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -295,7 +305,7 @@ function showInfoTitleAlert(title = '제목입니다.', msg = '안내 메시지�
             title: title, // 알림 제목
             text: msg, // 알림 메시지
             confirmButtonText: '확인',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
         }).then(() => {
             if (redirectUrl) location.href = redirectUrl;
         });
@@ -316,7 +326,7 @@ function showConfirmTitleAlert(
             html: msg, // 알림 메시지
             showCancelButton: true, // 취소 버튼 표시
             confirmButtonText: '예',
-            confirmButtonColor: '#ff6600', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
             cancelButtonText: '아니오',
         }).then((result) => {
             if (result.isConfirmed) {

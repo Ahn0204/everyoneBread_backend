@@ -65,6 +65,16 @@ public class MemberController {
             return "redirect:/shop/shop-register";
         }
 
+        // 라이더 회원은 rider-register로 이동
+        if("RIDER".equals(dto.getMemberRole())){
+            return "redirect:/rider/register/start";
+        }
+
+        // 일반 회원은 member-register로 이동
+        if("USER".equals(dto.getMemberRole())){
+            return "redirect:/member/login";
+        }
+
         // 일반 회원은 로그인으로 이동
         return "redirect:/member/login";
     }
