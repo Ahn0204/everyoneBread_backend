@@ -226,7 +226,7 @@
                     </div>
                     <div class="modal-bottom">
                         <a href="javascript:;" class="modal-btn closeBottomBtn"><span class="btn_text">취소</span></a>
-                        <a href="javascript:;" class="modal-btn"><span class="btn_text">확인</span></a>
+                        <a href="javascript:;" class="modal-btn successBottomBtn"><span class="btn_text">확인</span></a>
                     </div>
                 </div>
             </div>
@@ -284,6 +284,7 @@
                 const previewModal = $('#previewModal'); // 실제 사용할 모달
                 const cTB = $('.closeBtn'); // 상단 닫기 버튼
                 const cBB = $('.closeBottomBtn'); // 하단 닫기 버튼
+                const sBB = $('.successBottomBtn'); // 하단 확인 버튼
 
                 // 모달 닫기 (X 클릭)
                 cTB.on('click', function () {
@@ -297,6 +298,10 @@
                     dimmed.css('display', 'none');
                     $('.upload-name').text('선택된 파일 없음');
                     $('#realFile').val('');
+                });
+                sBB.on('click', function () {
+                    previewModal.css('display', 'none');
+                    dimmed.css('display', 'none');
                 });
 
                 // 바깥 영역 클릭 시 닫기
@@ -319,7 +324,6 @@
                 $('#realFile').on('change', function () {
                     const file = $('#realFile')[0].files[0]; // 선택된 파일 (첫 번째)
                     $('#previewContent').hide();
-
                     // 선택된 파일이 없을경우
                     if (!file) {
                         alert('업로드 된 파일이 없습니다.');
@@ -336,6 +340,7 @@
 
                     const filename = this.files[0].name;
                     const reader = new FileReader();
+                    console.log(filename);
                     reader.onload = function (e) {
                         $('#previewContent').attr('src', e.target.result); // base64 데이터 URL
                         $('#previewContent').show();
@@ -344,6 +349,7 @@
                     };
                     reader.readAsDataURL(file);
                 });
+
                 //===================================
             </script>
         </div>

@@ -296,6 +296,9 @@
                 margin-right: 8px;
                 transform: scale(1.2); /* 체크박스 크기 살짝 키움 */
             }
+            .dropdown-menu:hover {
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -304,8 +307,8 @@
                 <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">페이지 전환</button>
                 <ul class="dropdown-menu" style="margin-top: 3px">
                     <li><a class="dropdown-item" href="#">메인페이지</a></li>
-                    <li><a class="dropdown-item" href="/rider/">라이더페이지</a></li>
-                    <li><a class="dropdown-item" href="/shop/">판매자페이지</a></li>
+                    <li><a class="dropdown-item" th:href="@{/rider/}">라이더페이지</a></li>
+                    <li><a class="dropdown-item" th:href="@{/shop/}">판매자페이지</a></li>
                 </ul>
             </div>
         </div>
@@ -351,7 +354,7 @@
                 <ul class="link-list">
                     <li><a class="btn-a" id="findRiderId">아이디 찾기</a></li>
                     <li><a class="btn-a" id="findRiderPw">비밀번호 찾기</a></li>
-                    <li><a class="btn-a" th:href="@{/rider/insert}">회원가입</a></li>
+                    <li><a class="btn-a" th:href="@{/rider/register/start}">회원가입</a></li>
                 </ul>
             </div>
             <th:block th:replace="~{rider/loginModal :: loginModal}"></th:block>
