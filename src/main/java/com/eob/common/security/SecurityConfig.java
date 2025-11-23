@@ -183,11 +183,11 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
-        SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
-                return null;
+        // @Bean
+        // SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
+        //         return null;
 
-        }
+        // }
 
         @Bean
         SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
@@ -202,7 +202,7 @@ public class SecurityConfig {
                                                 // 관리자만 관리자 페이지 접근 허용
                                                 //.requestMatchers("/admin/**").hasRole("ADMIN")
                                 // 이외 모든 경로 관리자만 접근 허용
-                                .anyRequest().permitAll()
+                                .anyRequest().hasRole("ADMIN")
                                 )
 
                                 // 관리자 로그인 페이지 설정&처리
@@ -220,8 +220,9 @@ public class SecurityConfig {
                                                 // 로그인 성공 시 리다이렉트 될 url
                                                 // .defaultSuccessUrl("/admin", true) // 항상 이 url사용함(강제이동)
                                                 // 로그인 실패시의 동작 정의(핸들러)
-                                                //.failureHandler(customAuthFailureHandler)
-                                                .failureUrl("/admin/login?error=true")
+                                                .failureHandler(customAuthFailureHandler)
+                                                // 로그인 실패 시 리다이렉트 될 url
+                                                //.failureUrl("/admin/login?error=true")
                                                 .permitAll()
                                         )
 
@@ -231,7 +232,7 @@ public class SecurityConfig {
                                 // );
                                 
                                 //이 경로에서 사용할 userDetailsService 설정
-                                //.userDetailsService(adminDetailService)
+                                .userDetailsService(adminDetailService)
 
                                 .csrf(csrf -> csrf.disable());
 

@@ -26,10 +26,10 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         CustomSecurityDetail principal = (CustomSecurityDetail) authentication.getPrincipal();
         MemberEntity member = principal.getMember();
-        // * - ROLE_USER : 일반 소비자 (회원 기능)
-        // * - ROLE_SHOP : 판매자(상점) - 상품 등록/관리, 주문 처리 가능
-        // * - ROLE_RIDER : 배달 기사 - 배달/수령 상태 처리
-        // * - ROLE_ADMIN : 관리자 - 전체 회원/상점/상품 관리, 승인/반려 처리
+        // * - USER : 일반 소비자 (회원 기능)
+        // * - SHOP : 판매자(상점) - 상품 등록/관리, 주문 처리 가능
+        // * - RIDER : 배달 기사 - 배달/수령 상태 처리
+        // * - ADMIN : 관리자 - 전체 회원/상점/상품 관리, 승인/반려 처리
         switch (member.getMemberRole()) {
             case USER:
                 response.sendRedirect("/");
