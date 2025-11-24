@@ -1,10 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>회원가입 유형 선택</title>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            padding: 40px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            width: 200px;
+            height: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 2px solid #000;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        /* 비즈니스 드롭다운 래퍼 */
+        .business-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        /* 드롭다운 */
+        .dropdown-box {
+            display: none;
+            position: absolute;
+            top: 60px;
+            width: 200px;
+            border: 2px solid #000;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .dropdown-item {
+            display: block;
+            text-align: center;
+            padding: 14px 0;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f0f0f0;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1>회원가입 유형 선택</h1>
@@ -14,20 +79,55 @@
     <p>가입할 계정 유형을 선택해주세요.</p>
 </div>
 
+<br><br>
+
 <!-- 일반 계정 -->
 <div>
     <a href="/member/register?role=USER">
-        <button type="button">일반 계정</button>
+        <button class="btn">일반 계정</button>
     </a>
 </div> 
-<br>
-<br>
-<!-- 비즈니스 계정 -->
-<div>
-    <a href="/member/register?role=SELLER">
-        <button type="button">비즈니스 계정</button>
-    </a>
+
+<br><br>
+
+<!-- 비즈니스 계정(dropdown) -->
+<div class="business-wrapper">
+    <button class="btn" id="businessBtn">비즈니스 계정</button>
+
+    <div class="dropdown-box" id="dropdownBox">
+        <a href="/member/register?role=SHOP" class="dropdown-item">판매자 회원가입</a>
+        <a href="/member/register?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+    </div>
 </div>
+
+<script>
+// 비즈니스 계정 버튼 hover 시 메뉴 열기
+const businessBtn = document.getElementById("businessBtn");
+const dropdownBox = document.getElementById("dropdownBox");
+
+// 버튼 hover → 드롭다운 열림
+businessBtn.addEventListener("mouseover", () => {
+    dropdownBox.style.display = "block";
+});
+
+// 드롭다운 hover 중이면 유지
+dropdownBox.addEventListener("mouseover", () => {
+    dropdownBox.style.display = "block";
+});
+
+// 버튼/드롭다운에서 벗어나면 닫기
+businessBtn.addEventListener("mouseout", () => {
+    setTimeout(() => {
+        if (!dropdownBox.matches(":hover")) {
+            dropdownBox.style.display = "none";
+        }
+    }, 150);
+});
+
+dropdownBox.addEventListener("mouseout", () => {
+    dropdownBox.style.display = "none";
+});
+</script>
 
 </body>
 </html>

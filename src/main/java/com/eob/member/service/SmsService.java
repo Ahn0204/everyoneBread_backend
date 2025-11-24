@@ -1,102 +1,136 @@
-package com.eob.member.service;
+// package com.eob.member.service;
 
-import com.google.gson.JsonObject;
-import lombok.RequiredArgsConstructor;
-import okhttp3.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+// import com.google.gson.JsonObject;
+// import lombok.RequiredArgsConstructor;
+// import okhttp3.*;
+// import org.springframework.beans.factory.annotation.Value;
+// import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.Random;
+// import jakarta.servlet.http.HttpSession;
+// import java.util.Base64;
+// import java.util.Random;
 
-@Service
-@RequiredArgsConstructor
-public class SmsService {
+// import javax.crypto.Mac;
+// import javax.crypto.spec.SecretKeySpec;
 
-    @Value("${sms.api-key}")
-    private String apiKey;
+// @Service
+// @RequiredArgsConstructor
+// public class SmsService {
 
-    @Value("${sms.api-secret}")
-    private String apiSecret;
+//     @Value("${sms.api-key}")
+//     private String apiKey;
 
-    @Value("${sms.from-phone}")
-    private String fromPhone;
+//     @Value("${sms.api-secret}")
+//     private String apiSecret;
 
-    private final OkHttpClient client = new OkHttpClient();
+//     @Value("${sms.from-phone}")
+//     private String fromPhone;
 
-    /**
-     * 인증번호 생성 + API 호출 + 세션 저장
-     */
-    public String sendAuthCode(String phone, HttpSession session) {
+//     private final OkHttpClient client = new OkHttpClient();
 
-        // 1) 6자리 인증번호 생성
-        String authCode = String.format("%06d", new Random().nextInt(1000000));
+//     /**
+//      * 인증번호 생성 + API 호출 + 세션 저장
+//      */
+//     public String sendAuthCode(String phone, HttpSession session) {
 
-        // 2) 요청 JSON 구성
-        JsonObject body = new JsonObject();
-        body.addProperty("type", "SMS");
-        body.addProperty("from", fromPhone);
-        body.addProperty("to", phone);
-        body.addProperty("text", "[모두의빵] 인증번호는 " + authCode + " 입니다.");
+//         try {
+//             // 1) 인증번호 생성
+//             String authCode = String.format("%06d", new Random().nextInt(1000000));
 
-        // 3) HTTP 요청 구성
-        Request request = new Request.Builder()
-                .url("https://api.coolsms.co.kr/messages/v4/send")
-                .addHeader("Authorization", Credentials.basic(apiKey, apiSecret)) // 테스트 가능
-                .addHeader("Content-Type", "application/json")
-                .post(RequestBody.create(body.toString(), MediaType.parse("application/json")))
-                .build();
+//             // 2) 요청 바디 JSON
+//             JsonObject body = new JsonObject();
+//             body.addProperty("type", "SMS");
+//             body.addProperty("from", fromPhone);
+//             body.addProperty("to", phone);
+//             body.addProperty("text", "[모두의빵] 인증번호는 " + authCode + " 입니다.");
 
-        // 4) API 호출
-        try (Response response = client.newCall(request).execute()) {
+//             // 3) 현재 시간 (timestamp)
+//             String timestamp = String.valueOf(System.currentTimeMillis());
 
-            if (!response.isSuccessful()) {
-                System.out.println("SMS 전송 실패: " + response);
-                return null;
-            }
+//             String salt = generateSalt();
 
-            // 5) 세션 저장 구조 (핸드폰 번호별 저장)
-            session.setAttribute("AUTH_CODE_" + phone, authCode);
-            session.setAttribute("AUTH_EXPIRE_" + phone,
-                    System.currentTimeMillis() + (3 * 60 * 1000)); // 3분
+//             // 4) signature 생성
+//             String signature = makeSignature(timestamp + salt);
 
-            System.out.println("SMS 인증번호 전송: " + authCode);
+//             String authorizationHeader =
+//                     "HMAC-SHA256 apiKey=" + apiKey +
+//                     ", date=" + timestamp +
+//                     ", salt=" + salt +
+//                     ", signature=" + signature;
 
-            return authCode;
 
-        } catch (IOException e) {
-            System.out.println("SMS API 에러: " + e.getMessage());
-            return null;
-        }
-    }
+//             // 5) HTTP 요청 생성
+//             Request request = new Request.Builder()
+//                     .url("https://api.coolsms.co.kr/messages/v4/send")
+//                     .addHeader("Authorization", authorizationHeader)
+//                     .addHeader("Content-Type", "application/json; charset=utf-8")
+//                     .post(RequestBody.create(body.toString(), MediaType.parse("application/json")))
+//                     .build();
 
-    /**
-     * 인증번호 검증
-     */
-    public boolean verifyAuthCode(String phone, String inputCode, HttpSession session) {
+//             // 6) API 호출
+//             Response response = client.newCall(request).execute();
 
-        String savedCode = (String) session.getAttribute("AUTH_CODE_" + phone);
-        Long expire = (Long) session.getAttribute("AUTH_EXPIRE_" + phone);
+//             System.out.println("Authorization:" + authorizationHeader);
+//             System.out.println("Response Body:" +response.peekBody(Long.MAX_VALUE).string());
 
-        // 세션이 아예 없음 → 인증 안 됨
-        if (savedCode == null || expire == null) {
-            return false;
-        }
+//             if (!response.isSuccessful()) {
+//                 System.out.println("SMS 전송 실패: " + response.body().string());
+//                 return null;
+//             }
 
-        // 만료 시간 체크
-        if (System.currentTimeMillis() > expire) {
-            return false;
-        }
+//             // 7) 세션 저장
+//             session.setAttribute("AUTH_CODE_" + phone, authCode);
+//             session.setAttribute("AUTH_EXPIRE_" + phone,
+//                     System.currentTimeMillis() + (3 * 60 * 1000));
 
-        // 코드 비교
-        boolean isMatch = savedCode.equals(inputCode);
+//             return authCode;
 
-        // 성공하면 세션에 인증 완료 표시 (선택)
-        if (isMatch) {
-            session.setAttribute("AUTH_OK_" + phone, "OK");
-        }
+//         } catch (Exception e) {
+//             e.printStackTrace();
+//             return null;
+//         }
+//     }
 
-        return isMatch;
-    }
-}
+//     private String generateSalt(){
+//         return Long.toHexString(Double.doubleToLongBits(Math.random()));
+//     }
+
+//     private String makeSignature(String data) throws Exception {
+
+//         SecretKeySpec signingKey = new SecretKeySpec(apiSecret.getBytes("UTF-8"), "HmacSHA256");
+//         Mac mac = Mac.getInstance("HmacSHA256");
+//         mac.init(signingKey);
+//         byte[] rawHmac = mac.doFinal(data.getBytes("UTF-8"));
+
+//         return Base64.getEncoder().encodeToString(rawHmac);
+//     }
+
+//     /**
+//      * 인증번호 검증
+//      */
+//     public boolean verifyAuthCode(String phone, String inputCode, HttpSession session) {
+
+//         String savedCode = (String) session.getAttribute("AUTH_CODE_" + phone);
+//         Long expire = (Long) session.getAttribute("AUTH_EXPIRE_" + phone);
+
+//         // 세션이 아예 없음 → 인증 안 됨
+//         if (savedCode == null || expire == null) {
+//             return false;
+//         }
+
+//         // 만료 시간 체크
+//         if (System.currentTimeMillis() > expire) {
+//             return false;
+//         }
+
+//         // 코드 비교
+//         boolean isMatch = savedCode.equals(inputCode);
+
+//         // 성공하면 세션에 인증 완료 표시 (선택)
+//         if (isMatch) {
+//             session.setAttribute("AUTH_OK_" + phone, "OK");
+//         }
+
+//         return isMatch;
+//     }
+// }

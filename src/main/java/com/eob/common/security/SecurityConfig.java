@@ -2,6 +2,8 @@ package com.eob.common.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -35,6 +37,7 @@ public class SecurityConfig {
 
 
         @Bean
+        @Order(2)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
@@ -190,6 +193,7 @@ public class SecurityConfig {
         // }
 
         @Bean
+        @Order(3)
         SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
                 http
                                 // url이 /admin/~인 요청에 이 필터체인 적용
@@ -242,7 +246,7 @@ public class SecurityConfig {
 
         @Bean
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
-        // @Order(999)
+        @Order(1)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
                 http
                                 /**
@@ -253,18 +257,20 @@ public class SecurityConfig {
                                 .securityMatcher("/member/**")
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
+
                                 /**
                                  * URL 접근 허용 설정
                                  */
                                 .authorizeHttpRequests(auth -> auth
                                                 /* 인증 없이 접근 가능한 요청 목록 */
+                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인 페이지(GET)
                                                 .requestMatchers(
-                                                                "/member/login", // 로그인 페이지(GET)
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
+                                                                "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
-                                                                "/member/send-auth-code", // 문자 전송 AJAX
-                                                                "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                //"/member/send-auth-code", // 문자 전송 AJAX
+                                                                //"/member/verify-auth-code", // 문자 인증코드 확인 AJAX
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
@@ -335,7 +341,8 @@ public class SecurityConfig {
                                  * - 테스트 후 아래 코드 주석 해제 필요
                                  * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
                                  */
-                                .csrf(csrf -> csrf.disable());
+                                .csrf(csrf -> csrf.disable())
+                                .userDetailsService(customDetailService);
                 return http.build();
         }
 

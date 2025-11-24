@@ -1,0 +1,86 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 17.
+*  File : main-layout.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- BootStrap CDN -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+        <!--자식페이지에서 추가로 삽입될 head내용-->
+        <th:block layout:fragment="head"></th:block>
+        <title>모두의 빵</title>
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <!--헤더의 태그들로 replace되는 태그-->
+        <!-- <div th:replace="~{/admin/common/admin-header}"></div> -->
+        <!--헤더-->
+        <header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
+            <nav class="navbar bg-body-tertiary" style="min-width: 800px">
+                <div class="container-fluid d-flex">
+                    <!--수직정렬이 기본인 body의 영향을 벗어나기 위한 d-flex-->
+                    <a class="navbar-brand" href="#">
+                        <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
+                    </a>
+                    <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button> collapse 시 생성되는 햄버거 아이콘 과 id="navbarNavAltMarkup"인 메뉴를 햄버거 안에 담는다는 설정-->
+                    <div class="d-flex flex-column">
+                        <!--검색창과 카테고리를 수직정렬-->
+                        <div class="nav justify-content-center mb-2">
+                            <!--검색창-->
+                            <form class="d-flex" role="search" method="post" action="@{/search}">
+                                <input class="form-control me-2" type="search" aria-label="search" />
+                                <button class="btn btn-outline-primary" type="submit">검색</button>
+                            </form>
+                        </div>
+                        <div class="nav nav-pills justify-content-center">
+                            <!--카테고리 가운데 정렬-->
+                            <a class="nav-link active" href="#">빵</a>
+                            <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
+                            <a class="nav-link" href="#">케이크</a>
+                            <a class="nav-link" href="#">디저트</a>
+                            <a class="nav-link" href="#">카페</a>
+                        </div>
+                    </div>
+                    <div class="navbar-util d-flex flex-column">
+                        <div class="login-util mb-2">
+                            <a class="util-login" th:href="@{/member/login}">로그인/회원가입</a>
+                            <a class="util-logout" th:href="@{/logout}">로그아웃</a>
+                        </div>
+                        <div class="user-util">
+                            <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                            <button class="btn btn-secondary util-alert pb-2">마이페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!--본문-->
+        <main class="flex-grow-1 py-4">
+            <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->
+            <div class="container-fluid">
+                <!--container-fluid의 쓰임은? container-x1이 더 꽉참 fluid가 양쪽에 여백이 있음-->
+                <!-- <div class="row"> div안의 요소를 수평으로 나열 -->
+                <!--main-layout이 적용된 페이지의 content가 출력됨-->
+                <!-- </div> -->
+            </div>
+        </main>
+
+        <!--푸터-->
+        <footer class="mt-auto py-3 bg-light text-center">
+            <p>ⓒ 2025 모두의 빵</p>
+        </footer>
+
+        <script layout:fragment="script" type="text/javascript"></script>
+    </body>
+</html>

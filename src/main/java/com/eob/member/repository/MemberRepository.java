@@ -12,6 +12,7 @@ import com.eob.member.model.data.MemberEntity;
 @Repository
 public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
+    // 로그인 회원 조회
     @Query("select m from MemberEntity m where m.memberId = :username")
     Optional<MemberEntity> findByLoginMember(@Param("username") String username);
 
@@ -21,5 +22,4 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
     // 이메일 중복 확인
     boolean existsByMemberEmail(String memberEmail);
-
 }
