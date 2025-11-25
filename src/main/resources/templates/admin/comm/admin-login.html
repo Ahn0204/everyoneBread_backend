@@ -60,6 +60,7 @@
         </div>
         <th:block th:if="${param.error}">
             <script type="text/javascript">
+                console.log(session)
                 showToast('아이디 및 비밀번호를\n다시 입력해주세요.','error');
             </script>
         </th:block>
