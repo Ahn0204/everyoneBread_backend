@@ -38,7 +38,6 @@ public class CustomDetailService implements UserDetailsService {
 
         // PENDING=가입 대기 | ACTIVE=사용가능 | SUSPENDED=정지 | WITHDRAW=탈퇴 | INACTIVE=폐점 후 계정
         // 존재
-
         switch (member.getStatus()) {
             case PENDING:
                 throw new DisabledException("가입 대기중입니다.");

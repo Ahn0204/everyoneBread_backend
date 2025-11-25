@@ -24,6 +24,8 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
+        System.out.println("💥 로그인 실패 이유: " + exception.getClass().getSimpleName());
+        System.out.println("💥 상세 메시지: " + exception.getMessage());
 
         // 1. session에 메시지 저장
         HttpSession session = request.getSession();
@@ -54,6 +56,7 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
         // 시켜야함
         // 2. 해당 로그인 Controller에서 session에 loginErrorMessage 체크 후 있으면 model로 전송후 session
         // 지우기
+        
     }
 
 }

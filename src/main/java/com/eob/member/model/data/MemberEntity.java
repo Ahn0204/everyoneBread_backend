@@ -112,15 +112,6 @@ public class MemberEntity {
     @Column(name = "LONGITUDE")
     private Double longitude;
 
-    // 회원가입 시 createdAt 자동 설정
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        if(this.status == null){
-            this.status = MemberApprovalStatus.PENDING;
-        }
-    }
-
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     private RiderEntity rider;
 }

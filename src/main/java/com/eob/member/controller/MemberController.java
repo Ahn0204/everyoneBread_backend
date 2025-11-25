@@ -47,6 +47,7 @@ public class MemberController {
             BindingResult bindingResult,
             HttpSession session
     ) {
+        System.out.println(" 전달된 memberROle:" +dto.getMemberRole());
 
         // 1차 DTO @Valid 검증
         if (bindingResult.hasErrors()) {
