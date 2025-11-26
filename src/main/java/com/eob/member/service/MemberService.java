@@ -9,7 +9,6 @@ import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.repository.MemberRepository;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 
@@ -20,91 +19,106 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * 회원가입 처리 전체 로직
-     */
-    public void register(RegisterRequest dto, HttpSession session, BindingResult bindingResult) {
+    /*
+       공통 체크 : 아이디 / 이메일 중복검사
+    */
+    private void validateDuplicate(RegisterRequest dto, BindingResult bindingResult) {
 
-        /* 아이디 중복 */
         if (!isMemberIdAvailable(dto.getMemberId())) {
             bindingResult.rejectValue("memberId", "duplicateId", "이미 사용 중인 아이디입니다.");
-            return;
         }
 
-        /* 이메일 중복 */
         if (!isMemberEmailAvailable(dto.getMemberEmail())) {
             bindingResult.rejectValue("memberEmail", "duplicateEmail", "이미 사용 중인 이메일입니다.");
-            return;
         }
 
-        /* 비밀번호 일치 확인 */
+        if (bindingResult.hasErrors()) return;
+
         if (!dto.getMemberPw().equals(dto.getMemberPwConfirm())) {
             bindingResult.rejectValue("memberPwConfirm", "pwMismatch", "비밀번호가 일치하지 않습니다.");
-            return;
         }
+    }
 
-        // /* 휴대폰 인증 여부 */
-        // if (!isPhoneVerified(dto.getMemberPhone(), session)) {
-        //     bindingResult.rejectValue("memberPhone", "phoneNotVerified", "휴대폰 인증을 완료해주세요.");
-        //     return;
-        // }
+    /*
+        공통 처리 : DTO → MemberEntity 변환
+    */
+    private MemberEntity toEntity(RegisterRequest dto) {
 
-        /* MemberEntity 생성 및 DTO → 엔티티 변환 */
         MemberEntity entity = new MemberEntity();
 
         entity.setMemberId(dto.getMemberId());
-
-        // 비밀번호 암호화
-        String encodedPw = passwordEncoder.encode(dto.getMemberPw());
-        entity.setMemberPw(encodedPw);
-
+        entity.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
         entity.setMemberName(dto.getMemberName());
         entity.setMemberEmail(dto.getMemberEmail());
         entity.setMemberPhone(dto.getMemberPhone());
 
-        /* 주소 조합 (기본주소 + 상세주소) */
+        // 주소 조합
         String fullAddress = dto.getMemberAddress();
         if (dto.getMemberAddressDetail() != null && !dto.getMemberAddressDetail().isBlank()) {
             fullAddress += " " + dto.getMemberAddressDetail();
         }
         entity.setMemberAddress(fullAddress);
 
-
-        // 주민등록번호 합치기
+        // 주민등록번호
         entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
 
-        // 역할 세팅
-        /**
-         * 회원 상태 설정
-         * USER -> 로그인 시 메인 페이지로 이동 : ACTIVE
-         * SHOP, RIDER -> 가입 대기 상태로 설정 : PENDING
-         */
-        MemberRoleStatus role = MemberRoleStatus.valueOf(dto.getMemberRole());
-        entity.setMemberRole(role);
-
-        switch(role){
-            case USER:
-                // 일반 회원은 바로 ACTIVE
-                entity.setStatus(MemberApprovalStatus.ACTIVE);
-                break;
-
-            case SHOP:
-            case RIDER:
-                // 상점/라이더는 가입 대기 상태로 설정
-                entity.setStatus(MemberApprovalStatus.PENDING);
-                break;
-
-            default:
-                entity.setStatus(MemberApprovalStatus.PENDING);
-                break;
-        }
-
-        /* 저장 */
-        memberRepository.save(entity);
-
-        /* 인증 세션 제거 */
-        // cleanupPhoneAuth(dto.getMemberPhone(), session);
+        return entity;
     }
+
+    /*
+        일반 회원 가입
+    */
+    public MemberEntity registerUser(RegisterRequest dto, BindingResult bindingResult) {
+
+        // 중복 및 PW 검사
+        validateDuplicate(dto, bindingResult);
+        if (bindingResult.hasErrors()) return null;
+
+        // 엔티티 변환
+        MemberEntity entity = toEntity(dto);
+
+        // 역할 / 상태 지정
+        entity.setMemberRole(MemberRoleStatus.USER);
+        entity.setStatus(MemberApprovalStatus.ACTIVE);
+
+        return memberRepository.save(entity);
+    }
+
+    /*
+        판매자 회원 가입
+    */
+    public MemberEntity registerShop(RegisterRequest dto, BindingResult bindingResult) {
+
+        // 중복 및 PW 검사
+        validateDuplicate(dto, bindingResult);
+        if (bindingResult.hasErrors()) return null;
+
+        // 엔티티 변환
+        MemberEntity entity = toEntity(dto);
+
+        entity.setMemberRole(MemberRoleStatus.SHOP);
+        // entity.setStatus(MemberApprovalStatus.PENDING); // 테스트 후 주석 제거
+        entity.setStatus(MemberApprovalStatus.ACTIVE);  // 테스트용
+
+        return memberRepository.save(entity);
+    }
+
+    /*
+        라이더 회원 가입
+    */
+    // public MemberEntity registerRider(RegisterRequest dto, BindingResult bindingResult) {
+
+    //     validateDuplicate(dto, bindingResult);
+    //     if (bindingResult.hasErrors()) return null;
+
+    //     MemberEntity entity = toEntity(dto);
+
+    //     entity.setMemberRole(MemberRoleStatus.RIDER);
+    //     entity.setStatus(MemberApprovalStatus.PENDING);
+
+    //     return memberRepository.save(entity);
+    // }
+
 
     // 아이디 중복 확인
     public boolean isMemberIdAvailable(String memberId){
@@ -116,84 +130,8 @@ public class MemberService {
         return !memberRepository.existsByMemberEmail(memberEmail);
     }
 
-    // // 휴대폰 인증 여부 확인
-    // public boolean isPhoneVerified(String phone, HttpSession session) {
-    //     String verified = (String) session.getAttribute("AUTH_OK_" + phone);
-    //     return "OK".equals(verified);
-    // }
-
-    // // 휴대폰 인증 세션 정리
-    // private void cleanupPhoneAuth(String phone, HttpSession session) {
-    //     session.removeAttribute("AUTH_CODE_" + phone);
-    //     session.removeAttribute("AUTH_EXPIRE_" + phone);
-    //     session.removeAttribute("AUTH_OK_" + phone);
-    // }
-
-    /**
- * 판매자 회원가입 (SHOP 전용)
- */
-public MemberEntity registerShop(RegisterRequest dto) {
-
-    /* ============================
-       1. 아이디 / 이메일 중복 검사
-    ============================ */
-    if (!isMemberIdAvailable(dto.getMemberId())) {
-        throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+    public MemberEntity findById(Long memberNo) {
+        return memberRepository.findById(memberNo)
+                .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
-
-    if (!isMemberEmailAvailable(dto.getMemberEmail())) {
-        throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
-    }
-
-    /* ============================
-       2. 비밀번호 확인
-    ============================ */
-    if (!dto.getMemberPw().equals(dto.getMemberPwConfirm())) {
-        throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-    }
-
-    /* ============================
-       3. MemberEntity 생성
-    ============================ */
-    MemberEntity entity = new MemberEntity();
-
-    entity.setMemberId(dto.getMemberId());
-
-    // 비밀번호 암호화
-    entity.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
-
-    entity.setMemberName(dto.getMemberName());
-    entity.setMemberEmail(dto.getMemberEmail());
-    entity.setMemberPhone(dto.getMemberPhone());
-
-    // 주소 조합
-    String fullAddress = dto.getMemberAddress();
-    if (dto.getMemberAddressDetail() != null && !dto.getMemberAddressDetail().isBlank()) {
-        fullAddress += " " + dto.getMemberAddressDetail();
-    }
-    entity.setMemberAddress(fullAddress);
-
-    // 주민번호 합치기
-    entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
-
-    /* ============================
-       4. 역할 / 상태 설정
-    ============================ */
-    entity.setMemberRole(MemberRoleStatus.SHOP); // SHOP 고정
-
-    // 판매자/라이더는 승인(PENDING) 상태로 등록
-    entity.setStatus(MemberApprovalStatus.PENDING);
-
-    /* ============================
-       5. 저장 및 반환
-    ============================ */
-    return memberRepository.save(entity);
-}
-
-public MemberEntity findById(Long memberNo) {
-    return memberRepository.findById(memberNo)
-            .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
-}
-
-
 }

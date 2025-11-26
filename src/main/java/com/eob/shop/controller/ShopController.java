@@ -1,5 +1,7 @@
 package com.eob.shop.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,51 +21,59 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/shop/*")
 public class ShopController {
 
-    private final MemberService memberService; // 회원 저장용
-    private final ShopService shopService;     // 상점 저장용
+    private final MemberService memberService; 
+    private final ShopService shopService;     
 
+    /*
+       판매자 로그인 페이지
+    */
+    @GetMapping("login")
+    public String shopLogin() {
+        return "shop/shop-login";
+    }
 
-    /* ==========================================
-       STEP 1 : 판매자 회원 기본정보 입력 화면
-    ========================================== */
+    /*
+        판매자 회원가입 페이지
+    */
     @GetMapping("register/start")
     public String registerStartForm(Model model) {
 
-        // RegisterRequest 객체를 미리 넣어야 Thymeleaf 에러 안 남
         model.addAttribute("registerRequest", new RegisterRequest());
         return "shop/shop-register-start";
     }
 
-
-    /* ==========================================
-       STEP 1 제출 → 회원 저장 후 STEP2 이동
-    ========================================== */
+    /*
+        판매자 회원 저장
+    */
     @PostMapping("register/start")
-    public String registerStart(@Valid RegisterRequest dto,
-                                BindingResult bindingResult,
-                                Model model) {
+    public String registerStart(
+            @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
+            BindingResult bindingResult,
+            Model model) {
 
-        // 유효성 검증 실패 → 다시 폼으로
+        // Valid 검증 실패
         if (bindingResult.hasErrors()) {
             return "shop/shop-register-start";
         }
 
-        // role 강제 SHOP
+        // ROLE 강제 SHOP 주입
         dto.setMemberRole("SHOP");
 
-        // 회원 저장 (비밀번호 암호화 포함)
-        MemberEntity newMember = memberService.registerShop(dto);
+        // registerShop 호출 (이제 bindingResult 필요)
+        MemberEntity newMember = memberService.registerShop(dto, bindingResult);
 
-        // 다음 화면에서 필요하므로 memberNo 전달
+        // registerShop 내부 검증 실패
+        if (bindingResult.hasErrors()) {
+            return "shop/shop-register-start";
+        }
+
         model.addAttribute("memberNo", newMember.getMemberNo());
-
         return "shop/shop-register-step";
     }
 
-
-    /* ==========================================
-       STEP 2 : 상점 정보 입력 화면
-    ========================================== */
+    /*
+        상점 정보 입력 화면
+    */
     @GetMapping("register/step")
     public String registerStepForm(@RequestParam("memberNo") Long memberNo, Model model) {
 
@@ -71,32 +81,39 @@ public class ShopController {
         return "shop/shop-register-step";
     }
 
-
-    /* ==========================================
-       STEP 2 제출 → 상점 정보 저장
-    ========================================== */
+    /*
+        상점 정보 저장
+    */
     @PostMapping("register/step")
-    public String registerStep(ShopEntity shop, @RequestParam("memberNo") Long memberNo) {
+    public String registerStep(
+            ShopEntity shop,
+            @RequestParam("memberNo") Long memberNo) {
 
-        // 회원 정보 조회
+        // 회원 조회
         MemberEntity member = memberService.findById(memberNo);
 
-        // ShopEntity에 MemberEntity 세팅
+        // ShopEntity 세팅
         shop.setMember(member);
-
         shop.setSellerName(member.getMemberName());
+        shop.setCreatedAt(LocalDateTime.now());
 
-        // shop 안에 memberNo 반드시 있어야 함
         shopService.saveShop(shop);
 
-        // 저장 후 판매자 메인으로 이동
         return "redirect:/shop";
     }
 
+    /*
+        상점명 중복 확인
+    */
+    @GetMapping("check-name")
+    @ResponseBody
+    public boolean checkShopName(@RequestParam("shopName") String shopName) {
+        return !shopService.existsByShopName(shopName);
+    }
 
-    /* ==========================================
-       판매자 메인
-    ========================================== */
+    /*
+        판매자 메인 페이지
+    */
     @GetMapping("")
     public String shopMain() {
         return "shop/shop-main";

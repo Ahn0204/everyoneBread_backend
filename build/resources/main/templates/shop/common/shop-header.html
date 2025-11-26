@@ -3,95 +3,125 @@
 <th:block th:fragment="shop-header">
 
     <style>
-        /* ===== 공통 판매자 헤더 기본틀 ===== */
+        /* ===== 판매자 헤더 전체 ===== */
         .shop-header-wrapper {
             width: 100%;
-            border: 1px solid #000;
-            padding: 20px;
+            padding: 16px 24px;
             box-sizing: border-box;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
         }
 
         /* 왼쪽: 상점 이미지 + 상점명 */
         .shop-header-left {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .shop-img-box {
-            width: 70px;
-            height: 70px;
-            border: 1px solid #000;
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            background: #f7f7f7;
+            border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 11px;
+            color: #555;
         }
 
-        /* 중앙: 메뉴 */
+        .shop-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* 중앙 메뉴 */
         .shop-menu {
             display: flex;
-            gap: 15px;
+            gap: 20px;
         }
 
         .shop-menu a {
-            border: 1px solid #000;
-            padding: 8px 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #444;
             text-decoration: none;
-            color: #000;
-            font-size: 14px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            transition: 0.2s;
         }
 
-        /* 오른쪽: 알림함, 정보관리, 로그아웃 */
+        .shop-menu a:hover {
+            background: #f4f4f4;
+            color: #000;
+        }
+
+        /* 오른쪽: 아이콘 버튼 + 링크 */
         .shop-header-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 18px;
         }
 
         .shop-circle-btn {
-            width: 55px;
-            height: 55px;
-            border: 1px solid #000;
+            width: 45px;
+            height: 45px;
+            background: #f7f7f7;
             border-radius: 50%;
+            border: 1px solid #ddd;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
+            color: #555;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .shop-circle-btn:hover {
+            background: #ececec;
         }
 
         .shop-link {
-            font-size: 12px;
+            font-size: 14px;
+            color: #444;
             text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .shop-link:hover {
             color: #000;
+            text-decoration: underline;
         }
     </style>
 
     <div class="shop-header-wrapper">
 
-        <!-- 왼쪽 -->
+        <!-- 왼쪽: 로고 / 상점 이미지 -->
         <div class="shop-header-left">
-            <div class="shop-img-box">
-                상점img
-            </div>
+            <div class="shop-img-box">상점</div>
+            <div class="shop-name">상점명</div>
         </div>
 
         <!-- 중앙 메뉴 -->
         <div class="shop-menu">
             <a href="#">상품 관리</a>
             <a href="#">주문 관리</a>
-            <a href="#">후기/문의 관리</a>
+            <a href="#">후기 · 문의</a>
         </div>
 
-        <!-- 오른쪽 -->
+        <!-- 오른쪽 메뉴 -->
         <div class="shop-header-right">
-            <div class="shop-circle-btn">알림함</div>
-            <a class="shop-link" href="#">정보관리</a>
+            <div class="shop-circle-btn">알림</div>
+            <a class="shop-link" href="#">내 정보</a>
             <a class="shop-link" href="#">로그아웃</a>
-            <a class="shop-link" href="#">고객센터</a>
         </div>
 
     </div>

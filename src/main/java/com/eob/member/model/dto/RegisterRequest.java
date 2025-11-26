@@ -80,7 +80,7 @@ public class RegisterRequest {
     private String memberAddressDetail;
 
     //  회원 역할
-    //  USER / SHOP / RIDER
+    //  USER / SHOP / RIDER / ADMIN
     @NotBlank(message = "회원 유형이 지정되지 않았습니다.")
     private String memberRole;
 }

@@ -14,4 +14,14 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
     @Query("select s from ShopEntity s where s.member = :member")
     Optional<ShopEntity> loginShop(@Param("member") MemberEntity member);
 
+    /**
+     * 상점명 중복 확인
+     */
+    boolean existsByShopName(String shopName);
+
+    /**
+     * 회원 번호로 상점 조회
+     * (s.member.memberNo)
+     */
+    Optional<ShopEntity> findByMember_MemberNo(Long memberNo);
 }

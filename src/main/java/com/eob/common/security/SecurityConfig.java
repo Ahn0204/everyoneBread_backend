@@ -205,10 +205,10 @@ public class SecurityConfig {
                                 * 정적 리소스(css/js/img/...) 허용
                                 */
                                 .requestMatchers(
-                                        "shop",
-                                        "shop/",
-                                        "/shop/shop-register",       // 가입 폼 GET
-                                        "/shop/shop-register/**",   // 가입 처리 POST
+                                        "/shop/register/start",       // 가입 폼 GET
+                                        "/shop/register/start/**",   // 가입 처리 POST
+                                        "/shop/register/step",
+                                        "/shop/register/step/**",
                                         "/shop/login",              // 판매자 로그인 페이지
                                         "/css/**", "/js/**", 
                                         "/image/**", "/fonts/**", "/lib/**"
