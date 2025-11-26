@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/common/shop-layout}">
+
+<head>
+    <style>
+        .product-add-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            background-color: #fff;
+        }
+
+        .product-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        .product-form-table {
+            width: 100%;
+        }
+
+        .product-label {
+            width: 150px;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 0;
+            vertical-align: top;
+        }
+
+        .product-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* 이미지 업로드 박스 */
+        .image-upload-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .image-preview-box {
+            width: 120px;
+            height: 120px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            color: #777;
+        }
+
+        /* 카테고리 안내 */
+        .category-guide {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+        }
+
+        /* 등록 버튼 */
+        .submit-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border: 1px solid #000;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="product-add-container">
+
+        <div class="product-title">상품 등록</div>
+
+        <form th:action="@{/shop/products/add}" method="post" enctype="multipart/form-data">
+
+            <table class="product-form-table">
+                <tr>
+                    <td class="product-label">상품명</td>
+                    <td><input type="text" name="name" class="product-input" required></td>
+                </tr>
+
+                <tr>
+                    <td class="product-label">상품 이미지</td>
+                    <td>
+                        <div class="image-upload-wrapper">
+                            <div class="image-preview-box" id="previewBox">
+                                이미지<br>미리보기
+                            </div>
+                            <input type="file" name="image" id="imageInput" accept="image/*" class="product-input">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="product-label">가격</td>
+                    <td><input type="number" name="price" class="product-input" required></td>
+                </tr>
+
+                <tr>
+                    <td class="product-label">한줄소개</td>
+                    <td><input type="text" name="summary" class="product-input"></td>
+                </tr>
+
+                <tr>
+                    <td class="product-label">재료</td>
+                    <td><input type="text" name="ingredients" class="product-input"></td>
+                </tr>
+
+                <tr>
+                    <td class="product-label">카테고리 선택</td>
+                    <td>
+                        <select name="category" class="product-input">
+                            <option value="CROISSANT">크루아상</option>
+                            <option value="BREAD">식빵</option>
+                            <option value="MUFFIN">머핀</option>
+                            <option value="CASTELLA">카스테라</option>
+                        </select>
+                        <div class="category-guide">카테고리 추가는 카테고리 모듈을 이용해주세요.</div>
+                    </td>
+                </tr>
+            </table>
+
+            <button type="submit" class="submit-btn">등록</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script>
+    // 이미지 미리보기
+    document.getElementById("imageInput").addEventListener("change", function (e) {
+        let file = e.target.files[0];
+        let preview = document.getElementById("previewBox");
+
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                preview.innerHTML = `<img src="${event.target.result}" 
+                                         style="width:100%; height:100%; object-fit:cover; border-radius:8px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+
+</body>
+
+</html>
