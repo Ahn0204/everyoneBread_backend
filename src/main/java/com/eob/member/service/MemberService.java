@@ -128,4 +128,72 @@ public class MemberService {
     //     session.removeAttribute("AUTH_EXPIRE_" + phone);
     //     session.removeAttribute("AUTH_OK_" + phone);
     // }
+
+    /**
+ * 판매자 회원가입 (SHOP 전용)
+ */
+public MemberEntity registerShop(RegisterRequest dto) {
+
+    /* ============================
+       1. 아이디 / 이메일 중복 검사
+    ============================ */
+    if (!isMemberIdAvailable(dto.getMemberId())) {
+        throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+    }
+
+    if (!isMemberEmailAvailable(dto.getMemberEmail())) {
+        throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+    }
+
+    /* ============================
+       2. 비밀번호 확인
+    ============================ */
+    if (!dto.getMemberPw().equals(dto.getMemberPwConfirm())) {
+        throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+    }
+
+    /* ============================
+       3. MemberEntity 생성
+    ============================ */
+    MemberEntity entity = new MemberEntity();
+
+    entity.setMemberId(dto.getMemberId());
+
+    // 비밀번호 암호화
+    entity.setMemberPw(passwordEncoder.encode(dto.getMemberPw()));
+
+    entity.setMemberName(dto.getMemberName());
+    entity.setMemberEmail(dto.getMemberEmail());
+    entity.setMemberPhone(dto.getMemberPhone());
+
+    // 주소 조합
+    String fullAddress = dto.getMemberAddress();
+    if (dto.getMemberAddressDetail() != null && !dto.getMemberAddressDetail().isBlank()) {
+        fullAddress += " " + dto.getMemberAddressDetail();
+    }
+    entity.setMemberAddress(fullAddress);
+
+    // 주민번호 합치기
+    entity.setMemberJumin(dto.getJumin1() + "-" + dto.getJumin2());
+
+    /* ============================
+       4. 역할 / 상태 설정
+    ============================ */
+    entity.setMemberRole(MemberRoleStatus.SHOP); // SHOP 고정
+
+    // 판매자/라이더는 승인(PENDING) 상태로 등록
+    entity.setStatus(MemberApprovalStatus.PENDING);
+
+    /* ============================
+       5. 저장 및 반환
+    ============================ */
+    return memberRepository.save(entity);
+}
+
+public MemberEntity findById(Long memberNo) {
+    return memberRepository.findById(memberNo)
+            .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
+}
+
+
 }

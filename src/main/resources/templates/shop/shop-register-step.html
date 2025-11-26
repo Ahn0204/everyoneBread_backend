@@ -1,14 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <title>입점신청</title>
 
+    <!-- 공통 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* 1. 기본 초기화 및 폰트 */
+        /* ================================
+           기본 설정
+        =================================*/
         * {
             box-sizing: border-box;
             font-family: 'Noto Sans KR', sans-serif;
@@ -23,17 +26,21 @@
             min-height: 100vh;
         }
 
-        /* 2. 전체 컨테이너 (박스 형태) */
+        /* ================================
+           메인 컨테이너 박스
+        =================================*/
         .signup-container {
             width: 100%;
-            max-width: 550px; 
+            max-width: 550px;
             padding: 40px;
-            border: 2px solid #000; 
+            border: 2px solid #000;
             border-radius: 10px;
             background-color: #fff;
         }
 
-        /* 3. 헤더 스타일 */
+        /* ================================
+           헤더 (입점신청 제목)
+        =================================*/
         .signup-header {
             text-align: center;
             margin-bottom: 30px;
@@ -46,27 +53,30 @@
         .signup-header hr {
             border: 0;
             height: 2px;
+            background-color: #000;
         }
 
-        /* 4. 입력 폼 행(Row) 스타일 */
+        /* ================================
+           입력폼 (행 구성)
+        =================================*/
         .form-row {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
 
-        /* 왼쪽 라벨 (상점명, 주소 등) */
+        /* 왼쪽 라벨 */
         .form-label {
-            width: 130px; /* 글자 수가 길어져서 120px -> 130px로 살짝 늘림 */
+            width: 130px;
             font-weight: 700;
             font-size: 15px;
             color: #333;
-            flex-shrink: 0; 
+            flex-shrink: 0;
         }
 
-        /* 입력창 공통 스타일 */
+        /* 입력 박스 공통 스타일 */
         .input-text {
-            flex: 1; 
+            flex: 1;
             height: 45px;
             padding: 0 10px;
             border: 1px solid #000;
@@ -79,14 +89,14 @@
             border-width: 2px;
         }
 
-        /* 5. 버튼이 옆에 붙는 영역 */
+        /* 입력 옆 버튼 붙는 영역 */
         .input-with-btn {
             display: flex;
             flex: 1;
-            gap: 8px; 
+            gap: 8px;
         }
 
-        /* 작은 버튼 (인증, 사진첨부) */
+        /* 작은 버튼 */
         .btn-small {
             height: 45px;
             padding: 0 15px;
@@ -95,15 +105,16 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: bold;
-            white-space: nowrap;
+            font-weight: 700;
             transition: all 0.2s;
         }
         .btn-small:hover {
             background-color: #f0f0f0;
         }
 
-        /* 6. 하단 버튼 영역 (가입) */
+        /* ================================
+           하단 버튼 (가입)
+        =================================*/
         .action-buttons {
             margin-top: 40px;
             display: flex;
@@ -120,7 +131,6 @@
             transition: all 0.2s;
         }
 
-        /* 가입 버튼 스타일 */
         .btn-submit {
             background-color: #fff;
             border: 2px solid #000;
@@ -133,6 +143,7 @@
 
     </style>
 </head>
+
 <body>
 
     <div class="signup-container">
@@ -141,8 +152,13 @@
             <hr>
         </div>
 
-        <form method="post" action="/shop/shop-register">
+        <!-- STEP2 : 상점 정보 입력 -->
+        <form method="post" action="/shop/register/step">
 
+            <!-- Step1에서 받은 memberNo가 있다면 hidden으로 유지해야 한다 -->
+            <input type="hidden" name="memberNo" th:value="${memberNo}">
+
+            <!-- 상점명 -->
             <div class="form-row">
                 <label class="form-label">상점명</label>
                 <div class="input-with-btn">
@@ -151,11 +167,13 @@
                 </div>
             </div>
 
+            <!-- 사업장 주소 -->
             <div class="form-row">
                 <label class="form-label">사업장 주소</label>
                 <input type="text" name="shopAddress" class="input-text" required>
             </div>
 
+            <!-- 사업자 등록번호 -->
             <div class="form-row">
                 <label class="form-label">사업자 등록번호</label>
                 <div class="input-with-btn">
@@ -164,12 +182,65 @@
                 </div>
             </div>
 
+            <!-- 제출 버튼 -->
             <div class="action-buttons">
                 <button type="submit" class="btn-large btn-submit">가입</button>
             </div>
-            
+
         </form>
     </div>
+
+    <script>
+        /* --------------------------------------------------------
+           1) 사업자 등록번호 하이픈 자동 추가
+              입력 예: 123-45-67890 (길이 12)
+        ---------------------------------------------------------*/
+        $("input[name='bizNo']").on("input", function() {
+
+            let v = $(this).val().replace(/[^0-9]/g, "");  // 숫자만 남김
+            if (v.length > 10) v = v.substring(0, 10);    // 최대 10자리까지만
+
+            let res = "";
+
+            if (v.length < 4) res = v; // 3자리 이하 → 그대로
+            else if (v.length < 6) res = v.substring(0,3) + "-" + v.substring(3);
+            else res = v.substring(0,3) + "-" + v.substring(3,5) + "-" + v.substring(5);
+
+            $(this).val(res);
+        });
+
+
+        /* --------------------------------------------------------
+           2) 최종 submit 유효성 검사
+        ---------------------------------------------------------*/
+        $("form").submit(function() {
+
+            let shop = $("input[name='shopName']").val().trim();
+            let addr = $("input[name='shopAddress']").val().trim();
+            let biz = $("input[name='bizNo']").val().trim();
+
+            // 상점명 검사
+            if (shop.length < 1) {
+                alert("상점명을 입력해주세요.");
+                return false;
+            }
+
+            // 주소 검사
+            if (addr.length < 5) {
+                alert("사업장 주소를 입력해주세요.");
+                return false;
+            }
+
+            // 사업자번호 형식 검사 (123-45-67890 = 길이 12)
+            if (biz.length !== 12) {
+                alert("올바른 사업자 등록번호 형식이 아닙니다.");
+                return false;
+            }
+
+            return true;
+        });
+
+    </script>
 
 </body>
 </html>

@@ -41,7 +41,7 @@ public class MemberController {
     }
 
     // 회원가입 처리
-    @PostMapping("/register")
+    @PostMapping("register")
     public String register(
             @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
             BindingResult bindingResult,
@@ -63,12 +63,12 @@ public class MemberController {
 
         // 상점 회원은 shop-register로 이동
         if ("SHOP".equals(dto.getMemberRole())) {
-            return "redirect:/shop/shop-register";
+            return "redirect:/shop/shop-register-start";
         }
 
         // 라이더 회원은 rider-register로 이동
         if("RIDER".equals(dto.getMemberRole())){
-            return "redirect:/rider/register/start";
+            return "redirect:/rider/register-start";
         }
 
         // 일반 회원은 member-register로 이동
