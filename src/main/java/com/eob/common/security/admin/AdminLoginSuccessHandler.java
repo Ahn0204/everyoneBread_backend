@@ -12,8 +12,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 로그인 성공시 행동 하는 핸들러
+ * 관리자 로그인 성공시 행동 하는 핸들러
  * { 권한 별로 리다이렉트 페이지 다르게하기 }
+ * 실습용으로, 현재 사용안하는 중(2025-11-25)
  */
 @Component
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class AdminLoginSuccessHandler extends SavedRequestAwareAuthenticationSuc
         // 로그인한 유저의 권한을 꺼낸다(role값)
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        if (role.equals("ADMIN")) { // 꺼낸 권한이 ADMIN이라면
+        if (role.equals("ROLE_ADMIN")) { // 꺼낸 권한이 ADMIN이라면
             response.sendRedirect("/"); // 로그인 성공 시 /admin으로 이동
         }
             // } else if (role.equals("RIDER")) {

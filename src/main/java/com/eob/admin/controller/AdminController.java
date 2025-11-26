@@ -6,12 +6,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,19 @@ public class AdminController {
 
     // 로그인 페이지
     @GetMapping("/login")
-    public String getAdminLoginP() {
+    public String getAdminLoginP(HttpSession session, Model model) {
+        
+        //세션 값 확인
+        String error = (String)session.getAttribute("loginErrorMessage");
+        
+        //로그인 실패 메세지가 있다면
+        if(error!=null){
+            //에러 메시지 띄우기
+            model.addAttribute("error",error);
+            //세션 삭제
+            session.removeAttribute("loginErrorMessage");
+        }
+        
         return "admin/comm/admin-login";
     }
 

@@ -33,7 +33,7 @@ public class SecurityConfig {
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
-        //private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+        private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
 
         @Bean
@@ -250,7 +250,7 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login","/admin/login/**", "/css/**", "/js/**", "/image/**",
+                                                .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
@@ -264,7 +264,7 @@ public class SecurityConfig {
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
                                                 // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/loginPro")
+                                                .loginProcessingUrl("/admin/loginPro") //왜~~~여기가 login이면 안되는거야
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
                                                 .usernameParameter("id")
                                                 // password파라미터의 이름
@@ -285,8 +285,8 @@ public class SecurityConfig {
                                 // //로그아웃 요청
                                 // );
                                 
-                                //이 경로에서 사용할 userDetailsService 설정
-                                .userDetailsService(adminDetailService)
+                                //이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
+                                .userDetailsService(customDetailService)
 
                                 .csrf(csrf -> csrf.disable());
 
