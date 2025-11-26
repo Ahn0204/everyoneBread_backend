@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-         private final AdminDetailService adminDetailService;
+        private final AdminDetailService adminDetailService;
 
         private final CustomDetailService customDetailService;
 
@@ -34,7 +34,6 @@ public class SecurityConfig {
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
-
 
         @Bean
         @Order(2)
@@ -188,7 +187,7 @@ public class SecurityConfig {
 
         // @Bean
         // SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
-        //         return null;
+        // return null;
 
         // }
 
@@ -204,17 +203,16 @@ public class SecurityConfig {
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
-                                                //.requestMatchers("/admin/**").hasRole("ADMIN")
-                                // 이외 모든 경로 관리자만 접근 허용
-                                .anyRequest().hasRole("ADMIN")
-                                )
+                                                // .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                // 이외 모든 경로 관리자만 접근 허용
+                                                .anyRequest().hasRole("ADMIN"))
 
                                 // 관리자 로그인 페이지 설정&처리
                                 .formLogin((auth) -> auth
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
                                                 // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/login") //왜~~~여기가 login이면 안되는거야
+                                                .loginProcessingUrl("/admin/login") // 왜~~~여기가 login이면 안되는거야
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
                                                 .usernameParameter("id")
                                                 // password파라미터의 이름
@@ -226,16 +224,15 @@ public class SecurityConfig {
                                                 // 로그인 실패시의 동작 정의(핸들러)
                                                 .failureHandler(customAuthFailureHandler)
                                                 // 로그인 실패 시 리다이렉트 될 url
-                                                //.failureUrl("/admin/login?error=true")
-                                                .permitAll()
-                                        )
+                                                // .failureUrl("/admin/login?error=true")
+                                                .permitAll())
 
                                 // http
                                 // .logout((auth) -> auth
                                 // //로그아웃 요청
                                 // );
-                                
-                                //이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
+
+                                // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
                                 .userDetailsService(customDetailService)
 
                                 .csrf(csrf -> csrf.disable());
@@ -263,14 +260,15 @@ public class SecurityConfig {
                                  */
                                 .authorizeHttpRequests(auth -> auth
                                                 /* 인증 없이 접근 가능한 요청 목록 */
-                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인 페이지(GET)
+                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
+                                                                                                              // 페이지(GET)
                                                 .requestMatchers(
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
-                                                                //"/member/send-auth-code", // 문자 전송 AJAX
-                                                                //"/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                // "/member/send-auth-code", // 문자 전송 AJAX
+                                                                // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
