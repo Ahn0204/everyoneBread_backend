@@ -214,7 +214,7 @@ public class SecurityConfig {
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
                                                 // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/loginPro") //왜~~~여기가 login이면 안되는거야
+                                                .loginProcessingUrl("/admin/login") //왜~~~여기가 login이면 안되는거야
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
                                                 .usernameParameter("id")
                                                 // password파라미터의 이름
