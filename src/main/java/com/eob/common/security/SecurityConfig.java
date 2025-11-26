@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.eob.common.security.admin.AdminDetailService;
@@ -202,8 +203,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
-                                                // 관리자만 관리자 페이지 접근 허용
-                                                // .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                // .anyRequest().permitAll())
                                                 // 이외 모든 경로 관리자만 접근 허용
                                                 .anyRequest().hasRole("ADMIN"))
 
@@ -227,15 +227,28 @@ public class SecurityConfig {
                                                 // .failureUrl("/admin/login?error=true")
                                                 .permitAll())
 
-                                // http
-                                // .logout((auth) -> auth
-                                // //로그아웃 요청
-                                // );
+                                // 로그아웃 요청
+                                .logout((auth) -> auth
+                                                // 로그아웃 요청 url, http메서드 설정
+                                                // post매핑으로 해놓아야 사용자가 URL로 접속할 수 없음
+                                                .logoutRequestMatcher(
+                                                                new AntPathRequestMatcher("/admin/logout", "post"))
+                                                // 로그아웃 성공 시 url
+                                                .logoutSuccessUrl("/admin/login")
+                                                // 로그아웃 시 세션 무효화
+                                                .invalidateHttpSession(true)
+                                                // 로그아웃 시 브라우저에 저장된 JSESSIONID 쿠키 삭제
+                                                .deleteCookies("JSESSIONID"))
+
+                                // csrf비활성화
+                                // .csrf(csrf -> csrf.disable()
+                                .csrf(csrf -> csrf
+                                                // csrf 활성화
+                                                .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
+                                // .csrfTokenRepository(CookieCsrfTokenRepository)
 
                                 // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
-                                .userDetailsService(customDetailService)
-
-                                .csrf(csrf -> csrf.disable());
+                                .userDetailsService(customDetailService);
 
                 return http.build();
 
