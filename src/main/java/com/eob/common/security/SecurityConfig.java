@@ -186,11 +186,61 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        // @Bean
-        // SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
-        //         return null;
+        @Bean
+        @Order(4)
+        SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
 
-        // }
+                http
+                                /* 
+                                * 이 필터체인이 적용될 URL 패턴 지정
+                                * /shop/** 로 시작하는 모든 URL은 여기에서 처리됨
+                                */
+                                .securityMatcher("/shop/**")
+
+                                .authorizeHttpRequests(auth -> auth
+                                /* 
+                                * permitAll() : 로그인하지 않아도 접근 허용 
+                                * shop-register(입점 신청) GET/POST 모두 허용
+                                * shop 로그인 페이지도 허용
+                                * 정적 리소스(css/js/img/...) 허용
+                                */
+                                .requestMatchers(
+                                        "shop",
+                                        "shop/",
+                                        "/shop/shop-register",       // 가입 폼 GET
+                                        "/shop/shop-register/**",   // 가입 처리 POST
+                                        "/shop/login",              // 판매자 로그인 페이지
+                                        "/css/**", "/js/**", 
+                                        "/image/**", "/fonts/**", "/lib/**"
+                                ).permitAll()
+
+                                /*
+                                * 위에서 허용한 요청 외 /shop/** 내부의 모든 요청은 인증 필요
+                                * → 로그인하지 않은 SHOP 사용자는 /shop/login 으로 리다이렉트됨
+                                */
+                                .anyRequest().authenticated()
+                                )
+
+                                /* 
+                                * 판매자(Shop) 로그인 설정
+                                * - loginPage() : 로그인 화면을 보여줄 GET URL
+                                * - loginProcessingUrl() : 로그인 POST 요청 처리 URL
+                                * - usernameParameter / passwordParameter : form input name 설정
+                                */
+                                .formLogin(login -> login
+                                .loginPage("/shop/login")          // 로그인 페이지 (GET)
+                                .loginProcessingUrl("/shop/login") // 로그인 처리 (POST)
+                                .usernameParameter("shopId")       // input name="shopId"
+                                .passwordParameter("shopPw")       // input name="shopPw"
+                                .successHandler(customLoginSuccessHandler)   // 로그인 성공 시 처리
+                                .failureHandler(customAuthFailureHandler)    // 로그인 실패 시 처리
+                                )
+
+                                /* 개발 단계에서 CSRF 비활성화 */
+                                .csrf(csrf -> csrf.disable());
+
+                        return http.build();
+        }
 
         @Bean
         @Order(3)
@@ -266,6 +316,7 @@ public class SecurityConfig {
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인 페이지(GET)
                                                 .requestMatchers(
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
+                                                                "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX

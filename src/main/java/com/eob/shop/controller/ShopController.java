@@ -17,7 +17,7 @@ public class ShopController {
 
     private final ShopService shopService;
 
-    @GetMapping("main")
+    @GetMapping("")
     public String shopMain(){
         return "shop/shop-main";
     }

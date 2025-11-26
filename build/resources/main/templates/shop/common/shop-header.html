@@ -1,13 +1,9 @@
-@ -1,111 +0,0 @@
 <!-- templates/shop/common/shop-header.html -->
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
+
+<th:block th:fragment="shop-header">
 
     <style>
         /* ===== 공통 판매자 헤더 기본틀 ===== */
-
         .shop-header-wrapper {
             width: 100%;
             border: 1px solid #000;
@@ -73,11 +69,6 @@
             color: #000;
         }
     </style>
-</head>
-
-<body>
-<!-- Thymeleaf 조각 선언 -->
-<th:block th:fragment="shop-header">
 
     <div class="shop-header-wrapper">
 
@@ -97,10 +88,8 @@
 
         <!-- 오른쪽 -->
         <div class="shop-header-right">
-            <div class="shop-circle-btn" href="#">알림함</div>
-            <div class="shop-menu-item">
-                <a class="shop-link" href="#">정보관리</a>
-            </div>
+            <div class="shop-circle-btn">알림함</div>
+            <a class="shop-link" href="#">정보관리</a>
             <a class="shop-link" href="#">로그아웃</a>
             <a class="shop-link" href="#">고객센터</a>
         </div>
@@ -108,5 +97,3 @@
     </div>
 
 </th:block>
-</body>
-</html>
