@@ -235,6 +235,7 @@ public class SecurityConfig {
                                                  * /shop/** 경로는 오직 ROLE_SHOP 계정만 접근할 수 있도록 제한한다.
                                                  */
                                                 .anyRequest().hasRole("SHOP")
+                                )
 
                                 /*
                                  * 판매자(Shop) 로그인 설정
