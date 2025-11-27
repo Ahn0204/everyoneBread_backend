@@ -49,6 +49,66 @@ public class AdminController {
         return "admin/comm/admin-main";
     }
 
+    /*
+     * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
+     * return redirect:도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
+     */
+
+    // ============== 정산 /admin/settlement
+    // ==================================================
+
+    // 헤더, 사이드바에서 '정산' 항목 클릭 시
+    @GetMapping("/settlement")
+    public String getSettlementP() {
+        // 기본 뷰 = 정산 내역 페이지
+        return "redirect:/admin/settlement/settlement-list";
+    }
+
+    // 정산내역 페이지
+    @GetMapping("/settlement/settlement-list")
+    public String getSettlementList() {
+        return "admin/settlement/settlement-list";
+    }
+
+    // 수수료 변경 페이지
+    @GetMapping("/settlement/feeHistory-list")
+    public String getFeeHistoryList() {
+        return "admin/settlement/feeHistory-list";
+    }
+
+    // 배송비 변경 페이지
+    @GetMapping("/settlement/distanceFeeHistory-list")
+    public String getDistanceFeeHistoryList() {
+        return "admin/settlement/distanceFeeHistory-list";
+    }
+
+    // ============== 회원 /admin/user
+    // ==================================================
+
+    // 헤더, 사이드바에서 'user' 항목 클릭 시
+    @GetMapping("/user")
+    public String getUserP() {
+        return "redirect:/admin/user/shop-list";
+    }
+
+    // 입점신청 내역 페이지
+    @GetMapping("/user/shopApproval-list")
+    public String getShopApprovalList() {
+        return "admin/user/shopApproval-list";
+    }
+
+    // 폐점신청 내역 페이지
+    @GetMapping("/user/shopClose-list")
+    public String getShopCloseList() {
+        return "admin/user/shopClose-list";
+    }
+
+    // 라이더승인 내역 페이지
+    @GetMapping("/user/shop-list")
+    public String getShopList() {
+        return "admin/user/shop-list";
+    }
+
     // 관리자 계정 내역(추가) 페이지
     @GetMapping("/user/admin-list")
     public String getAdminList(Model model) { // 그냥 insertAdminForm만 뷰로 전달해도, 뷰에서 th:object로 사용가능
@@ -109,34 +169,42 @@ public class AdminController {
         return "redirect:/admin/user/admin-list"; // 새 admin-list 페이지가 다시 요청됨(redirect)
     }
 
-    /*
-     * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
-     * return redirect:도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
-     */
-
-    // ============== 정산 /admin/settlement
-    // ==================================================
-
-    // 헤더, 사이드바에서 '정산' 항목 클릭 시
-    @GetMapping("/settlement")
-    public String getSettlementP() {
-        // 기본 뷰 = 정산 내역 페이지
-        return "redirect:/admin/settlement/settlement-list";
+    // 회원 내역 페이지
+    @GetMapping("/user/shop-list")
+    public String getShopList() {
+        return "admin/user/shop-list";
     }
 
-    // 정산내역 페이지
-    @GetMapping("/settlement/settlement-list")
-    public String getSettlementList() {
-        return "admin/settlement/settlement-list";
     }
 
-    // ============== 회원 /admin/user
+    // ============== 문의 /admin/inquiry
     // ==================================================
 
-    // 입점신청 내역 페이지
-    @GetMapping("/user")
-    public String getMethodName(@RequestParam String param) {
-        return new String();
+    // 헤더, 사이드바에서 'inquiry' 항목 클릭 시
+    @GetMapping("/inquiry")
+    public String getInquriyP() {
+        return "redirect:/admin/inquiry/inquiry-list";
+    }
+
+    // 일반문의 내역 페이지
+    @GetMapping("/inquiry/inquiry-list")
+    public String getInquiryList() {
+        return "admin/inquiry/inquiry-list";
+    }
+
+    // ============== 홈페이지 관리 /admin/homePage
+    // ==================================================
+
+    // 헤더, 사이드바에서 'homePage' 항목 클릭 시
+    @GetMapping("/homePage")
+    public String gethomePageP() {
+        return "redirect:/admin/homePage/notice-list";
+    }
+
+    // 공지 내역 페이지
+    @GetMapping("/homePage/notice-list")
+    public String getNoticeList() {
+        return "admin/homePage/notice-list";
     }
 
 }

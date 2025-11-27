@@ -1,7 +1,7 @@
     <!--헤더 fragment-->
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" th:href="@{/admin/}">
                 <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,11 +9,10 @@
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
                 <div class="navbar-nav nav-pills">
-                    <a class="nav-link active" th:href="@{/admin/settlement}">정산</a>
-                    <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
-                    <a class="nav-link" th:href="@{/admin/user/shop-list}">회원</a>
-                    <a class="nav-link" th:href="@{/admin/inquiry/inquiry-list}">문의</a>
-                    <a class="nav-link" th:href="@{/admin/management/notice-list}">홈페이지 관리</a>
+                    <a class="nav-link" id="settlement" th:href="@{/admin/settlement}">정산</a>
+                    <a class="nav-link" id="user" th:href="@{/admin/user}">회원</a>
+                    <a class="nav-link" id="inquiry" th:href="@{/admin/inquiry}">문의</a>
+                    <a class="nav-link" id="homePage" th:href="@{/admin/homePage}">홈페이지 관리</a>
                 </div>
                 <div class="navbar-util">
                     <!--#인증된 사용자 정보 객체.사용자 정보.member.memberName-->

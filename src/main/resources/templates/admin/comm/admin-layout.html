@@ -31,89 +31,12 @@
             <div th:replace="~{/admin/comm/admin-header}"></div>
         </header>
 
+        <!--헤더 아래 출력부-->
         <div class="container-fluid flex-grow-1">
             <div class="row">
                 <!--사이드바-->
-                <!-- 서버 켜지면 fragment태그로 대체 <div th:replace="~{/admin/common/admin-sidebar::sidebar}"></div> -->
+                <div th:replace="~{/admin/comm/admin-sidebar}"></div>
 
-                <div id="sidebarWrapper" class="collapse show">
-                    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse" style="position: fixed; top: 100px; height: calc(100vh - 56px); overflow-y: auto">
-                        <!-- <button class="btn btn-primary m-2" data-bs-toggle="collapse" data-bs-target="#sidebarWrapper">
-                        x
-                    </button>    접기 버튼 시도...-->
-                        <div class="position-sticky pt-3" style="top: 0">
-                            <ul class="nav flex-column nav-pills">
-                                <li class="nav-item">
-                                    <a class="nav-link" data-bs-toggle="collapse" href="#menuSettlement" role="button" aria-expanded="true" aria-controls="menuSettlement">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2">
-                                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                                        </svg>
-                                        정산
-                                    </a>
-                                    <div class="collapse show" id="menuSettlement">
-                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
-                                            <li><a href="#" class="nav-link">정산 내역</a></li>
-                                            <li><a href="#" class="nav-link">수수료 변경</a></li>
-                                            <li><a href="#" class="nav-link">배송비 변경</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#menuUser" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuUser">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-users" aria-hidden="true">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                        </svg>
-                                        회원
-                                    </a>
-                                    <div class="collapse show" id="menuUser">
-                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
-                                            <li><a href="#" class="nav-link">입/폐점 관리</a></li>
-                                            <li><a href="#" class="nav-link">라이더 승인</a></li>
-                                            <li><a href="#" class="nav-link">관리자 계정 추가</a></li>
-                                            <li><a href="#" class="nav-link">회원 조회</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" href="#menuInquiry" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuInquiry">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file" aria-hidden="true">
-                                            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                                            <polyline points="13 2 13 9 20 9"></polyline>
-                                        </svg>
-                                        문의
-                                    </a>
-                                    <div class="collapse show" id="menuInquiry">
-                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
-                                            <li><a href="#" class="nav-link">일반 문의</a></li>
-                                            <li><a href="#" class="nav-link">신고 문의</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" aria-current="page" href="#menuHomePage" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuHomePage">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home" aria-hidden="true">
-                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                                        </svg>
-                                        홈페이지 관리
-                                    </a>
-                                    <div class="collapse show" id="menuHomePage">
-                                        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
-                                            <li><a href="#" class="nav-link">공지사항</a></li>
-                                            <li><a href="#" class="nav-link">카테고리</a></li>
-                                        </ul>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-                    </nav>
-                </div>
                 <!--본문-->
                 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                     <!--admin-layout상속한 페이지의 content 출력부-->
@@ -137,6 +60,82 @@
                     if (token && header) xhr.setRequestHeader(header, token);
                 });
             });
+
+            //헤더 & 사이드바에 현재 페이지 표시
+            //현재 페이지의 uri가져오기
+            let uri = $(location).attr('pathname').split('/'); //window.location.pathname; 전체 url일 경우 => pathname대신 href
+
+            switch (
+                uri[2] //uri를 /로 자른 String의 배열 중 2번째 요소가 다음과 같다면
+            ) {
+                case 'settlement':
+                    //헤더id=settlement인 선택자에 class에 active값 추가, aria-current=page 추가
+                    $('#settlement').addClass('active').attr('aria-current', 'page');
+                    //사이드바 해당하지 않는 메뉴의 class에서 show속성 삭제
+                    $('#menuUser, #menuInquiry, #menuHomePage').removeClass('show');
+                    //사이드바 해당하는 메뉴의 class에 active속성 추가
+                    switch (uri[3]) {
+                        case 'settlement-list':
+                            $('#menuSettlement ul li').eq(0).find('a').addClass('active');
+                            break;
+                        case 'feeHistory-list':
+                            $('#menuSettlement ul li').eq(1).find('a').addClass('active');
+                            break;
+                        case 'distanceFeeHistory-list':
+                            $('#menuSettlement ul li').eq(2).find('a').addClass('active');
+                            break;
+                    }
+                    break;
+                case 'user':
+                    $('#user').addClass('active').attr('aria-current', 'page');
+                    $('#menuSettlement, #menuInquiry, #menuHomePage').removeClass('show');
+                    //사이드바 입/폐점 관리 항목 펼치기
+                    $('#menuShopList').addClass('show');
+                    //사이드바 해당하는 메뉴의 class에 active속성 추가
+                    switch (uri[3]) {
+                        case 'shopApproval-list':
+                            $('#menuUser #menuShopList ul li').eq(0).find('a').addClass('active');
+                            break;
+                        case 'shopClose-list':
+                            $('#menuUser #menuShopList ul li').eq(1).find('a').addClass('active');
+                            break;
+                        case 'riderApproval-list':
+                            $('#menuUser ul li').eq(1).find('a').addClass('active');
+                            break;
+                        case 'admin-list':
+                            $('#menuUser ul li').eq(2).find('a').addClass('active');
+                            break;
+                        case 'user-list':
+                            $('#menuUser ul li').eq(3).find('a').addClass('active');
+                            break;
+                    }
+                    break;
+                case 'inquiry':
+                    $('#inquiry').addClass('active').attr('aria-current', 'page');
+                    $('#menuSettlement, #menuUser, #menuHomePage').removeClass('show');
+                    //사이드바 해당하는 메뉴의 class에 active속성 추가
+                    switch (uri[3]) {
+                        case 'inquiry-list':
+                            $('#menuInquiry ul li').eq(0).find('a').addClass('active');
+                            break;
+                        case 'banInquiry-list':
+                            $('#menuInquiry ul li').eq(1).find('a').addClass('active');
+                            break;
+                    }
+                case 'homePage':
+                    $('#homePage').addClass('active').attr('aria-current', 'page');
+                    $('#menuSettlement, #menuInquiry, #menuUser').removeClass('show');
+                    break;
+                    switch (uri[3]) {
+                        case 'notice-list':
+                            $('#menuHomepage ul li').eq(0).find('a').addClass('active');
+                            break;
+                        case 'category':
+                            $('#menuHomepage ul li').eq(1).find('a').addClass('active');
+                            break;
+                    default:
+                    break;
+            }
         </script>
         <!--자식 script 삽입부-->
         <script layout:fragment="script" type="text/javascript"></script>
