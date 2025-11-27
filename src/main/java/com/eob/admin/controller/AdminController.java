@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -44,8 +45,8 @@ public class AdminController {
 
     // 메인 페이지
     @GetMapping("/")
-    public String adminMain() {
-        return "/admin/comm/admin-main";
+    public String getAdminMain() {
+        return "admin/comm/admin-main";
     }
 
     // 관리자 계정 내역(추가) 페이지
@@ -64,7 +65,7 @@ public class AdminController {
 
     // 관리자 계정 추가 처리
     @PostMapping("/user/insertAdmin")
-    public String postMethodName(@Valid InsertAdminForm insertAdminForm, BindingResult bindingResult,
+    public String insertAdmin(@Valid InsertAdminForm insertAdminForm, BindingResult bindingResult,
             RedirectAttributes rttr) {
 
         // 입력값 유효성 검사
@@ -106,6 +107,36 @@ public class AdminController {
         }
 
         return "redirect:/admin/user/admin-list"; // 새 admin-list 페이지가 다시 요청됨(redirect)
+    }
+
+    /*
+     * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
+     * return redirect:도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
+     */
+
+    // ============== 정산 /admin/settlement
+    // ==================================================
+
+    // 헤더, 사이드바에서 '정산' 항목 클릭 시
+    @GetMapping("/settlement")
+    public String getSettlementP() {
+        // 기본 뷰 = 정산 내역 페이지
+        return "redirect:/admin/settlement/settlement-list";
+    }
+
+    // 정산내역 페이지
+    @GetMapping("/settlement/settlement-list")
+    public String getSettlementList() {
+        return "admin/settlement/settlement-list";
+    }
+
+    // ============== 회원 /admin/user
+    // ==================================================
+
+    // 입점신청 내역 페이지
+    @GetMapping("/user")
+    public String getMethodName(@RequestParam String param) {
+        return new String();
     }
 
 }

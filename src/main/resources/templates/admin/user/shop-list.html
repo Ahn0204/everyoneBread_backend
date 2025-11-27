@@ -1,11 +1,11 @@
 <!--
 ******************************************
-*  Created On : 2025. 11. 16.
-*  File : main.html
+*  Created On : 2025. 11. 27.
+*  File : shop-list.html
 *******************************************
  -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/경로}">
     <head>
         <th:block layout:fragment="head">
             <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
@@ -13,11 +13,11 @@
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
-        <div layout:fragment="content">main 페이지 내용내용</div>
+        <div layout:fragment="content">페이지 내용내용</div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script">
-            console.log('main fragment 됨');
+            console.log('fragment 됨');
         </script>
     </body>
 </html>

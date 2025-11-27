@@ -10,9 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
 import com.eob.common.security.admin.AdminDetailService;
 import com.eob.common.security.admin.AdminLoginSuccessHandler;
 
@@ -265,7 +265,8 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
+                                                .requestMatchers("/admin/login", "/admin/logout", "/css/**", "/js/**",
+                                                                "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // .anyRequest().permitAll())
@@ -295,11 +296,13 @@ public class SecurityConfig {
                                 // 로그아웃 요청
                                 .logout((auth) -> auth
                                                 // 로그아웃 요청 url, http메서드 설정
-                                                // post매핑으로 해놓아야 사용자가 URL로 접속할 수 없음
+                                                // POST매핑으로 해놓아야 사용자가 URL로 접속할 수 없음
+                                                // 꼭 대문자로 써야함..
+                                                // .logoutRequestMatcher(new AntPathRequestMatcher("/admin/logout"))
                                                 .logoutRequestMatcher(
-                                                                new AntPathRequestMatcher("/admin/logout", "post"))
+                                                                new AntPathRequestMatcher("/admin/logout", "POST"))
                                                 // 로그아웃 성공 시 url
-                                                .logoutSuccessUrl("/admin/login")
+                                                .logoutSuccessUrl("/admin/")
                                                 // 로그아웃 시 세션 무효화
                                                 .invalidateHttpSession(true)
                                                 // 로그아웃 시 브라우저에 저장된 JSESSIONID 쿠키 삭제

@@ -9,11 +9,11 @@
             </button>
             <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
                 <div class="navbar-nav nav-pills">
-                    <a class="nav-link active" href="#">정산</a>
+                    <a class="nav-link active" th:href="@{/admin/settlement}">정산</a>
                     <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
-                    <a class="nav-link" href="#">회원</a>
-                    <a class="nav-link" href="#">문의</a>
-                    <a class="nav-link" href="#">홈페이지 관리</a>
+                    <a class="nav-link" th:href="@{/admin/user/shop-list}">회원</a>
+                    <a class="nav-link" th:href="@{/admin/inquiry/inquiry-list}">문의</a>
+                    <a class="nav-link" th:href="@{/admin/management/notice-list}">홈페이지 관리</a>
                 </div>
                 <div class="navbar-util">
                     <!--#인증된 사용자 정보 객체.사용자 정보.member.memberName-->
@@ -21,7 +21,11 @@
                     <span class="util-text" th:text="${#authentication.principal.member.memberName}"></span>
                     <span class="util-text">님</span>
                     <form th:action="@{/admin/logout}" method="post">
-                        <button type="submit" class="util-logout">로그아웃</button>
+        <!--csrf토큰 파라미터 -->
+        <!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" /> 는 Security6이전 버전인가보다-->
+         <!--layout.html의 헤더에서도 아래와 같은 이름으로 전달 중임-->
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />                
+        <button type="submit" class="util-logout">로그아웃</button>
                     </form>
                     <button class="btn btn-secondary util-alert pb-2">알림함</button>
                 </div>
