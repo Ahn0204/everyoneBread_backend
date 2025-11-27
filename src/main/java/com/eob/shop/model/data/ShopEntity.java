@@ -152,6 +152,6 @@ public class ShopEntity {
         // 생성일 자동 저장
         this.createdAt = LocalDateTime.now();
     }
-    }
+    
 
 }
