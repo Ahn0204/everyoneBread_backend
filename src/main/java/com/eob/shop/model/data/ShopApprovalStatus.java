@@ -16,10 +16,10 @@ import lombok.Getter;
 @Getter
 public enum ShopApprovalStatus {
 
-    APPLY_REVIEW("입점 검토"),   // 입점 검토 : 관리자가 심사하는 상태
-    APPLY_REJECT("입점 반려"),   // 입점 반려 : 보완 필요 또는 불가 판정
-    CLOSE_REVIEW("폐점 검토"),   // 폐점 검토 : 폐점 요청 시 상태 변경
-    CLOSE_REJECT("폐점 반려"),   // 폐점 반려 : 폐점 승인 거부
+    APPLY_REVIEW("입점 검토"), // 입점 검토 : 관리자가 심사하는 상태
+    APPLY_REJECT("입점 반려"), // 입점 반려 : 보완 필요 또는 불가 판정
+    CLOSE_REVIEW("폐점 검토"), // 폐점 검토 : 폐점 요청 시 상태 변경
+    CLOSE_REJECT("폐점 반려"), // 폐점 반려 : 폐점 승인 거부
     APPLY_APPROVED("입점 승인"), // 입점 승인 : 정상 영업 가능 상태
     CLOSE_APPROVED("폐점 승인"); // 폐점 승인 : 상점 운영 종료
 

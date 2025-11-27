@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
@@ -15,6 +17,7 @@ import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.shop.model.data.ShopEntity;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -35,6 +38,42 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         MemberEntity member = userDetail.getMember();
         RiderEntity rider = userDetail.getRider();
+
+        // 로그인 각 역할별 로그인 필터 조회
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest();
+
+        String requestURL = request.getRequestURI();
+        System.out.println("requestURL : " + requestURL);
+
+        switch (requestURL) {
+            case "/rider/login":
+                if (member.getMemberRole() != MemberRoleStatus.RIDER) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+                break;
+            case "/shop/login":
+                if (member.getMemberRole() != MemberRoleStatus.SHOP) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+
+                break;
+            case "/admin/login":
+                if (member.getMemberRole() != MemberRoleStatus.ADMIN) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+
+                break;
+            case "/member/login":
+                if (member.getMemberRole() != MemberRoleStatus.USER) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+                break;
+
+            default:
+                break;
+        }
+
         // ShopEntity shop = userDetail.getShop();
         System.out.println("authentication ");
         System.out.println(authentication);
