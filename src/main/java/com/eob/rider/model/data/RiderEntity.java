@@ -1,26 +1,34 @@
 package com.eob.rider.model.data;
 
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.eob.member.model.data.MemberEntity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "rider")
 public class RiderEntity {
 
     /**
-     * 라이더 고유 번호 
+     * 라이더 고유 번호
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "rider_seq")
@@ -41,7 +49,7 @@ public class RiderEntity {
     /**
      * 운전면허 발급일
      */
-    private LocalDateTime licenseCreatedAt;
+    private LocalDate licenseCreatedAt;
 
     /**
      * 라이더 회원의 등록일
@@ -56,6 +64,7 @@ public class RiderEntity {
     /**
      * 라이더 회원의 가입 승인 상태
      */
+    @Enumerated(EnumType.STRING)
     private ApprovalStatus aStatus = ApprovalStatus.PENDING;
 
     /**

@@ -36,8 +36,15 @@ public class SecurityConfig {
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
+        // CustomAuthenticationProvider 를 Bean 으로 등록
+        // -
         @Bean
-        @Order(2)
+        public CustomAuthenticationProvider customAuthenticationProvider() {
+                return new CustomAuthenticationProvider(customDetailService, passwordEncoder());
+        }
+
+        @Bean
+        @Order(1)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
@@ -49,6 +56,14 @@ public class SecurityConfig {
                                 // 경로(/rider/order/list 등)는 적용되지 않음
                                 // - "/rider/**"
                                 .securityMatcher("/rider/**")
+
+                                // Security에서 "로그인 ID/PW"가 맞는지 실제로 확인하는 엔진
+                                // authenticationProvider(...)
+                                // - 사용자가 로그인 요청 시 입력한 ID/PW가 맞는지 검사하는 핵심 인증 처리 로직.
+                                // - 내부적으로 UserDetailsService를 통해 DB에서 사용자 정보를 조회하고, PasswordEncoder를 사용하여 비밀번호
+                                // 일치여부 조회.
+                                // - 또한 계정의 상태(활성/정지/탈퇴 등) 까지 해당 요청에서 검증하고, 인증에 실패하면 FailureHandler로 이동한다.
+                                .authenticationProvider(customAuthenticationProvider())
 
                                 // Security의 요청(URL)에 대한 접근 권한(Authorization) 설정
                                 // authrizeHttpRequests(...)
@@ -133,6 +148,7 @@ public class SecurityConfig {
                                 // - 이미 authorizeHttpRequests 에서 permitAll 로 열어두었다면 생략 가능.
                                 // .permitAll()
                                 )
+                                .userDetailsService(customDetailService)
 
                                 // .logout()
                                 // - 로그아웃에 관한 설정
@@ -148,7 +164,7 @@ public class SecurityConfig {
                                                 // 로그아웃을 성공 한 후 이동할 페이지 지정하는 설정
                                                 // - 만약 로그인 페이지로 이동시키고 싶다면 .logoutSuccessUrl("/rider/login?logout") 이렇게
                                                 // 바꿔도 된다.
-                                                .logoutSuccessUrl("/")
+                                                .logoutSuccessUrl("/rider/login")
 
                                                 // .invalidateHttpSession()
                                                 // 로그아웃 시 서버 세션을 무효화하는 설정
@@ -260,8 +276,8 @@ public class SecurityConfig {
                                 .formLogin((auth) -> auth
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
-                                                // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/login") // 왜~~~여기가 login이면 안되는거야
+                                                // 로그인 처리 url 로그인폼의 actiion=경로와 일치해야함
+                                                .loginProcessingUrl("/admin/login")
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
                                                 .usernameParameter("adminId")
                                                 // password파라미터의 이름
@@ -305,7 +321,7 @@ public class SecurityConfig {
 
         @Bean
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
-        @Order(1)
+        @Order(4)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
                 http
                                 /**
