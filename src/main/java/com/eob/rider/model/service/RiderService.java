@@ -51,7 +51,7 @@ public class RiderService {
     }
 
     public void passwordChange() {
-        MemberEntity member = this.memberRepository.findByMemberId("test1");
+        MemberEntity member = this.memberRepository.findByMemberId("test2");
         member.setMemberPw(passwordEncoder.encode("1234"));
         this.memberRepository.save(member);
     }
