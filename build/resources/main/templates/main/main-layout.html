@@ -5,7 +5,7 @@
 *******************************************
  -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <head>
         <meta charset="UTF-8" />
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
@@ -52,13 +52,21 @@
                         </div>
                     </div>
                     <div class="navbar-util d-flex flex-column">
+
+                        <!-- 비로그인 : 로그인/회원가입만 보임 -->
                         <div class="login-util mb-2">
-                            <a class="util-login" th:href="@{/member/login}">로그인/회원가입</a>
-                            <a class="util-logout" th:href="@{/logout}">로그아웃</a>
+                            <a class="util-login" th:href="@{/member/login}" sec:authorize="isAnonymous()">로그인/회원가입</a>
                         </div>
-                        <div class="user-util">
+                        
+                        <!-- 로그인 : 로그아웃만 보임 -->
+                        <div class="login-util mb-2">
+                             <a class="util-logout" th:href="@{/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
+                         </div>
+
+                         <!-- 로그인 : 마이페이지 + 알림함 -->
+                        <div class="user-util" sec:authorize="isAuthenticated()">
                             <button class="btn btn-secondary util-alert pb-2">알림함</button>
-                            <button class="btn btn-secondary util-alert pb-2">마이페이지</button>
+                            <button class="btn btn-secondary util-alert pb-2" onclick="location.href='#'">마이페이지</button>
                         </div>
                     </div>
                 </div>

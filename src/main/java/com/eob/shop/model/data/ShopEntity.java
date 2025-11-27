@@ -150,8 +150,7 @@ public class ShopEntity {
     public void PrePersist(){
 
         // 생성일 자동 저장
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().withNano(0);
     }
-    
 
 }
