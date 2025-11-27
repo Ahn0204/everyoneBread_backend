@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-         private final AdminDetailService adminDetailService;
+        private final AdminDetailService adminDetailService;
 
         private final CustomDetailService customDetailService;
 
@@ -33,11 +33,17 @@ public class SecurityConfig {
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
-        //private final AdminLoginSuccessHandler adminLoginSuccessHandler;
+        // CustomAuthenticationProvider 를 Bean 으로 등록
+        // -
+        @Bean
+        public CustomAuthenticationProvider customAuthenticationProvider() {
+                return new CustomAuthenticationProvider(customDetailService, passwordEncoder());
+        }
 
+        // private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
         @Bean
-        @Order(2)
+        @Order(1)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
@@ -49,6 +55,14 @@ public class SecurityConfig {
                                 // 경로(/rider/order/list 등)는 적용되지 않음
                                 // - "/rider/**"
                                 .securityMatcher("/rider/**")
+
+                                // Security에서 "로그인 ID/PW"가 맞는지 실제로 확인하는 엔진
+                                // authenticationProvider(...)
+                                // - 사용자가 로그인 요청 시 입력한 ID/PW가 맞는지 검사하는 핵심 인증 처리 로직.
+                                // - 내부적으로 UserDetailsService를 통해 DB에서 사용자 정보를 조회하고, PasswordEncoder를 사용하여 비밀번호
+                                // 일치여부 조회.
+                                // - 또한 계정의 상태(활성/정지/탈퇴 등) 까지 해당 요청에서 검증하고, 인증에 실패하면 FailureHandler로 이동한다.
+                                .authenticationProvider(customAuthenticationProvider())
 
                                 // Security의 요청(URL)에 대한 접근 권한(Authorization) 설정
                                 // authrizeHttpRequests(...)
@@ -133,6 +147,7 @@ public class SecurityConfig {
                                 // - 이미 authorizeHttpRequests 에서 permitAll 로 열어두었다면 생략 가능.
                                 // .permitAll()
                                 )
+                                .userDetailsService(customDetailService)
 
                                 // .logout()
                                 // - 로그아웃에 관한 설정
@@ -148,7 +163,7 @@ public class SecurityConfig {
                                                 // 로그아웃을 성공 한 후 이동할 페이지 지정하는 설정
                                                 // - 만약 로그인 페이지로 이동시키고 싶다면 .logoutSuccessUrl("/rider/login?logout") 이렇게
                                                 // 바꿔도 된다.
-                                                .logoutSuccessUrl("/")
+                                                .logoutSuccessUrl("/rider/login")
 
                                                 // .invalidateHttpSession()
                                                 // 로그아웃 시 서버 세션을 무효화하는 설정
@@ -188,7 +203,7 @@ public class SecurityConfig {
 
         // @Bean
         // SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
-        //         return null;
+        // return null;
 
         // }
 
@@ -200,14 +215,14 @@ public class SecurityConfig {
                                 .securityMatcher("/admin/**")
                                 .authorizeHttpRequests((auth) -> auth
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
-                                                .requestMatchers("/admin/login","/admin/login/**", "/css/**", "/js/**", "/image/**",
+                                                .requestMatchers("/admin/login", "/admin/login/**", "/css/**", "/js/**",
+                                                                "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
                                                 // 관리자만 관리자 페이지 접근 허용
-                                                //.requestMatchers("/admin/**").hasRole("ADMIN")
-                                // 이외 모든 경로 관리자만 접근 허용
-                                .anyRequest().hasRole("ADMIN")
-                                )
+                                                // .requestMatchers("/admin/**").hasRole("ADMIN")
+                                                // 이외 모든 경로 관리자만 접근 허용
+                                                .anyRequest().hasRole("ADMIN"))
 
                                 // 관리자 로그인 페이지 설정&처리
                                 .formLogin((auth) -> auth
@@ -226,16 +241,15 @@ public class SecurityConfig {
                                                 // 로그인 실패시의 동작 정의(핸들러)
                                                 .failureHandler(customAuthFailureHandler)
                                                 // 로그인 실패 시 리다이렉트 될 url
-                                                //.failureUrl("/admin/login?error=true")
-                                                .permitAll()
-                                        )
+                                                // .failureUrl("/admin/login?error=true")
+                                                .permitAll())
 
                                 // http
                                 // .logout((auth) -> auth
                                 // //로그아웃 요청
                                 // );
-                                
-                                //이 경로에서 사용할 userDetailsService 설정
+
+                                // 이 경로에서 사용할 userDetailsService 설정
                                 .userDetailsService(adminDetailService)
 
                                 .csrf(csrf -> csrf.disable());
@@ -246,7 +260,7 @@ public class SecurityConfig {
 
         @Bean
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
-        @Order(1)
+        @Order(4)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
                 http
                                 /**
@@ -263,14 +277,15 @@ public class SecurityConfig {
                                  */
                                 .authorizeHttpRequests(auth -> auth
                                                 /* 인증 없이 접근 가능한 요청 목록 */
-                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인 페이지(GET)
+                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
+                                                                                                              // 페이지(GET)
                                                 .requestMatchers(
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
-                                                                //"/member/send-auth-code", // 문자 전송 AJAX
-                                                                //"/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                // "/member/send-auth-code", // 문자 전송 AJAX
+                                                                // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
