@@ -304,7 +304,7 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/member/**")
+                                .securityMatcher("/**")
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
 
@@ -375,8 +375,8 @@ public class SecurityConfig {
 
                                 /* 로그아웃 설정 */
                                 .logout(logout -> logout
-                                                /* 로그아웃 요청 URL (POST) */
-                                                .logoutUrl("/member/logout")
+                                                /* 로그아웃 요청 URL (GET) */
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout", "GET"))
                                                 /* 로그아웃 성공 시 이동할 URL */
                                                 .logoutSuccessUrl("/")
                                                 /* 세션 완전 삭제 */
