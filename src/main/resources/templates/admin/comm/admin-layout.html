@@ -27,38 +27,10 @@
     <body class="d-flex flex-column min-vh-100">
         <!--csrf토큰 파라미터 -->
         <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" />
-
-        <!--헤더의 태그들로 replace되는 태그-->
-        <!-- <div th:replace="~{/admin/common/admin-header}"></div> -->
         <!--헤더-->
         <header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
-            <nav class="navbar navbar-expand-lg bg-body-tertiary">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="#">
-                        <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
-                    </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
-                        <div class="navbar-nav nav-pills">
-                            <a class="nav-link active" href="#">정산</a>
-                            <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
-                            <a class="nav-link" href="#">회원</a>
-                            <a class="nav-link" href="#">문의</a>
-                            <a class="nav-link" href="#">홈페이지 관리</a>
-                        </div>
-                        <div class="navbar-util">
-                            <!-- <span class="util-text" th:text="${#authentication.principal.member.memberName}"></span> -->
-                            <span class="util-text">님</span>
-                            <form th:action="@{/admin/logout}" method="post">
-                                <button type="submit" class="util-logout">로그아웃</button>
-                            </form>
-                            <button class="btn btn-secondary util-alert pb-2">알림함</button>
-                        </div>
-                    </div>
-                </div>
-            </nav>
+            <!--html통째로 아래 div를 replace-->
+            <div th:replace="~{/admin/comm/admin-header}"></div>
         </header>
 
         <div class="container-fluid flex-grow-1">

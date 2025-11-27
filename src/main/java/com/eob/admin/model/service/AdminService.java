@@ -2,6 +2,7 @@ package com.eob.admin.model.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.member.model.data.MemberApprovalStatus;
@@ -19,12 +20,6 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
 
     public boolean insertAdmin(InsertAdminForm form) {
-
-        // 아이디 중복 여부 확인 (아래 정의된 메서드 사용)
-        if (!isMemberIdAvailable(form.getAdminId())) { // !(중복id면false, 중복아니면 true) => 중복id면 if문 실행, 아니면 if문 스킵
-            // bindingResult.rejectValue("memberId", "duplicateId", "이미 사용 중인 아이디입니다.");
-            return false;
-        }
 
         // 관리자 계정 insert
         try {

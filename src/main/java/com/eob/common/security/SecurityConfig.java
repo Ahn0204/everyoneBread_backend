@@ -263,9 +263,9 @@ public class SecurityConfig {
                                                 // 로그인 처리 url
                                                 .loginProcessingUrl("/admin/login") // 왜~~~여기가 login이면 안되는거야
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
-                                                .usernameParameter("id")
+                                                .usernameParameter("adminId")
                                                 // password파라미터의 이름
-                                                .passwordParameter("pw")
+                                                .passwordParameter("adminPw")
                                                 // 로그인 성공시의 동작 정의(핸들러)
                                                 .successHandler(customLoginSuccessHandler)
                                                 // 로그인 성공 시 리다이렉트 될 url
@@ -294,7 +294,7 @@ public class SecurityConfig {
                                 .csrf(csrf -> csrf
                                                 // csrf 활성화
                                                 .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
-                                // .csrfTokenRepository(CookieCsrfTokenRepository)
+                                // .csrfTokenRepository(CookieCsrfTokenRepository)와의 차이는?
 
                                 // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
                                 .userDetailsService(customDetailService);
