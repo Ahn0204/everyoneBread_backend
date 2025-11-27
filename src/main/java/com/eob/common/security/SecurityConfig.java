@@ -214,6 +214,8 @@ public class SecurityConfig {
                                  */
                                 .securityMatcher("/shop/**")
 
+                                .authenticationProvider(customAuthenticationProvider())
+
                                 .authorizeHttpRequests(auth -> auth
                                                 /*
                                                  * permitAll() : 로그인하지 않아도 접근 허용
@@ -227,6 +229,7 @@ public class SecurityConfig {
                                                                 "/shop/register/step",
                                                                 "/shop/register/step/**",
                                                                 "/shop/login", // 판매자 로그인 페이지
+                                                                "/shop/check-name",
                                                                 "/css/**", "/js/**",
                                                                 "/image/**", "/fonts/**", "/lib/**")
                                                 .permitAll()
@@ -337,6 +340,8 @@ public class SecurityConfig {
                                 .securityMatcher("/**")
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
+
+                                .authenticationProvider(customAuthenticationProvider())
 
                                 /**
                                  * URL 접근 허용 설정
