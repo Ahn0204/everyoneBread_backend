@@ -1,56 +1,73 @@
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<style>
-.shop-main-container {
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
-}
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/common/shop-layout}">
 
-/* 대시보드 4개 박스 */
-.dashboard-box-wrapper {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 30px;
-}
+<head>
+    <style>
+        .shop-main-container {
+            width: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+        }
 
-.dashboard-box {
-    flex: 1;
-    border: 1px solid #000;
-    padding: 20px;
-    text-align: center;
-}
+        /* 대시보드 영역 */
+        .dashboard-box-wrapper {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 35px;
+        }
 
-.dash-title {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
+        .dashboard-box {
+            flex: 1;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-.dash-value {
-    font-size: 20px;
-    font-weight: bold;
-}
+        .dash-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
 
-/* 그래프 영역 */
-.sales-graph-section {
-    margin-top: 30px;
-}
+        .dash-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #222;
+        }
 
-.graph-placeholder,
-.circle-graph-placeholder {
-    width: 100%;
-    height: 250px;
-    border: 1px solid #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
-}
+        /* 그래프 영역 */
+        .sales-graph-section {
+            margin-top: 20px;
+        }
 
-</style>
-<!-- 공통 레이아웃 적용 -->
-<th:block th:replace="shop/common/shop-layout :: content">
+        .graph-placeholder,
+        .circle-graph-placeholder {
+            width: 100%;
+            height: 260px;
+            border: 1px solid #ddd;
+            background: #fafafa;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #777;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 판매자 레이아웃 shop-layout.html -->
+<div layout:fragment="content">
 
     <div class="shop-main-container">
 
@@ -96,6 +113,7 @@
 
     </div>
 
-</th:block>
+</div>
 
+</body>
 </html>

@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -144,5 +145,13 @@ public class ShopEntity {
      * 보완 사유
      */
     private String rejectReason;
+
+    @PrePersist
+    public void PrePersist(){
+
+        // 생성일 자동 저장
+        this.createdAt = LocalDateTime.now();
+    }
+    
 
 }

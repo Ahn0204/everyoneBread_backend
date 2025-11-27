@@ -1,13 +1,19 @@
 package com.eob.shop.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import java.time.LocalDateTime;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import com.eob.member.model.dto.RegisterRequest;
+import com.eob.member.model.data.MemberEntity;
+import com.eob.member.service.MemberService;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ShopService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Controller
@@ -15,28 +21,101 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/shop/*")
 public class ShopController {
 
-    private final ShopService shopService;
+    private final MemberService memberService; 
+    private final ShopService shopService;     
 
-    @GetMapping("main")
-    public String shopMain(){
-        return "shop/shop-main";
+    /*
+       판매자 로그인 페이지
+    */
+    @GetMapping("login")
+    public String shopLogin() {
+        return "shop/shop-login";
     }
 
-    // 상점 등록 폼 (회원가입 다음 버튼 누른 후 페이지)
-    @GetMapping("shop-register")
-    public String shopRegisterForm(){
-        return "shop/shop-register";
+    /*
+        판매자 회원가입 페이지
+    */
+    @GetMapping("register/start")
+    public String registerStartForm(Model model) {
+
+        model.addAttribute("registerRequest", new RegisterRequest());
+        return "shop/shop-register-start";
     }
 
-    @PostMapping("shop-register")
-    public String shopRegister(ShopEntity shop){
+    /*
+        판매자 회원 저장
+    */
+    @PostMapping("register/start")
+    public String registerStart(
+            @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
+            BindingResult bindingResult,
+            Model model) {
 
-        // 상점 정보 유효성 검사 예정
+        // Valid 검증 실패
+        if (bindingResult.hasErrors()) {
+            return "shop/shop-register-start";
+        }
 
-        // DB 저장
+        // ROLE 강제 SHOP 주입
+        dto.setMemberRole("SHOP");
+
+        // registerShop 호출 (이제 bindingResult 필요)
+        MemberEntity newMember = memberService.registerShop(dto, bindingResult);
+
+        // registerShop 내부 검증 실패
+        if (bindingResult.hasErrors()) {
+            return "shop/shop-register-start";
+        }
+
+        model.addAttribute("memberNo", newMember.getMemberNo());
+        return "shop/shop-register-step";
+    }
+
+    /*
+        상점 정보 입력 화면
+    */
+    @GetMapping("register/step")
+    public String registerStepForm(@RequestParam("memberNo") Long memberNo, Model model) {
+
+        model.addAttribute("memberNo", memberNo);
+        return "shop/shop-register-step";
+    }
+
+    /*
+        상점 정보 저장
+    */
+    @PostMapping("register/step")
+    public String registerStep(
+            ShopEntity shop,
+            @RequestParam("memberNo") Long memberNo) {
+
+        // 회원 조회
+        MemberEntity member = memberService.findById(memberNo);
+
+        // ShopEntity 세팅
+        shop.setMember(member);
+        shop.setSellerName(member.getMemberName());
+        shop.setCreatedAt(LocalDateTime.now());
+
         shopService.saveShop(shop);
 
-        // 저장 후 판매자 메인 페이지로 이동
-        return "redirect:/shop/main";
+        return "redirect:/shop";
+    }
+
+    /*
+        상점명 중복 확인
+    */
+    @GetMapping("check-name")
+    @ResponseBody
+    public boolean checkShopName(@RequestParam("shopName") String shopName) {
+        return !shopService.existsByShopName(shopName);
+    }
+
+    /*
+        판매자 메인 페이지
+    */
+    @GetMapping("")
+    public String shopMain() {
+        return "shop/shop-main";
     }
 }

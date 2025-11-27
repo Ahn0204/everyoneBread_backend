@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>입점신청</title>
+
+    <!-- 공통 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+
+    <!-- Daum 주소 API -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <style>
+        * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 40px 0;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 550px;
+            padding: 40px;
+            border: 2px solid #000;
+            border-radius: 10px;
+            background-color: #fff;
+        }
+
+        .signup-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .signup-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            width: 130px;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+            color: #333;
+        }
+
+        .input-text {
+            flex: 1;
+            height: 45px;
+            padding: 0 10px;
+            border: 1px solid #000;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .input-with-btn {
+            display: flex;
+            flex: 1;
+            gap: 8px;
+        }
+
+        .btn-small {
+            height: 45px;
+            padding: 0 15px;
+            background-color: #fff;
+            border: 1px solid #000;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .btn-small:hover { background-color: #f0f0f0; }
+
+        .action-buttons {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-submit {
+            width: 200px;
+            height: 50px;
+            background-color: #fff;
+            border: 2px solid #000;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .btn-submit:hover {
+            background-color: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>입점신청</h1>
+            <hr>
+        </div>
+
+        <form method="post" action="/shop/register/step">
+
+            <input type="hidden" name="memberNo" th:value="${memberNo}">
+
+            <!-- 상점명 -->
+            <div class="form-row">
+                <label class="form-label">상점명</label>
+                <div class="input-with-btn">
+                    <input type="text" name="shopName" class="input-text" required>
+                    <button type="button" class="btn-small" id="shopNameChkBtn">중복확인</button>
+                </div>
+            </div>
+
+            <!-- 사업장 주소 -->
+            <div class="form-row">
+                <label class="form-label">사업장 주소</label>
+                <div class="input-with-btn">
+                    <input type="text" name="shopAddress" id="shopAddress" class="input-text" placeholder="주소 검색" required readonly>
+                    <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                </div>
+            </div>
+
+            <!-- 사업자 등록번호 -->
+            <div class="form-row">
+                <label class="form-label">사업자 등록번호</label>
+                <div class="input-with-btn">
+                    <input type="text" name="bizNo" class="input-text" required>
+                    <button type="button" class="btn-small">사진첨부</button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="btn-submit">가입</button>
+            </div>
+
+        </form>
+    </div>
+
+    <script>
+        /* ------------------------------
+           1) 상점명 중복확인
+        ------------------------------ */
+        let shopNameOk = false;
+
+        $("#shopNameChkBtn").click(function () {
+
+            let shopName = $("input[name='shopName']").val().trim();
+
+            if (shopName === "") {
+                alert("상점명을 입력해주세요.");
+                return;
+            }
+
+            $.ajax({
+                url: "/shop/check-name",
+                type: "GET",
+                data: { shopName: shopName },
+                success: function (available) {
+                    if (available === true) {
+                        alert("사용 가능한 상점명입니다.");
+                        shopNameOk = true;
+                    } else {
+                        alert("이미 등록된 상점명입니다.");
+                        shopNameOk = false;
+                    }
+                }
+            });
+        });
+
+        $("input[name='shopName']").on("input", function () {
+            shopNameOk = false;
+        });
+
+
+        /* ------------------------------
+           2) 사업자 등록번호 자동 하이픈
+        ------------------------------ */
+        $("input[name='bizNo']").on("input", function() {
+
+            let v = $(this).val().replace(/[^0-9]/g, "");
+            if (v.length > 10) v = v.substring(0, 10);
+
+            let res = "";
+
+            if (v.length < 4) res = v;
+            else if (v.length < 6) res = v.substring(0,3) + "-" + v.substring(3);
+            else res = v.substring(0,3) + "-" + v.substring(3,5) + "-" + v.substring(5);
+
+            $(this).val(res);
+        });
+
+
+        /* ------------------------------
+           3) 카카오 주소 API
+        ------------------------------ */
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+
+                    let addr = "";
+
+                    if (data.userSelectedType === "R") {
+                        addr = data.roadAddress;
+                    } else {
+                        addr = data.jibunAddress;
+                    }
+
+                    document.getElementById("shopAddress").value = addr;
+                }
+            }).open();
+        }
+
+
+        /* ------------------------------
+           4) 최종 submit 검사
+        ------------------------------ */
+        $("form").submit(function() {
+
+            if (!shopNameOk) {
+                alert("상점명 중복확인을 완료해주세요.");
+                return false;
+            }
+
+            let addr = $("input[name='shopAddress']").val().trim();
+            if (addr.length < 5) {
+                alert("사업장 주소를 입력해주세요.");
+                return false;
+            }
+
+            let biz = $("input[name='bizNo']").val().trim();
+            if (biz.length !== 12) {
+                alert("올바른 사업자 등록번호 형식이 아닙니다.");
+                return false;
+            }
+
+            return true;
+        });
+
+    </script>
+
+</body>
+</html>

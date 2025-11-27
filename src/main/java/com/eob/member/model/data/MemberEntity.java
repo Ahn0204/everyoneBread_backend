@@ -114,4 +114,10 @@ public class MemberEntity {
 
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     private RiderEntity rider;
+
+    @PrePersist
+    public void PrePersist(){
+        // 생성일 자동 저장
+        this.createdAt = LocalDateTime.now();
+    }
 }
