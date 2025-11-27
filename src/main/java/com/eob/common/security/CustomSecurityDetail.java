@@ -36,9 +36,9 @@ public class CustomSecurityDetail implements UserDetails {
         return member.getRider();
     }
 
-    // public ShopEntity getShop(){
-    // return member.getShop();
-    // }
+    public ShopEntity getShop(){
+        return member.getShop();
+    }
 
     // ====================== UserDetails 필수 구현 메서드 ======================
 

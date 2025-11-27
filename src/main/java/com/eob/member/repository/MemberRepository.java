@@ -17,19 +17,20 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
     @Query("select m from MemberEntity m where m.memberId = :username")
     Optional<MemberEntity> findByLoginMember(@Param("username") String username);
 
-    // 아이디 중복 확인
+    // 회원 아이디 중복 확인
     // memberId가 이미 DB에 있으면 true 없으면 false.
     boolean existsByMemberId(String memberId);
 
-    // 이메일 중복 확인
+    // 회원 이메일 중복 확인
     boolean existsByMemberEmail(String memberEmail);
-
-    MemberEntity findByMemberId(String memberId);
 
     // 라이더 아이디 중복 확인
     boolean existsByMemberIdAndMemberRole(String memberId, MemberRoleStatus rider);
 
     // 라이더 이메일 중복 확인
     boolean existsByMemberEmailAndMemberRole(String memberEmail, MemberRoleStatus rider);
+
+    // 라이더
+    MemberEntity findByMemberId(String memberId);
 
 }
