@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
@@ -16,6 +18,7 @@ import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.shop.model.data.ShopEntity;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -37,6 +40,42 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         MemberEntity member = userDetail.getMember();
         RiderEntity rider = userDetail.getRider();
         ShopEntity shop = userDetail.getShop();
+
+        // 로그인 각 역할별 로그인 필터 조회
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest();
+
+        String requestURL = request.getRequestURI();
+        System.out.println("requestURL : " + requestURL);
+
+        switch (requestURL) {
+            case "/rider/login":
+                if (member.getMemberRole() != MemberRoleStatus.RIDER) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+                break;
+            case "/shop/login":
+                if (member.getMemberRole() != MemberRoleStatus.SHOP) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+
+                break;
+            case "/admin/login":
+                if (member.getMemberRole() != MemberRoleStatus.ADMIN) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+
+                break;
+            case "/member/login":
+                if (member.getMemberRole() != MemberRoleStatus.USER) {
+                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                }
+                break;
+
+            default:
+                break;
+        }
+
         System.out.println("authentication ");
         System.out.println(authentication);
         System.out.println("rawPw: " + rawPw);
@@ -68,7 +107,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             case ACTIVE:
                 break;
         }
-        
 
         // // 5) 역할별 상세 검증
         switch (member.getMemberRole()) {
@@ -90,15 +128,15 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 break;
 
             case SHOP:
-                if (shop == null){
+                if (shop == null) {
                     throw new DisabledException("가게 정보가 존재하지 않습니다.");
                 }
                 // 로그인한 사용자가 이 상점의 주인인지 확인
-                if(!shop.getMember().getMemberNo().equals(member.getMemberNo())){
+                if (!shop.getMember().getMemberNo().equals(member.getMemberNo())) {
                     throw new DisabledException("상점 정보와 회원 정보가 일치하지 않습니다.");
                 }
 
-                switch(shop.getStatus()){
+                switch (shop.getStatus()) {
                     case APPLY_REVIEW:
                         throw new DisabledException("입점 심사 중입니다.");
                     case APPLY_REJECT:
@@ -106,20 +144,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                     case CLOSE_REVIEW:
                         throw new DisabledException("폐점 검토 중입니다.");
                     case CLOSE_REJECT:
-                        break;  // 폐점 반려 -> 영업은 가능함
+                        break; // 폐점 반려 -> 영업은 가능함
                     case APPLY_APPROVED:
-                        break;  // 입점 승인 완료 -> 상점 로그인 가능
+                        break; // 입점 승인 완료 -> 상점 로그인 가능
                     case CLOSE_APPROVED:
                         throw new DisabledException("폐점된 상점입니다.");
                 }
                 break;
 
-
             // case ADMIN:
 
-
             case USER:
-                switch(member.getStatus()){
+                switch (member.getStatus()) {
                     case ACTIVE:
                         break;
                     case INACTIVE:

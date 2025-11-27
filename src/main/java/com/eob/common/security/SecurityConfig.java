@@ -158,7 +158,8 @@ public class SecurityConfig {
                                                 // Security이 로그아웃 요청을 POST "/logout" 이
                                                 // GET /rider/logout 허용
                                                 // 실제 운영되는 서버에서는 GET 매핑이 아닌 POST 매핑으로 설정해주어야한다.
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/rider/logout", "GET"))
+                                                .logoutRequestMatcher(
+                                                                new AntPathRequestMatcher("/rider/logout", "POST"))
 
                                                 // .logoutSuccessUrl()
                                                 // 로그아웃을 성공 한 후 이동할 페이지 지정하는 설정
