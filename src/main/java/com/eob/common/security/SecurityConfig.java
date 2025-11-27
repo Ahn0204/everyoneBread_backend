@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.eob.common.security.admin.AdminDetailService;
@@ -25,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-         private final AdminDetailService adminDetailService;
+        private final AdminDetailService adminDetailService;
 
         private final CustomDetailService customDetailService;
 
@@ -35,9 +36,15 @@ public class SecurityConfig {
 
         private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
+        // CustomAuthenticationProvider 를 Bean 으로 등록
+        // -
+        @Bean
+        public CustomAuthenticationProvider customAuthenticationProvider() {
+                return new CustomAuthenticationProvider(customDetailService, passwordEncoder());
+        }
 
         @Bean
-        @Order(2)
+        @Order(1)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
@@ -49,6 +56,14 @@ public class SecurityConfig {
                                 // 경로(/rider/order/list 등)는 적용되지 않음
                                 // - "/rider/**"
                                 .securityMatcher("/rider/**")
+
+                                // Security에서 "로그인 ID/PW"가 맞는지 실제로 확인하는 엔진
+                                // authenticationProvider(...)
+                                // - 사용자가 로그인 요청 시 입력한 ID/PW가 맞는지 검사하는 핵심 인증 처리 로직.
+                                // - 내부적으로 UserDetailsService를 통해 DB에서 사용자 정보를 조회하고, PasswordEncoder를 사용하여 비밀번호
+                                // 일치여부 조회.
+                                // - 또한 계정의 상태(활성/정지/탈퇴 등) 까지 해당 요청에서 검증하고, 인증에 실패하면 FailureHandler로 이동한다.
+                                .authenticationProvider(customAuthenticationProvider())
 
                                 // Security의 요청(URL)에 대한 접근 권한(Authorization) 설정
                                 // authrizeHttpRequests(...)
@@ -133,6 +148,7 @@ public class SecurityConfig {
                                 // - 이미 authorizeHttpRequests 에서 permitAll 로 열어두었다면 생략 가능.
                                 // .permitAll()
                                 )
+                                .userDetailsService(customDetailService)
 
                                 // .logout()
                                 // - 로그아웃에 관한 설정
@@ -148,7 +164,7 @@ public class SecurityConfig {
                                                 // 로그아웃을 성공 한 후 이동할 페이지 지정하는 설정
                                                 // - 만약 로그인 페이지로 이동시키고 싶다면 .logoutSuccessUrl("/rider/login?logout") 이렇게
                                                 // 바꿔도 된다.
-                                                .logoutSuccessUrl("/")
+                                                .logoutSuccessUrl("/rider/login")
 
                                                 // .invalidateHttpSession()
                                                 // 로그아웃 시 서버 세션을 무효화하는 설정
@@ -191,55 +207,54 @@ public class SecurityConfig {
         SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
 
                 http
-                                /* 
-                                * 이 필터체인이 적용될 URL 패턴 지정
-                                * /shop/** 로 시작하는 모든 URL은 여기에서 처리됨
-                                */
+                                /*
+                                 * 이 필터체인이 적용될 URL 패턴 지정
+                                 * /shop/** 로 시작하는 모든 URL은 여기에서 처리됨
+                                 */
                                 .securityMatcher("/shop/**")
 
                                 .authorizeHttpRequests(auth -> auth
-                                /* 
-                                * permitAll() : 로그인하지 않아도 접근 허용 
-                                * shop-register(입점 신청) GET/POST 모두 허용
-                                * shop 로그인 페이지도 허용
-                                * 정적 리소스(css/js/img/...) 허용
-                                */
-                                .requestMatchers(
-                                        "/shop/register/start",       // 가입 폼 GET
-                                        "/shop/register/start/**",   // 가입 처리 POST
-                                        "/shop/register/step",
-                                        "/shop/register/step/**",
-                                        "/shop/login",              // 판매자 로그인 페이지
-                                        "/css/**", "/js/**", 
-                                        "/image/**", "/fonts/**", "/lib/**"
-                                ).permitAll()
+                                                /*
+                                                 * permitAll() : 로그인하지 않아도 접근 허용
+                                                 * shop-register(입점 신청) GET/POST 모두 허용
+                                                 * shop 로그인 페이지도 허용
+                                                 * 정적 리소스(css/js/img/...) 허용
+                                                 */
+                                                .requestMatchers(
+                                                                "/shop/register/start", // 가입 폼 GET
+                                                                "/shop/register/start/**", // 가입 처리 POST
+                                                                "/shop/register/step",
+                                                                "/shop/register/step/**",
+                                                                "/shop/login", // 판매자 로그인 페이지
+                                                                "/css/**", "/js/**",
+                                                                "/image/**", "/fonts/**", "/lib/**")
+                                                .permitAll()
+
+                                                /*
+                                                 * 위에서 허용한 요청 외 /shop/** 내부의 모든 요청은 인증 필요
+                                                 * → 로그인하지 않은 SHOP 사용자는 /shop/login 으로 리다이렉트됨
+                                                 */
+                                                .anyRequest().authenticated())
 
                                 /*
-                                * 위에서 허용한 요청 외 /shop/** 내부의 모든 요청은 인증 필요
-                                * → 로그인하지 않은 SHOP 사용자는 /shop/login 으로 리다이렉트됨
-                                */
-                                .anyRequest().authenticated()
-                                )
-
-                                /* 
-                                * 판매자(Shop) 로그인 설정
-                                * - loginPage() : 로그인 화면을 보여줄 GET URL
-                                * - loginProcessingUrl() : 로그인 POST 요청 처리 URL
-                                * - usernameParameter / passwordParameter : form input name 설정
-                                */
+                                 * 판매자(Shop) 로그인 설정
+                                 * - loginPage() : 로그인 화면을 보여줄 GET URL
+                                 * - loginProcessingUrl() : 로그인 POST 요청 처리 URL
+                                 * - usernameParameter / passwordParameter : form input name 설정
+                                 */
                                 .formLogin(login -> login
-                                .loginPage("/shop/login")          // 로그인 페이지 (GET)
-                                .loginProcessingUrl("/shop/login") // 로그인 처리 (POST)
-                                .usernameParameter("shopId")       // input name="shopId"
-                                .passwordParameter("shopPw")       // input name="shopPw"
-                                .successHandler(customLoginSuccessHandler)   // 로그인 성공 시 처리
-                                .failureHandler(customAuthFailureHandler)    // 로그인 실패 시 처리
+                                                .loginPage("/shop/login") // 로그인 페이지 (GET)
+                                                .loginProcessingUrl("/shop/login") // 로그인 처리 (POST)
+                                                .usernameParameter("shopId") // input name="shopId"
+                                                .passwordParameter("shopPw") // input name="shopPw"
+                                                .successHandler(customLoginSuccessHandler) // 로그인 성공 시 처리
+                                                .failureHandler(customAuthFailureHandler) // 로그인 실패 시 처리
                                 )
 
                                 /* 개발 단계에서 CSRF 비활성화 */
                                 .csrf(csrf -> csrf.disable());
 
-                        return http.build();
+                return http.build();
         }
 
         @Bean
@@ -253,22 +268,20 @@ public class SecurityConfig {
                                                 .requestMatchers("/admin/login", "/css/**", "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
-                                                // 관리자만 관리자 페이지 접근 허용
-                                                //.requestMatchers("/admin/**").hasRole("ADMIN")
-                                // 이외 모든 경로 관리자만 접근 허용
-                                .anyRequest().hasRole("ADMIN")
-                                )
+                                                // .anyRequest().permitAll())
+                                                // 이외 모든 경로 관리자만 접근 허용
+                                                .anyRequest().hasRole("ADMIN"))
 
                                 // 관리자 로그인 페이지 설정&처리
                                 .formLogin((auth) -> auth
                                                 // 관리자 로그인 페이지 설정
                                                 .loginPage("/admin/login")
-                                                // 로그인 처리 url
-                                                .loginProcessingUrl("/admin/loginPro") //왜~~~여기가 login이면 안되는거야
+                                                // 로그인 처리 url 로그인폼의 actiion=경로와 일치해야함
+                                                .loginProcessingUrl("/admin/login")
                                                 // username파라미터의 이름 >> userDetailService 내 메소드(인자)의 파라미터명을 지정하는 것임.
-                                                .usernameParameter("id")
+                                                .usernameParameter("adminId")
                                                 // password파라미터의 이름
-                                                .passwordParameter("pw")
+                                                .passwordParameter("adminPw")
                                                 // 로그인 성공시의 동작 정의(핸들러)
                                                 .successHandler(customLoginSuccessHandler)
                                                 // 로그인 성공 시 리다이렉트 될 url
@@ -276,19 +289,31 @@ public class SecurityConfig {
                                                 // 로그인 실패시의 동작 정의(핸들러)
                                                 .failureHandler(customAuthFailureHandler)
                                                 // 로그인 실패 시 리다이렉트 될 url
-                                                //.failureUrl("/admin/login?error=true")
-                                                .permitAll()
-                                        )
+                                                // .failureUrl("/admin/login?error=true")
+                                                .permitAll())
 
-                                // http
-                                // .logout((auth) -> auth
-                                // //로그아웃 요청
-                                // );
-                                
-                                //이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
-                                .userDetailsService(customDetailService)
+                                // 로그아웃 요청
+                                .logout((auth) -> auth
+                                                // 로그아웃 요청 url, http메서드 설정
+                                                // post매핑으로 해놓아야 사용자가 URL로 접속할 수 없음
+                                                .logoutRequestMatcher(
+                                                                new AntPathRequestMatcher("/admin/logout", "post"))
+                                                // 로그아웃 성공 시 url
+                                                .logoutSuccessUrl("/admin/login")
+                                                // 로그아웃 시 세션 무효화
+                                                .invalidateHttpSession(true)
+                                                // 로그아웃 시 브라우저에 저장된 JSESSIONID 쿠키 삭제
+                                                .deleteCookies("JSESSIONID"))
 
-                                .csrf(csrf -> csrf.disable());
+                                // csrf비활성화
+                                // .csrf(csrf -> csrf.disable()
+                                .csrf(csrf -> csrf
+                                                // csrf 활성화
+                                                .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
+                                // .csrfTokenRepository(CookieCsrfTokenRepository)와의 차이는?
+
+                                // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
+                                .userDetailsService(customDetailService);
 
                 return http.build();
 
@@ -296,7 +321,7 @@ public class SecurityConfig {
 
         @Bean
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
-        @Order(1)
+        @Order(4)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
                 http
                                 /**
@@ -313,15 +338,16 @@ public class SecurityConfig {
                                  */
                                 .authorizeHttpRequests(auth -> auth
                                                 /* 인증 없이 접근 가능한 요청 목록 */
-                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인 페이지(GET)
+                                                .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
+                                                                                                              // 페이지(GET)
                                                 .requestMatchers(
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
-                                                                //"/member/send-auth-code", // 문자 전송 AJAX
-                                                                //"/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                // "/member/send-auth-code", // 문자 전송 AJAX
+                                                                // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",

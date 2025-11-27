@@ -1,16 +1,37 @@
-<!--
-******************************************
-*  Created On : 2025. 11. 14.
-*  File : admin-header.html
-*******************************************
- -->
-<!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8" />
-        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <title>모두의 빵</title>
-    </head>
-    <body></body>
-</html>
+    <!--헤더 fragment-->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
+                <div class="navbar-nav nav-pills">
+                    <a class="nav-link active" href="#">정산</a>
+                    <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
+                    <a class="nav-link" href="#">회원</a>
+                    <a class="nav-link" href="#">문의</a>
+                    <a class="nav-link" href="#">홈페이지 관리</a>
+                </div>
+                <div class="navbar-util">
+                    <!--#인증된 사용자 정보 객체.사용자 정보.member.memberName-->
+                    <!--CustomUserDetails에서 get메서드로 꺼내주고 있기때문에 authentication.principal에서 꺼내쓸 수 있음-->
+                    <span class="util-text" th:text="${#authentication.principal.member.memberName}"></span>
+                    <span class="util-text">님</span>
+                    <form th:action="@{/admin/logout}" method="post">
+                        <button type="submit" class="util-logout">로그아웃</button>
+                    </form>
+                    <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 
+    <script layout:fragment="script">
+        console.log('헤더 fragment됨');
+        헤더보다 나중에 fragment되는 main의 script fragment에 덮어쓰기되므로 layout.html의 script에 직접 작성하기로!!
+    </script> -->
+</div>

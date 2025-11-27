@@ -1,7 +1,9 @@
 package com.eob.rider.model.data;
 
-import java.security.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,11 +11,11 @@ import lombok.Setter;
 @Setter
 public class RiderRegisterForm {
 
+    @NotEmpty(message = "운전면허번호는 필수 입력 항목입니다.")
     private String driverLicense;
 
-    private Timestamp licenseCreatedAt;
+    private LocalDate licenseCreatedAt;
 
     private String licenseFile;
-    
 
 }
