@@ -231,10 +231,10 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 /*
-                                                 * 위에서 허용한 요청 외 /shop/** 내부의 모든 요청은 인증 필요
-                                                 * → 로그인하지 않은 SHOP 사용자는 /shop/login 으로 리다이렉트됨
+                                                 * /shop/** 내부의 모든 요청은 판매자(SHOP)권한만 접근 가능
+                                                 * /shop/** 경로는 오직 ROLE_SHOP 계정만 접근할 수 있도록 제한한다.
                                                  */
-                                                .anyRequest().authenticated())
+                                                .anyRequest().hasRole("SHOP")
 
                                 /*
                                  * 판매자(Shop) 로그인 설정
@@ -359,7 +359,8 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
-                                                .anyRequest().authenticated())
+                                                .anyRequest().hasRole("USER")
+                                )
 
                                 /* 로그인 설정 */
                                 .formLogin(login -> login
