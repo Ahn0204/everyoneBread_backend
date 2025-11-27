@@ -172,11 +172,11 @@
     <body>
         <div class="container" style="width: 600px; height: 80vh">
             <h5 class="my-4 border-bottom">회원가입</h5>
-            <form th:object="${riderInsertForm}" id="form" th:action="@{/rider/insert}" method="post">
-                <th:block th:if="${#fields.hasAnyErrors()}"></th:block>
+            <form th:object="${riderRegisterForm}" id="form" th:action="@{/rider/register/step}" method="post">
+                <!-- <th:block th:if="${#fields.hasAnyErrors()}"></th:block>
                 <div class="alert alert-danger" role="alert" th:if="${#fields.hasAnyErrors()}">
                     <div style="height: 80px; width: 100%" th:each="error , loop : ${#fields.allErrors()}" th:text="${error}+${loop.count}"></div>
-                </div>
+                </div> -->
                 <div class="mb-3 form-floating">
                     <input type="text" maxlength="15" id="driverLicense" th:field="*{driverLicense}" class="form-control" placeholder="운전면허번호" />
                     <label for="driverLicense" class="form-label">운전면허번호</label>
@@ -187,7 +187,7 @@
                     </div>
                     <div>
                         <!-- <input type="date" name="licenseCreatedAt" id="licenseCreatedAt" /> -->
-                        <input type="text" id="licenseCreatedAt" placeholder="면허 발급일자 선택" />
+                        <input type="text" id="licenseCreatedAt" th:field="*{licenseCreatedAt}" placeholder="면허 발급일자 선택" />
                     </div>
                 </div>
                 <div class="mb-3">
@@ -199,7 +199,7 @@
                     <div class="filebox">
                         <label class="openUpload upload-btn">파일 선택</label>
                         <span id="fileName" class="upload-name">선택된 파일 없음</span>
-                        <input type="file" id="realFile" accept="image/*" hidden />
+                        <input type="file" id="realFile" th:field="*{licenseFile}" accept="image/*" hidden />
                     </div>
                 </div>
 
@@ -226,7 +226,7 @@
                     </div>
                     <div class="modal-bottom">
                         <a href="javascript:;" class="modal-btn closeBottomBtn"><span class="btn_text">취소</span></a>
-                        <a href="javascript:;" class="modal-btn"><span class="btn_text">확인</span></a>
+                        <a href="javascript:;" class="modal-btn successBottomBtn"><span class="btn_text">확인</span></a>
                     </div>
                 </div>
             </div>
@@ -284,6 +284,7 @@
                 const previewModal = $('#previewModal'); // 실제 사용할 모달
                 const cTB = $('.closeBtn'); // 상단 닫기 버튼
                 const cBB = $('.closeBottomBtn'); // 하단 닫기 버튼
+                const sBB = $('.successBottomBtn'); // 하단 확인 버튼
 
                 // 모달 닫기 (X 클릭)
                 cTB.on('click', function () {
@@ -297,6 +298,10 @@
                     dimmed.css('display', 'none');
                     $('.upload-name').text('선택된 파일 없음');
                     $('#realFile').val('');
+                });
+                sBB.on('click', function () {
+                    previewModal.css('display', 'none');
+                    dimmed.css('display', 'none');
                 });
 
                 // 바깥 영역 클릭 시 닫기
@@ -319,7 +324,6 @@
                 $('#realFile').on('change', function () {
                     const file = $('#realFile')[0].files[0]; // 선택된 파일 (첫 번째)
                     $('#previewContent').hide();
-
                     // 선택된 파일이 없을경우
                     if (!file) {
                         alert('업로드 된 파일이 없습니다.');
@@ -336,6 +340,7 @@
 
                     const filename = this.files[0].name;
                     const reader = new FileReader();
+                    console.log(filename);
                     reader.onload = function (e) {
                         $('#previewContent').attr('src', e.target.result); // base64 데이터 URL
                         $('#previewContent').show();
@@ -344,6 +349,7 @@
                     };
                     reader.readAsDataURL(file);
                 });
+
                 //===================================
             </script>
         </div>

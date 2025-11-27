@@ -105,11 +105,11 @@ function focusAlert(icon = 'success', title = '', html = '', element = null) {
         confirmButtonText: '확인',
         confirmButtonColor: '#6494ed', // 강조 버튼 (주황)
         didClose: () => {
-            if (element) {
-                // jQuery 객체면 DOM element로 변환
-                // if (element instanceof jQuery) {
-                //     element = element[0];
-                // }
+            if (!element) return; // jQuery 객체 → DOM Element로 변환
+            if (window.jQuery && element instanceof jQuery) {
+                element = element[0];
+            } // DOM Element인지 최종 확인
+            if (element instanceof HTMLElement) {
                 element.focus();
             }
         },

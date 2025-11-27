@@ -1,0 +1,34 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 25.
+*  File : rider-main.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- BootStrap CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous" />
+        <title>모두의 빵</title>
+    </head>
+    <body>
+        <h2>로그인 성공</h2>
+        <h3 th:text="${#authentication.principal.member.memberId}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberPw}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberName}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberPhone}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberEmail}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberJumin}"></h3>
+        <h3 th:text="${#authentication.principal.member.memberRole}"></h3>
+        <h3 th:text="${#authentication.principal.member.rider}"></h3>
+        <script th:inline="javascript"></script>
+    </body>
+</html>
