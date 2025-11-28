@@ -1,0 +1,56 @@
+    <!--헤더 fragment-->
+        <header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
+            <nav class="navbar bg-body-tertiary" style="min-width: 800px">
+                <div class="container-fluid d-flex">
+                    <!--수직정렬이 기본인 body의 영향을 벗어나기 위한 d-flex-->
+                    <a class="navbar-brand" href="#">
+                        <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
+                    </a>
+                    <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button> collapse 시 생성되는 햄버거 아이콘 과 id="navbarNavAltMarkup"인 메뉴를 햄버거 안에 담는다는 설정-->
+                    <div class="d-flex flex-column">
+                        <!--검색창과 카테고리를 수직정렬-->
+                        <div class="nav justify-content-center mb-2">
+                            <!--검색창-->
+                            <form class="d-flex" role="search" method="post" action="@{/search}">
+                                <input class="form-control me-2" type="search" aria-label="search" />
+                                <button class="btn btn-outline-primary" type="submit">검색</button>
+                            </form>
+                        </div>
+                        <div class="nav nav-pills justify-content-center">
+                            <!--카테고리 가운데 정렬-->
+                            <a class="nav-link active" href="#">빵</a>
+                            <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
+                            <a class="nav-link" href="#">케이크</a>
+                            <a class="nav-link" href="#">디저트</a>
+                            <a class="nav-link" href="#">카페</a>
+                        </div>
+                    </div>
+                    <div class="navbar-util d-flex flex-column">
+
+                        <!-- 비로그인 : 로그인/회원가입만 보임 -->
+                        <div class="login-util mb-2">
+                            <a class="util-login" th:href="@{/member/login}" sec:authorize="isAnonymous()">로그인/회원가입</a>
+                        </div>
+                        
+                        <!-- 로그인 : 로그아웃만 보임 -->
+                        <div class="login-util mb-2">
+                             <a class="util-logout" th:href="@{/member/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
+                         </div>
+                    <form th:action="@{/admin/logout}" method="post" name="logoutForm">
+                        <!--csrf토큰 파라미터 -->
+                        <!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" /> 는 Security6이전 버전인가보다-->
+                        <!--layout.html의 헤더에서도 아래와 같은 이름으로 전달 중임-->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />                
+                        <button type="button" class="util-logout">로그아웃</button>
+                    </form>
+                    <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                         <!-- 로그인 : 마이페이지 + 알림함 -->
+                        <div class="user-util" sec:authorize="isAuthenticated()">
+                            <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                            <button class="btn btn-secondary util-alert pb-2" onclick="location.href='#'">마이페이지</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>

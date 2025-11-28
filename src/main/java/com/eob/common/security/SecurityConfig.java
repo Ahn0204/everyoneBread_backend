@@ -12,10 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import com.eob.common.security.admin.AdminDetailService;
-import com.eob.common.security.admin.AdminLoginSuccessHandler;
-
 import lombok.RequiredArgsConstructor;
 
 //설정을 담당하는 어노테이션 
@@ -26,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final AdminDetailService adminDetailService;
 
         private final CustomDetailService customDetailService;
 
@@ -34,7 +29,6 @@ public class SecurityConfig {
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
 
-        private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
         // CustomAuthenticationProvider 를 Bean 으로 등록
         // -
@@ -203,8 +197,9 @@ public class SecurityConfig {
                 return http.build();
         }
 
+        //예솔: Order가 default랑 똑같이 4였어서 2로 바꿨습니다.
         @Bean
-        @Order(4)
+        @Order(2)
         SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
 
                 http
@@ -333,7 +328,8 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/**")
+                                .securityMatcher("/member/**", "/")
+                                //예솔: "/**"였던 url설정을 바꿨습니다.
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
 
@@ -344,8 +340,8 @@ public class SecurityConfig {
                                                 /* 인증 없이 접근 가능한 요청 목록 */
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
                                                                                                               // 페이지(GET)
-                                                .requestMatchers(
-                                                                "/member/register", // 회원가입 페이지(GET/POST)
+                                                .requestMatchers( //예솔: "/**"를 추가했습니다.
+                                                                "/**","/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
@@ -422,7 +418,11 @@ public class SecurityConfig {
                                  * - 테스트 후 아래 코드 주석 해제 필요
                                  * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
                                  */
-                                .csrf(csrf -> csrf.disable())
+                                //예솔: csrf토큰 기능을 활성화 했습니다.
+                                //.csrf(csrf -> csrf.disable())
+                                .csrf(csrf -> csrf
+                                        .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+                                )
                                 .userDetailsService(customDetailService);
                 return http.build();
         }
