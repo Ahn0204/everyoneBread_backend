@@ -72,7 +72,7 @@
                     //헤더id=settlement인 선택자에 class에 active값 추가, aria-current=page 추가
                     $('#settlement').addClass('active').attr('aria-current', 'page');
                     //사이드바 해당하지 않는 메뉴의 class에서 show속성 삭제
-                    $('#menuUser, #menuInquiry, #menuHomePage').removeClass('show');
+                    $('#menuSettlement').addClass('show');
                     //사이드바 해당하는 메뉴의 class에 active속성 추가
                     switch (uri[3]) {
                         case 'settlement-list':
@@ -88,32 +88,32 @@
                     break;
                 case 'user':
                     $('#user').addClass('active').attr('aria-current', 'page');
-                    $('#menuSettlement, #menuInquiry, #menuHomePage').removeClass('show');
+                    $('#menuUser').addClass('show');
                     //사이드바 입/폐점 관리 항목 펼치기
                     $('#menuShopList').addClass('show');
                     //사이드바 해당하는 메뉴의 class에 active속성 추가
                     switch (uri[3]) {
                         case 'shopApproval-list':
-                            $('#menuUser #menuShopList ul li').eq(0).find('a').addClass('active');
-                            break;
-                        case 'shopClose-list':
-                            $('#menuUser #menuShopList ul li').eq(1).find('a').addClass('active');
-                            break;
-                        case 'riderApproval-list':
                             $('#menuUser ul li').eq(1).find('a').addClass('active');
                             break;
-                        case 'admin-list':
+                        case 'shopClose-list':
                             $('#menuUser ul li').eq(2).find('a').addClass('active');
                             break;
-                        case 'user-list':
+                        case 'riderApproval-list':
                             $('#menuUser ul li').eq(3).find('a').addClass('active');
+                            break;
+                        case 'admin-list':
+                            $('#menuUser ul li').eq(4).find('a').addClass('active');
+                            break;
+                        case 'user-list':
+                            $('#menuUser ul li').eq(5).find('a').addClass('active');
                             break;
                     }
                     break;
                 case 'inquiry':
+                    console.log(uri[2]+uri[3]);
                     $('#inquiry').addClass('active').attr('aria-current', 'page');
-                    $('#menuSettlement, #menuUser, #menuHomePage').removeClass('show');
-                    //사이드바 해당하는 메뉴의 class에 active속성 추가
+                    $('#menuInquiry').addClass('show');
                     switch (uri[3]) {
                         case 'inquiry-list':
                             $('#menuInquiry ul li').eq(0).find('a').addClass('active');
@@ -122,20 +122,36 @@
                             $('#menuInquiry ul li').eq(1).find('a').addClass('active');
                             break;
                     }
+                    break;
                 case 'homePage':
                     $('#homePage').addClass('active').attr('aria-current', 'page');
-                    $('#menuSettlement, #menuInquiry, #menuUser').removeClass('show');
-                    break;
+                    $('#menuHomePage').addClass('show');
                     switch (uri[3]) {
                         case 'notice-list':
-                            $('#menuHomepage ul li').eq(0).find('a').addClass('active');
+                            $('#menuHomePage ul li').eq(0).find('a').addClass('active');
                             break;
-                        case 'category':
-                            $('#menuHomepage ul li').eq(1).find('a').addClass('active');
+                        case 'category-list':
+                            $('#menuHomePage ul li').eq(1).find('a').addClass('active');
                             break;
-                    default:
+                    }
+                    default: //메인일 때
+                        //모든 사이드바 항목 펼치기
+                        $('ul li .collapse').addClass('show');
                     break;
-            }
+                }
+            //로그아웃 버튼클릭 시 confirm알림
+            $(document).ready(function(){
+                $('.util-logout').on('click',function(){
+                    showConfirmAlert(
+                        '로그아웃 하시겠습니까?\n로그인 페이지로 이동합니다.',
+                        () => { //예
+                            $('form[name="logoutForm"]').submit();
+                        },
+                        () => { //아니오
+                        }
+                    );
+                });
+            });            
         </script>
         <!--자식 script 삽입부-->
         <script layout:fragment="script" type="text/javascript"></script>

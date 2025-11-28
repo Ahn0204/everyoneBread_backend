@@ -16,7 +16,7 @@
                         </svg>
                         정산
                     </a>
-                    <div class="collapse show" id="menuSettlement">
+                    <div class="collapse" id="menuSettlement">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
                             <li><a th:href="@{/admin/settlement/settlement-list}" class="nav-link">정산 내역</a></li>
                             <li><a th:href="@{/admin/settlement/feeHistory-list}" class="nav-link">수수료 변경</a></li>
@@ -35,7 +35,7 @@
                         </svg>
                         회원
                     </a>
-                    <div class="collapse show" id="menuUser">
+                    <div class="collapse" id="menuUser">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
                             <li>
                                 <a class="nav-link" href="#menuShopList" data-bs-toggle="collapse" role="button" aria-expanded="true" aria-controls="menuShopList">입/폐점 관리</a>
@@ -60,9 +60,9 @@
                         </svg>
                         문의
                     </a>
-                    <div class="collapse show" id="menuInquiry">
+                    <div class="collapse" id="menuInquiry">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
-                            <li><a th:href="@{/admin/inquiry/inquiry-list}" class="nav-link active">일반 문의</a></li>
+                            <li><a th:href="@{/admin/inquiry/inquiry-list}" class="nav-link">일반 문의</a></li>
                             <li><a th:href="@{/admin/inquiry/banInquiry-list}" class="nav-link">신고 문의</a></li>
                         </ul>
                     </div>
@@ -75,10 +75,10 @@
                         </svg>
                         홈페이지 관리
                     </a>
-                    <div class="collapse show" id="menuHomePage">
+                    <div class="collapse" id="menuHomePage">
                         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-4">
                             <li><a th:href="@{/admin/homePage/notice-list}" class="nav-link">공지사항</a></li>
-                            <li><a th:href="@{/admin/homePage/category}" class="nav-link">카테고리</a></li>
+                            <li><a th:href="@{/admin/homePage/category-list}" class="nav-link">카테고리</a></li>
                         </ul>
                     </div>
                 </li>

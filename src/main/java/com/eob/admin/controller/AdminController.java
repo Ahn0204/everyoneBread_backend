@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -88,7 +87,7 @@ public class AdminController {
     // 헤더, 사이드바에서 'user' 항목 클릭 시
     @GetMapping("/user")
     public String getUserP() {
-        return "redirect:/admin/user/shop-list";
+        return "redirect:/admin/user/shopApproval-list";
     }
 
     // 입점신청 내역 페이지
@@ -104,9 +103,9 @@ public class AdminController {
     }
 
     // 라이더승인 내역 페이지
-    @GetMapping("/user/shop-list")
-    public String getShopList() {
-        return "admin/user/shop-list";
+    @GetMapping("/user/riderApproval-list")
+    public String getRiderApprovalList() {
+        return "admin/user/riderApproval-list";
     }
 
     // 관리자 계정 내역(추가) 페이지
@@ -170,19 +169,18 @@ public class AdminController {
     }
 
     // 회원 내역 페이지
-    @GetMapping("/user/shop-list")
-    public String getShopList() {
-        return "admin/user/shop-list";
+    @GetMapping("/user/user-list")
+    public String getUserList() {
+        return "admin/user/user-list";
     }
 
-    }
 
     // ============== 문의 /admin/inquiry
     // ==================================================
 
     // 헤더, 사이드바에서 'inquiry' 항목 클릭 시
     @GetMapping("/inquiry")
-    public String getInquriyP() {
+    public String getInquiryP() {
         return "redirect:/admin/inquiry/inquiry-list";
     }
 
@@ -192,12 +190,18 @@ public class AdminController {
         return "admin/inquiry/inquiry-list";
     }
 
+    // 신고문의 내역 페이지
+    @GetMapping("/inquiry/banInquiry-list")
+    public String getBanInquiryList() {
+        return "admin/inquiry/banInquiry-list";
+    }
+
     // ============== 홈페이지 관리 /admin/homePage
     // ==================================================
 
     // 헤더, 사이드바에서 'homePage' 항목 클릭 시
     @GetMapping("/homePage")
-    public String gethomePageP() {
+    public String getHomePageP() {
         return "redirect:/admin/homePage/notice-list";
     }
 
@@ -207,4 +211,9 @@ public class AdminController {
         return "admin/homePage/notice-list";
     }
 
+    //  내역 페이지
+    @GetMapping("/homePage/category-list")
+    public String getCategoryP() {
+        return "admin/homePage/category-list";
+    }
 }
