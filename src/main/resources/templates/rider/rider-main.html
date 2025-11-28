@@ -29,6 +29,26 @@
         <h3 th:text="${#authentication.principal.member.memberJumin}"></h3>
         <h3 th:text="${#authentication.principal.member.memberRole}"></h3>
         <h3 th:text="${#authentication.principal.member.rider}"></h3>
-        <script th:inline="javascript"></script>
+        <button sec:authorize="isAuthenticated()" id="logoutBtn" type="button">로그아웃</button>
+        <script th:inline="javascript">
+            // 모든 jQuery AJAX 요청에 CSRF 헤더 자동 첨부
+            $(function () {
+                const token = $('meta[name="_csrf"]').attr('content');
+                const header = $('meta[name="_csrf_header"]').attr('content');
+                $(document).ajaxSend(function (e, xhr) {
+                    if (token && header) xhr.setRequestHeader(header, token);
+                });
+            });
+
+            $('#logoutBtn').on('click', function () {
+                $.ajax({
+                    url: '/rider/logout',
+                    type: 'POST',
+                    success: function () {
+                        window.location.href = '/rider/login';
+                    },
+                });
+            });
+        </script>
     </body>
 </html>

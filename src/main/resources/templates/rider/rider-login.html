@@ -307,7 +307,8 @@
         <h1 th:text="${errorMsg}"></h1>
         <th:block th:if="${errorMsg}">
             <script th:inline="javascript">
-                showErrorAlert(`[[${errorMsg}]]`);
+                const msg = /*[[${errorMsg}]]*/ '';
+                showErrorAlert(msg);
             </script>
         </th:block>
 

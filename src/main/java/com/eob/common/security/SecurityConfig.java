@@ -158,7 +158,8 @@ public class SecurityConfig {
                                                 // Security이 로그아웃 요청을 POST "/logout" 이
                                                 // GET /rider/logout 허용
                                                 // 실제 운영되는 서버에서는 GET 매핑이 아닌 POST 매핑으로 설정해주어야한다.
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/rider/logout", "GET"))
+                                                .logoutRequestMatcher(
+                                                                new AntPathRequestMatcher("/rider/logout", "POST"))
 
                                                 // .logoutSuccessUrl()
                                                 // 로그아웃을 성공 한 후 이동할 페이지 지정하는 설정
@@ -332,7 +333,7 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/member/**")
+                                .securityMatcher("/**")
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
 
@@ -404,8 +405,8 @@ public class SecurityConfig {
 
                                 /* 로그아웃 설정 */
                                 .logout(logout -> logout
-                                                /* 로그아웃 요청 URL (POST) */
-                                                .logoutUrl("/member/logout")
+                                                /* 로그아웃 요청 URL (GET) */
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout", "GET"))
                                                 /* 로그아웃 성공 시 이동할 URL */
                                                 .logoutSuccessUrl("/")
                                                 /* 세션 완전 삭제 */

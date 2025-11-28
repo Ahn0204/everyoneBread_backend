@@ -35,8 +35,8 @@ public class RiderService {
         member.setMemberId(memberForm.getMemberId());
         member.setMemberPw(memberForm.getMemberPw());
         member.setMemberName(memberForm.getMemberName());
-        member.setMemberJumin(memberForm.getMemberJuminFront() + memberForm.getMemberJuminBack());
-        member.setMemberPhone(memberForm.getMemberPhone());
+        member.setMemberJumin(memberForm.getMemberJuminFront() + "-" + memberForm.getMemberJuminBack());
+        member.setMemberPhone(memberForm.getMemberPhone().replace("-", ""));
         member.setMemberEmail(memberForm.getMemberEmail());
         member.setMemberAddress(memberForm.getRoadAddress() + memberForm.getDetailAddress());
         member.setStatus(MemberApprovalStatus.PENDING);
@@ -51,19 +51,19 @@ public class RiderService {
     }
 
     public void passwordChange() {
-        MemberEntity member = this.memberRepository.findByMemberId("test1");
+        MemberEntity member = this.memberRepository.findByMemberId("test2");
         member.setMemberPw(passwordEncoder.encode("1234"));
         this.memberRepository.save(member);
     }
 
     // 아이디 중복확인 AJAX
     public boolean ajaxDuplicationId(String memberId) {
-        return this.memberRepository.existsByMemberIdAndMemberRole(memberId, MemberRoleStatus.RIDER);
+        return this.memberRepository.existsByMemberId(memberId);
     }
 
     // 이메일 중복확인 AJAX
     public boolean ajaxDuplicationEmail(String memberEmail) {
-        return this.memberRepository.existsByMemberEmailAndMemberRole(memberEmail, MemberRoleStatus.RIDER);
+        return this.memberRepository.existsByMemberEmail(memberEmail);
     }
 
 }

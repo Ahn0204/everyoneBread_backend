@@ -2,8 +2,10 @@ package com.eob.member.model.data;
 
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.eob.rider.model.data.RiderEntity;
+import com.eob.shop.model.data.ShopEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -115,9 +117,12 @@ public class MemberEntity {
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
     private RiderEntity rider;
 
+    @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    private ShopEntity shop;
+
     @PrePersist
     public void PrePersist(){
         // 생성일 자동 저장
-        this.createdAt = LocalDateTime.now().withNano(0);
+        this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 }

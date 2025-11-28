@@ -1,6 +1,7 @@
 package com.eob.shop.model.data;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.eob.member.model.data.MemberEntity;
 
@@ -150,7 +151,7 @@ public class ShopEntity {
     public void PrePersist(){
 
         // 생성일 자동 저장
-        this.createdAt = LocalDateTime.now().withNano(0);
+        this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
 }

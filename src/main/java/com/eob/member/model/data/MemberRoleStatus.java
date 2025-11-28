@@ -3,6 +3,9 @@ package com.eob.member.model.data;
 import lombok.Getter;
 
 /**
+ * 로그인 후 어디로 보낼지 / 어떤 권한을 줄지
+ * 권한과 이동 경로를 지정하는데 사용한다.
+ * 
  * 회원 권한 (Enum)
  * 
  * 권한 설명 :
@@ -19,7 +22,7 @@ public enum MemberRoleStatus {
 
     USER("일반 회원"), // 일반 소비자 권한
     SHOP("상점"),      // 판매자 (상점) 권한
-    RIDER("라이더"),   // 배달 기사 권한
+    RIDER("라이더"),   // 배달 기사 (라이더) 권한
     ADMIN("관리자");   // 관리자 권한
 
     // 화면/로그에서 사용할 설명
