@@ -31,49 +31,70 @@
     <body class="d-flex flex-column min-vh-100">
         <!--헤더-->
         <div th:replace="~{/main/main-header}"></div>
-        </header>
 
         <!--본문-->
         <main class="flex-grow-1 py-4">
-            <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->                          
+            <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->
             <div layout:fragment="content" class="container-fluid">
                 <!--container-fluid의 쓰임은? container-x1이 더 꽉참 fluid가 양쪽에 여백이 있음-->
             </div>
         </main>
 
         <!--사용자편의버튼-->
-            <table class="user-btn wrapper position-fixed bottom-0 end-0 m-3" style="border: 1px;">
-                <tr th:if="${session.cart!=null}"><!--주문표-->
-                    <td>
-                        <a th:href="@{|${session.cart.url}|}" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow fb-1"></i></a>
-                    </td>
-                </tr>
-                <tr><!--고객센터-->
-                    <td>
-                        <a th:href="@{/customerCenter}" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow fb-1"></i>고객센터</a>
-                    </td>
-                </tr>
-                <tr><!--위로가기-->
-                    <td>            
-            <div id="up-btn" class="m-3" style="z-index:4000;">
-                <a href="#top" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow bi bi-arrow-up fb-1"></i></a>
-            </div>
-            <script>
-                $(window).on("scroll",function(){ //화면이 스크롤되면
-                    if($(this).scrollTop() > 100){ //화면이 스크롤된 정도가 100을 넘을 때
-                        $('#up-btn').removeClass("d-none");//"d-none" 클래스 삭제(버튼 보이게)
-                    }else{ //스크롤이 맨 위일때
-                        $('#up-btn').addClass("d-none");//"d-none" 클래스 추가(버튼 안보이게)
-                    }
-                });
-                </script></td></tr>
-            </table>
+        <table class="user-btn wrapper position-fixed bottom-0 end-0 m-3 text-center" style="border-radius: 10px; border: 1px solid cornflowerblue; background-color: rgb(218, 218, 218)">
+            <tr th:if="${session.cart!=null}">
+                <!--주문표-->
+                <td>
+                    <a th:href="@{|${session.cart.url}|}" class="linkDefault p-2">주문표</a>
+                </td>
+            </tr>
+            <tr>
+                <!--고객센터-->
+                <td>
+                    <a th:href="@{/customerCenter}" class="linkDefault p-2">고객센터</a>
+                </td>
+            </tr>
+            <tr>
+                <!--위로가기-->
+                <td>
+                    <div id="up-btn">
+                        <a href="#top" class="linkDefault p-2">↑</a>
+                    </div>
+                    <script>
+                        $(window).on('scroll', function () {
+                            //화면이 스크롤되면
+                            if ($(this).scrollTop() > 100) {
+                                //화면이 스크롤된 정도가 100을 넘을 때
+                                $('#up-btn').removeClass('d-none'); //"d-none" 클래스 삭제(버튼 보이게)
+                            } else {
+                                //스크롤이 맨 위일때
+                                $('#up-btn').addClass('d-none'); //"d-none" 클래스 추가(버튼 안보이게)
+                            }
+                        });
+                    </script>
+                </td>
+            </tr>
+        </table>
 
         <!--푸터-->
         <footer class="mt-auto py-3 bg-light text-center">
             <p>ⓒ 2025 모두의 빵</p>
         </footer>
 
+        <!--layout script-->
+        <script type="text/javascript">
+            //ajax사용시 csrf헤더 생성
+            $(function () {
+                const token = $('meta[name="_csrf"]').attr('content');
+                const header = $('meta[name="_csrf_header"]').attr('content');
+                $(document).ajaxSend(function (e, xhr) {
+                    if (token && header) xhr.setRequestHeader(header, token);
+                });
+            });
+        </script>
+        <!--헤더 script-->
+        <script layout:fragment="main-header-script" type="text/javascript"></script>
+        <!--자식 script-->
         <script layout:fragment="script" type="text/javascript"></script>
     </body>
 </html>

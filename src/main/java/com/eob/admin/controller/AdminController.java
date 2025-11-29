@@ -174,7 +174,6 @@ public class AdminController {
         return "admin/user/user-list";
     }
 
-
     // ============== 문의 /admin/inquiry
     // ==================================================
 
@@ -211,7 +210,7 @@ public class AdminController {
         return "admin/homePage/notice-list";
     }
 
-    //  내역 페이지
+    // 내역 페이지
     @GetMapping("/homePage/category-list")
     public String getCategoryP() {
         return "admin/homePage/category-list";

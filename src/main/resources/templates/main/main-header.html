@@ -1,48 +1,77 @@
-    <!--헤더 fragment-->
-        <header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
-            <nav class="navbar bg-body-tertiary" style="min-width: 800px">
-                <div class="container-fluid d-flex">
-                    <!--수직정렬이 기본인 body의 영향을 벗어나기 위한 d-flex-->
-                    <a class="navbar-brand" th:href="@{/}">
-                        <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
-                    </a>
-                    <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+<!--헤더 fragment-->
+<header class="bg-body-tertiary position-sticky top-0" style="z-index: 1030">
+    <nav class="navbar bg-body-tertiary" style="min-width: 800px">
+        <div class="container-fluid d-flex">
+            <!--수직정렬이 기본인 body의 영향을 벗어나기 위한 d-flex-->
+            <a class="navbar-brand" th:href="@{/}">
+                <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
+            </a>
+            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button> collapse 시 생성되는 햄버거 아이콘 과 id="navbarNavAltMarkup"인 메뉴를 햄버거 안에 담는다는 설정-->
-                    <div class="d-flex flex-column">
-                        <!--검색창과 카테고리를 수직정렬-->
-                        <div class="nav justify-content-center mb-2">
-                            <!--검색창-->
-                            <form class="d-flex" role="search" method="post" action="@{/search}">
-                                <input class="form-control me-2" type="search" aria-label="search" />
-                                <button class="btn btn-outline-primary" type="submit">검색</button>
-                            </form>
-                        </div>
-                        <div class="nav nav-pills justify-content-center">
-                            <!--카테고리 가운데 정렬-->
-                            <a class="nav-link" th:href="@{/shopList?category=bread}" >빵</a>
-                            <a class="nav-link" th:href="@{/shopList?category=cake}" >케이크</a>
-                            <a class="nav-link" th:href="@{/shopList?category=dessert}">디저트</a>
-                            <a class="nav-link" th:href="@{/shopList?category=cafe}">카페</a>
-                        </div>
-                    </div>
-                    <div class="navbar-util d-flex flex-column">
-
-                        <!-- 비로그인 : 로그인/회원가입만 보임 -->
-                        <div class="login-util mb-2">
-                            <a class="util-login" th:href="@{/member/login}" sec:authorize="isAnonymous()">로그인/회원가입</a>
-                        </div>
-                        
-                        <!-- 로그인 : 로그아웃만 보임 -->
-                        <div sec:authorize="isAuthenticated()" class="login-util mb-2 ">
-                            <!--메인 로그아웃 url은 get요청-->
-                                <a th:href="@{/member/logout}" class="util-logout">로그아웃</a>
-                        </div>
-                         <!-- 로그인 : 마이페이지 + 알림함 -->
-                        <div class="user-util" sec:authorize="isAuthenticated()">
-                            <button class="btn btn-secondary util-alert pb-2" id="alert">알림함</button>
-                            <button class="btn btn-secondary util-alert pb-2" th:onclick="|location.href='@{/member/myPage}'|">마이페이지</button>
-                        </div>
-                    </div>
+            <div class="d-flex flex-column">
+                <!--검색창과 카테고리를 수직정렬-->
+                <div class="nav justify-content-center mb-2">
+                    <!--검색창-->
+                    <form class="d-flex mt-3" role="search" method="post" action="@{/search}">
+                        <input class="form-control me-2" type="search" aria-label="search" style="width: 25vw; height: 45px" />
+                        <button class="btn btn-outline-primary" type="submit">검색</button>
+                    </form>
                 </div>
-            </nav>
+                <!--카테고리 가운데 정렬-->
+                <div id="categoryDiv" class="nav nav-pills justify-content-center"></div>
+            </div>
+            <div class="navbar-util d-flex flex-column">
+                <!-- 비로그인 : 로그인/회원가입만 보임 -->
+                <div class="login-util mb-2">
+                    <a class="util-login" th:href="@{/member/login}" sec:authorize="isAnonymous()">로그인/회원가입</a>
+                </div>
+
+                <!-- 로그인 : 로그아웃만 보임 -->
+                <div sec:authorize="isAuthenticated()" class="login-util mb-2">
+                    <!--메인 로그아웃 url은 get요청-->
+                    <a th:href="@{/member/logout}" class="util-logout">로그아웃</a>
+                </div>
+                <!-- 로그인 : 마이페이지 + 알림함 -->
+                <div class="user-util" sec:authorize="isAuthenticated()">
+                    <button class="btn btn-secondary util-alert pb-2" id="alert">알림함</button>
+                    <button class="btn btn-secondary util-alert pb-2" th:onclick="|location.href='@{/member/myPage}'|">마이페이지</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script layout:fragment="main-header-script" type="text/javascript">
+    $(document).ready(function () {
+        //sessionStorage에 카테고리List가 있는지 확인
+        //sessionStorage는 브라우저에 저장됨
+        //sessionStorage에서 꺼내는 값은 무조건 String으로, 객체를 저장, 꺼낼 때 jsonStringfy가 필요하다.
+        let category = sessionStorage.getItem('category') ? sessionStorage.getItem('category') : null;
+        //category == null
+        if (category == null) {
+            //ajax 카테고리 요청
+            $.ajax({
+                url: '/getCategory',
+                type: 'GET',
+                success: function (category) {
+                    //session에 카테고리 List 저장
+                    sessionStorage.setItem('category', category);
+                },
+                error: function (error) {
+                    console.error(error);
+                    showToast('카테고리를 불러올 수 없습니다.', 'error');
+                },
+            });
+        } //category != null
+        //배열 통째로 String으로 추출되는 category를 ,를 기준으로 split하여 배열로 저장
+        let mainCate = category.split(',');
+        //categoryDiv선택자 선언
+        const categoryDiv = $('#categoryDiv');
+        //category반복문으로 html에 출력
+        mainCate.forEach((element) => {
+            let a = $(`<a class="nav-link" href=/shopList?category=${element}>${element}</a>`);
+            categoryDiv.append(a);
+        });
+    });
+</script>
