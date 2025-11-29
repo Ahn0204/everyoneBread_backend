@@ -12,14 +12,19 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
         <!--csrf토근 헤더 추가-->
-        <meta name="_csrf" th:content="${_csrf.token}" />
-        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}" />
         <!-- BootStrap CDN -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
         <!--자식페이지에서 추가로 삽입될 head내용-->
         <th:block layout:fragment="head"></th:block>
+        <style>
+            .linkDefault {
+                text-decoration: none;
+            }
+        </style>
         <title>모두의 빵</title>
     </head>
 
@@ -30,14 +35,39 @@
 
         <!--본문-->
         <main class="flex-grow-1 py-4">
-            <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->
-            <div class="container-fluid">
+            <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->                          
+            <div layout:fragment="content" class="container-fluid">
                 <!--container-fluid의 쓰임은? container-x1이 더 꽉참 fluid가 양쪽에 여백이 있음-->
-                <!-- <div class="row"> div안의 요소를 수평으로 나열 -->
-                <!--main-layout이 적용된 페이지의 content가 출력됨-->
-                <!-- </div> -->
             </div>
         </main>
+
+        <!--사용자편의버튼-->
+            <table class="user-btn wrapper position-fixed bottom-0 end-0 m-3" style="border: 1px;">
+                <tr th:if="${session.cart!=null}"><!--주문표-->
+                    <td>
+                        <a th:href="@{|${session.cart.url}|}" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow fb-1"></i></a>
+                    </td>
+                </tr>
+                <tr><!--고객센터-->
+                    <td>
+                        <a th:href="@{/customerCenter}" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow fb-1"></i>고객센터</a>
+                    </td>
+                </tr>
+                <tr><!--위로가기-->
+                    <td>            
+            <div id="up-btn" class="m-3" style="z-index:4000;">
+                <a href="#top" class="linkDefault p-2"><i class="btn rounded-circle p-2 shadow bi bi-arrow-up fb-1"></i></a>
+            </div>
+            <script>
+                $(window).on("scroll",function(){ //화면이 스크롤되면
+                    if($(this).scrollTop() > 100){ //화면이 스크롤된 정도가 100을 넘을 때
+                        $('#up-btn').removeClass("d-none");//"d-none" 클래스 삭제(버튼 보이게)
+                    }else{ //스크롤이 맨 위일때
+                        $('#up-btn').addClass("d-none");//"d-none" 클래스 추가(버튼 안보이게)
+                    }
+                });
+                </script></td></tr>
+            </table>
 
         <!--푸터-->
         <footer class="mt-auto py-3 bg-light text-center">

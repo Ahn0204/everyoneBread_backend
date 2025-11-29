@@ -185,7 +185,8 @@
         </div>
 
         <form method="post" action="/member/register">
-
+            <!--예솔: csrf토큰 추가-->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <input type="hidden" name="memberRole" value="USER">
             
             <div class="form-row">

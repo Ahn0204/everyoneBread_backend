@@ -3,7 +3,7 @@
             <nav class="navbar bg-body-tertiary" style="min-width: 800px">
                 <div class="container-fluid d-flex">
                     <!--수직정렬이 기본인 body의 영향을 벗어나기 위한 d-flex-->
-                    <a class="navbar-brand" href="#">
+                    <a class="navbar-brand" th:href="@{/}">
                         <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
                     </a>
                     <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,11 +20,10 @@
                         </div>
                         <div class="nav nav-pills justify-content-center">
                             <!--카테고리 가운데 정렬-->
-                            <a class="nav-link active" href="#">빵</a>
-                            <!--aria-current="page" 현재 페이지일 때 javascript로 추가-->
-                            <a class="nav-link" href="#">케이크</a>
-                            <a class="nav-link" href="#">디저트</a>
-                            <a class="nav-link" href="#">카페</a>
+                            <a class="nav-link" th:href="@{/shopList?category=bread}" >빵</a>
+                            <a class="nav-link" th:href="@{/shopList?category=cake}" >케이크</a>
+                            <a class="nav-link" th:href="@{/shopList?category=dessert}">디저트</a>
+                            <a class="nav-link" th:href="@{/shopList?category=cafe}">카페</a>
                         </div>
                     </div>
                     <div class="navbar-util d-flex flex-column">
@@ -35,21 +34,14 @@
                         </div>
                         
                         <!-- 로그인 : 로그아웃만 보임 -->
-                        <div class="login-util mb-2">
-                             <a class="util-logout" th:href="@{/member/logout}" sec:authorize="isAuthenticated()">로그아웃</a>
-                         </div>
-                    <form th:action="@{/admin/logout}" method="post" name="logoutForm">
-                        <!--csrf토큰 파라미터 -->
-                        <!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" /> 는 Security6이전 버전인가보다-->
-                        <!--layout.html의 헤더에서도 아래와 같은 이름으로 전달 중임-->
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />                
-                        <button type="button" class="util-logout">로그아웃</button>
-                    </form>
-                    <button class="btn btn-secondary util-alert pb-2">알림함</button>
+                        <div sec:authorize="isAuthenticated()" class="login-util mb-2 ">
+                            <!--메인 로그아웃 url은 get요청-->
+                                <a th:href="@{/member/logout}" class="util-logout">로그아웃</a>
+                        </div>
                          <!-- 로그인 : 마이페이지 + 알림함 -->
                         <div class="user-util" sec:authorize="isAuthenticated()">
-                            <button class="btn btn-secondary util-alert pb-2">알림함</button>
-                            <button class="btn btn-secondary util-alert pb-2" onclick="location.href='#'">마이페이지</button>
+                            <button class="btn btn-secondary util-alert pb-2" id="alert">알림함</button>
+                            <button class="btn btn-secondary util-alert pb-2" th:onclick="|location.href='@{/member/myPage}'|">마이페이지</button>
                         </div>
                     </div>
                 </div>

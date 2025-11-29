@@ -328,8 +328,10 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/member/**", "/")
-                                //예솔: "/**"였던 url설정을 바꿨습니다.
+                                //.securityMatcher("/member/**","/**")
+                                //예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요 
+                                // /**이라고 경로를 지정하는게 보안에 의미가 없고, 
+                                // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
 
@@ -340,14 +342,16 @@ public class SecurityConfig {
                                                 /* 인증 없이 접근 가능한 요청 목록 */
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
                                                                                                               // 페이지(GET)
-                                                .requestMatchers( //예솔: "/**"를 추가했습니다.
-                                                                "/**","/member/register", // 회원가입 페이지(GET/POST)
+                                                .requestMatchers(
+                                                                "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
                                                                 // "/member/send-auth-code", // 문자 전송 AJAX
                                                                 // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                "/customerCenter", //고객센터
+                                                                "/customerCenter/**", 
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
