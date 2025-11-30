@@ -309,6 +309,10 @@ public class SecurityConfig {
                                                 .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                                 // .csrfTokenRepository(CookieCsrfTokenRepository)와의 차이는?
 
+                                // 검증 시 사용하는 객체 지정
+                                // ROLE값이 로그인 페이지에 맞는지 확인 => 비밀번호 맞는지 확인 => (필요하다면 승인여부 확인)
+                                .authenticationProvider(customAuthenticationProvider())
+
                                 // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
                                 .userDetailsService(customDetailService);
 

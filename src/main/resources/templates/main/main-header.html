@@ -57,21 +57,30 @@
                 success: function (category) {
                     //session에 카테고리 List 저장
                     sessionStorage.setItem('category', category);
+                    //카테고리 헤더에 출력
+                    getCategory(sessionStorage.getItem('category'));
                 },
                 error: function (error) {
                     console.error(error);
                     showToast('카테고리를 불러올 수 없습니다.', 'error');
                 },
             });
-        } //category != null
-        //배열 통째로 String으로 추출되는 category를 ,를 기준으로 split하여 배열로 저장
-        let mainCate = category.split(',');
-        //categoryDiv선택자 선언
-        const categoryDiv = $('#categoryDiv');
-        //category반복문으로 html에 출력
-        mainCate.forEach((element) => {
-            let a = $(`<a class="nav-link" href=/shopList?category=${element}>${element}</a>`);
-            categoryDiv.append(a);
-        });
+        } else {
+            //category != null
+            getCategory(category);
+        }
+
+        //카테고리 헤더에 출력하는 함수
+        function getCategory(category) {
+            //배열 통째로 String으로 추출되는 category를 ,를 기준으로 split하여 배열로 저장
+            let mainCate = category.split(',');
+            //categoryDiv선택자 선언
+            const categoryDiv = $('#categoryDiv');
+            //category반복문으로 html에 출력
+            mainCate.forEach((element) => {
+                let a = $(`<a class="nav-link" href=/shopList?category=${element}>${element}</a>`);
+                categoryDiv.append(a);
+            });
+        }
     });
 </script>
