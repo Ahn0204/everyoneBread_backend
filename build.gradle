@@ -109,3 +109,8 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+//-parameters 플래그 추가, 컨트롤러에서 파라미터명 지정되지 않았을 때 자동 매핑시킴  
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ["-parameters"]
+}

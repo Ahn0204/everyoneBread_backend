@@ -38,8 +38,8 @@ public class MemberController {
         회원가입 페이지
         ?role=USER 기본
     */
-    @GetMapping("register")
-    public String registerPage(@RequestParam(defaultValue = "USER") String role, Model model) {
+    @GetMapping("register") //예솔: 파라미터 이름을 명시했습니다. name=role
+    public String registerPage(@RequestParam(name="role",defaultValue = "USER") String role, Model model) {
         RegisterRequest dto = new RegisterRequest();
         dto.setMemberRole(role);  // 기본 USER
         model.addAttribute("registerRequest", dto);

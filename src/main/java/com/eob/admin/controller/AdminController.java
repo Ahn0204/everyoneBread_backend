@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -47,6 +46,70 @@ public class AdminController {
     @GetMapping("/")
     public String getAdminMain() {
         return "admin/comm/admin-main";
+    }
+
+    /*
+     * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
+     * return redirect:도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
+     */
+
+    // ============== 정산 /admin/settlement
+    // ==================================================
+
+    // 헤더, 사이드바에서 '정산' 항목 클릭 시
+    @GetMapping("/settlement")
+    public String getSettlementP() {
+        // 기본 뷰 = 정산 내역 페이지
+        return "redirect:/admin/settlement/settlement-list";
+    }
+
+    // 정산내역 페이지
+    @GetMapping("/settlement/settlement-list")
+    public String getSettlementList() {
+        return "admin/settlement/settlement-list";
+    }
+
+    // 수수료 변경 페이지
+    @GetMapping("/settlement/feeHistory-list")
+    public String getFeeHistoryList() {
+        return "admin/settlement/feeHistory-list";
+    }
+
+    // 배송비 변경 페이지
+    @GetMapping("/settlement/distanceFeeHistory-list")
+    public String getDistanceFeeHistoryList() {
+        return "admin/settlement/distanceFeeHistory-list";
+    }
+
+    // ============== 회원 /admin/user
+    // ==================================================
+
+    // 헤더, 사이드바에서 'user' 항목 클릭 시
+    @GetMapping("/user")
+    public String getUserP() {
+        return "redirect:/admin/user/shopApproval-list";
+    }
+
+    // 입점신청 내역 페이지
+    @GetMapping("/user/shopApproval-list")
+    public String getShopApprovalList(Model model) {
+        // shop레코드 전체 조회
+        shopRepository.
+
+                model.addAttribute("shopList", shopList);
+        return "admin/user/shopApproval-list";
+    }
+
+    // 폐점신청 내역 페이지
+    @GetMapping("/user/shopClose-list")
+    public String getShopCloseList() {
+        return "admin/user/shopClose-list";
+    }
+
+    // 라이더승인 내역 페이지
+    @GetMapping("/user/riderApproval-list")
+    public String getRiderApprovalList() {
+        return "admin/user/riderApproval-list";
     }
 
     // 관리자 계정 내역(추가) 페이지
@@ -109,34 +172,51 @@ public class AdminController {
         return "redirect:/admin/user/admin-list"; // 새 admin-list 페이지가 다시 요청됨(redirect)
     }
 
-    /*
-     * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
-     * return redirect:도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
-     */
+    // 회원 내역 페이지
+    @GetMapping("/user/user-list")
+    public String getUserList() {
+        return "admin/user/user-list";
+    }
 
-    // ============== 정산 /admin/settlement
+    // ============== 문의 /admin/inquiry
     // ==================================================
 
-    // 헤더, 사이드바에서 '정산' 항목 클릭 시
-    @GetMapping("/settlement")
-    public String getSettlementP() {
-        // 기본 뷰 = 정산 내역 페이지
-        return "redirect:/admin/settlement/settlement-list";
+    // 헤더, 사이드바에서 'inquiry' 항목 클릭 시
+    @GetMapping("/inquiry")
+    public String getInquiryP() {
+        return "redirect:/admin/inquiry/inquiry-list";
     }
 
-    // 정산내역 페이지
-    @GetMapping("/settlement/settlement-list")
-    public String getSettlementList() {
-        return "admin/settlement/settlement-list";
+    // 일반문의 내역 페이지
+    @GetMapping("/inquiry/inquiry-list")
+    public String getInquiryList() {
+        return "admin/inquiry/inquiry-list";
     }
 
-    // ============== 회원 /admin/user
+    // 신고문의 내역 페이지
+    @GetMapping("/inquiry/banInquiry-list")
+    public String getBanInquiryList() {
+        return "admin/inquiry/banInquiry-list";
+    }
+
+    // ============== 홈페이지 관리 /admin/homePage
     // ==================================================
 
-    // 입점신청 내역 페이지
-    @GetMapping("/user")
-    public String getMethodName(@RequestParam String param) {
-        return new String();
+    // 헤더, 사이드바에서 'homePage' 항목 클릭 시
+    @GetMapping("/homePage")
+    public String getHomePageP() {
+        return "redirect:/admin/homePage/notice-list";
     }
 
+    // 공지 내역 페이지
+    @GetMapping("/homePage/notice-list")
+    public String getNoticeList() {
+        return "admin/homePage/notice-list";
+    }
+
+    // 내역 페이지
+    @GetMapping("/homePage/category-list")
+    public String getCategoryP() {
+        return "admin/homePage/category-list";
+    }
 }

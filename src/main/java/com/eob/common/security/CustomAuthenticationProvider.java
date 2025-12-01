@@ -46,29 +46,32 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 .getRequest();
 
         String requestURL = request.getRequestURI();
-        System.out.println("requestURL : " + requestURL);
+        System.out.println("로그인 요청 URL = " + requestURL);
+        System.out.println("로그인한 사용자의 ROLE = " + member.getMemberRole());
+        System.out.println("ROLE 비교 결과 = " + (member.getMemberRole() == MemberRoleStatus.RIDER));
 
         switch (requestURL) {
             case "/rider/login":
+                System.out.println("라이더 페이지 로그인");
                 if (member.getMemberRole() != MemberRoleStatus.RIDER) {
-                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                    throw new DisabledException("아이디 혹은 비밀번호가 틀렸습니다.");
                 }
                 break;
             case "/shop/login":
                 if (member.getMemberRole() != MemberRoleStatus.SHOP) {
-                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                    throw new DisabledException("아이디 혹은 비밀번호가 틀렸습니다.");
                 }
 
                 break;
             case "/admin/login":
                 if (member.getMemberRole() != MemberRoleStatus.ADMIN) {
-                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                    throw new DisabledException("아이디 혹은 비밀번호가 틀렸습니다.");
                 }
 
                 break;
             case "/member/login":
                 if (member.getMemberRole() != MemberRoleStatus.USER) {
-                    throw new BadCredentialsException("아이디 혹은 비밀번호가 틀렸습니다.");
+                    throw new DisabledException("아이디 혹은 비밀번호가 틀렸습니다.");
                 }
                 break;
 
@@ -96,6 +99,21 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                         case REVISION_REQUIRED:
                             throw new DisabledException("보완 요청중입니다.");
                     }
+                } else if (member.getMemberRole() == MemberRoleStatus.SHOP) {
+                    switch (shop.getStatus()) {
+                        case APPLY_REVIEW:
+                            throw new DisabledException("입점 심사 중입니다.");
+                        case APPLY_REJECT:
+                            throw new DisabledException("입점 심사가 반려되었습니다.");
+                        case CLOSE_REVIEW:
+                            throw new DisabledException("폐점 검토 중입니다.");
+                        case CLOSE_REJECT:
+                            break; // 폐점 반려 -> 영업은 가능함
+                        case APPLY_APPROVED:
+                            break; // 입점 승인 완료 -> 상점 로그인 가능
+                        case CLOSE_APPROVED:
+                            throw new DisabledException("폐점된 상점입니다.");
+                    }
                 }
                 throw new DisabledException("가입 대기중입니다.");
             case SUSPENDED:
@@ -109,65 +127,65 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         // // 5) 역할별 상세 검증
-        switch (member.getMemberRole()) {
+        // switch (member.getMemberRole()) {
 
-            case RIDER:
-                if (rider == null)
-                    throw new DisabledException("라이더 정보가 존재하지 않습니다.");
+        // case RIDER:
+        // if (rider == null)
+        // throw new DisabledException("라이더 정보가 존재하지 않습니다.");
 
-                switch (rider.getAStatus()) {
-                    case PENDING:
-                        throw new DisabledException("가입 승인 대기중입니다.");
-                    case UNDER_REVIEW:
-                        throw new DisabledException("가입 서류 검토중입니다.");
-                    case REVISION_REQUIRED:
-                        throw new DisabledException("보완 요청중입니다.");
-                    case APPROVED:
-                        break;
-                }
-                break;
+        // switch (rider.getAStatus()) {
+        // case PENDING:
+        // throw new DisabledException("가입 승인 대기중입니다.");
+        // case UNDER_REVIEW:
+        // throw new DisabledException("가입 서류 검토중입니다.");
+        // case REVISION_REQUIRED:
+        // throw new DisabledException("보완 요청중입니다.");
+        // case APPROVED:
+        // break;
+        // }
+        // break;
 
-            case SHOP:
-                if (shop == null) {
-                    throw new DisabledException("가게 정보가 존재하지 않습니다.");
-                }
-                // 로그인한 사용자가 이 상점의 주인인지 확인
-                if (!shop.getMember().getMemberNo().equals(member.getMemberNo())) {
-                    throw new DisabledException("상점 정보와 회원 정보가 일치하지 않습니다.");
-                }
+        // case SHOP:
+        // if (shop == null) {
+        // throw new DisabledException("가게 정보가 존재하지 않습니다.");
+        // }
+        // // 로그인한 사용자가 이 상점의 주인인지 확인
+        // if (!shop.getMember().getMemberNo().equals(member.getMemberNo())) {
+        // throw new DisabledException("상점 정보와 회원 정보가 일치하지 않습니다.");
+        // }
 
-                switch (shop.getStatus()) {
-                    case APPLY_REVIEW:
-                        throw new DisabledException("입점 심사 중입니다.");
-                    case APPLY_REJECT:
-                        throw new DisabledException("입점 심사가 반려되었습니다.");
-                    case CLOSE_REVIEW:
-                        throw new DisabledException("폐점 검토 중입니다.");
-                    case CLOSE_REJECT:
-                        break; // 폐점 반려 -> 영업은 가능함
-                    case APPLY_APPROVED:
-                        break; // 입점 승인 완료 -> 상점 로그인 가능
-                    case CLOSE_APPROVED:
-                        throw new DisabledException("폐점된 상점입니다.");
-                }
-                break;
+        // switch (shop.getStatus()) {
+        // case APPLY_REVIEW:
+        // throw new DisabledException("입점 심사 중입니다.");
+        // case APPLY_REJECT:
+        // throw new DisabledException("입점 심사가 반려되었습니다.");
+        // case CLOSE_REVIEW:
+        // throw new DisabledException("폐점 검토 중입니다.");
+        // case CLOSE_REJECT:
+        // break; // 폐점 반려 -> 영업은 가능함
+        // case APPLY_APPROVED:
+        // break; // 입점 승인 완료 -> 상점 로그인 가능
+        // case CLOSE_APPROVED:
+        // throw new DisabledException("폐점된 상점입니다.");
+        // }
+        // break;
 
-            // case ADMIN:
+        // // case ADMIN:
 
-            case USER:
-                switch (member.getStatus()) {
-                    case ACTIVE:
-                        break;
-                    case INACTIVE:
-                        throw new DisabledException("휴면 계정입니다.");
-                    case WITHDRAW:
-                        throw new DisabledException("탈퇴한 계정입니다.");
-                    case SUSPENDED:
-                        throw new DisabledException("정지된 계정입니다.");
-                    case PENDING:
-                        throw new DisabledException("가입 절차가 완료되지 않았습니다.");
-                }
-        }
+        // case USER:
+        // switch (member.getStatus()) {
+        // case ACTIVE:
+        // break;
+        // case INACTIVE:
+        // throw new DisabledException("휴면 계정입니다.");
+        // case WITHDRAW:
+        // throw new DisabledException("탈퇴한 계정입니다.");
+        // case SUSPENDED:
+        // throw new DisabledException("정지된 계정입니다.");
+        // case PENDING:
+        // throw new DisabledException("가입 절차가 완료되지 않았습니다.");
+        // }
+        // }
 
         // 6) 모두 통과 → 인증 성공 토큰 생성
         return new UsernamePasswordAuthenticationToken(

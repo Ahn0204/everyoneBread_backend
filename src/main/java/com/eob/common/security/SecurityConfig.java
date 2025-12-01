@@ -12,10 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import com.eob.common.security.admin.AdminDetailService;
-import com.eob.common.security.admin.AdminLoginSuccessHandler;
-
 import lombok.RequiredArgsConstructor;
 
 //설정을 담당하는 어노테이션 
@@ -26,15 +22,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-        private final AdminDetailService adminDetailService;
-
         private final CustomDetailService customDetailService;
 
         private final CustomAuthFailureHandler customAuthFailureHandler;
 
         private final CustomLoginSuccessHandler customLoginSuccessHandler;
-
-        private final AdminLoginSuccessHandler adminLoginSuccessHandler;
 
         // CustomAuthenticationProvider 를 Bean 으로 등록
         // -
@@ -203,8 +195,9 @@ public class SecurityConfig {
                 return http.build();
         }
 
+        // 예솔: Order가 default랑 똑같이 4였어서 2로 바꿨습니다.
         @Bean
-        @Order(4)
+        @Order(2)
         SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
 
                 http
@@ -320,6 +313,10 @@ public class SecurityConfig {
                                                 .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                                 // .csrfTokenRepository(CookieCsrfTokenRepository)와의 차이는?
 
+                                // 검증 시 사용하는 객체 지정
+                                // ROLE값이 로그인 페이지에 맞는지 확인 => 비밀번호 맞는지 확인 => (필요하다면 승인여부 확인)
+                                .authenticationProvider(customAuthenticationProvider())
+
                                 // 이 경로에서 사용할 userDetailsService 설정(@Bean으로 등록된 UserDetails가 여러개일 경우 필수)
                                 .userDetailsService(customDetailService);
 
@@ -337,7 +334,10 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/**")
+                                // .securityMatcher("/member/**","/**")
+                                // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
+                                // /**이라고 경로를 지정하는게 보안에 의미가 없고,
+                                // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
 
@@ -350,7 +350,11 @@ public class SecurityConfig {
                                                 /* 인증 없이 접근 가능한 요청 목록 */
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
                                                                                                               // 페이지(GET)
-                                                .requestMatchers(
+                                                .requestMatchers( // 예솔: 메인 홈페이지에서 비회원도 접근가능한 링크 추가했습니다.
+                                                                "/", // 메인 페이지
+                                                                "/shopList/**", // 상점 목록 페이지
+                                                                "/shopList/detail", // 상품 선택페이지
+                                                                "/shopList/detail/**", // 상품 선택페이지
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
@@ -358,6 +362,8 @@ public class SecurityConfig {
                                                                 "/member/check-email", // 이메일 중복 체크 AJAX
                                                                 // "/member/send-auth-code", // 문자 전송 AJAX
                                                                 // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
+                                                                "/customerCenter", // 고객센터
+                                                                "/customerCenter/**",
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
@@ -366,8 +372,9 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
-                                                .anyRequest().hasRole("USER")
-                                )
+                                                .anyRequest().authenticated())
+                                // 예솔: role='user'인 사용자만 로그인되도록 나중에 변경
+                                // .anyRequest().hasRole("USER"))
 
                                 /* 로그인 설정 */
                                 .formLogin(login -> login
@@ -413,7 +420,8 @@ public class SecurityConfig {
                                 /* 로그아웃 설정 */
                                 .logout(logout -> logout
                                                 /* 로그아웃 요청 URL (GET) */
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/member/logout", "GET"))
+                                                .logoutRequestMatcher(
+                                                                new AntPathRequestMatcher("/member/logout", "GET"))
                                                 /* 로그아웃 성공 시 이동할 URL */
                                                 .logoutSuccessUrl("/")
                                                 /* 세션 완전 삭제 */
@@ -429,7 +437,10 @@ public class SecurityConfig {
                                  * - 테스트 후 아래 코드 주석 해제 필요
                                  * .csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
                                  */
-                                .csrf(csrf -> csrf.disable())
+                                // 예솔: csrf토큰 기능을 활성화 했습니다.
+                                // .csrf(csrf -> csrf.disable())
+                                .csrf(csrf -> csrf
+                                                .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                                 .userDetailsService(customDetailService);
                 return http.build();
         }
