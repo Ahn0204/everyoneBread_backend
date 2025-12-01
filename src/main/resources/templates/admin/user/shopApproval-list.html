@@ -13,7 +13,29 @@
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
-        <div layout:fragment="content">입점승인 내역</div>
+        <div layout:fragment="content">
+            <!--입점승인 신청내역 출력-->
+            <table calss="m-2" border="1px solid black">
+                <tr>
+                    <th>번호</th>
+                    <th>상태</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>상점명</th>
+                    <th>신청일시</th>
+                    <th>승인일시</th>
+                </tr>
+                <tr th:each="shop : ${shopList}">
+                    <td th:text="${shop.shopNo}"></td>
+                    <td th:text="${shop.status}"></td>
+                    <td th:text="${shop.member.memberId}"></td>
+                    <td th:text="${shop.member.memberName}"></td>
+                    <td th:text="${shop.shopName}"></td>
+                    <td th:text="${shop.createdAt}"></td>
+                    <td th:text="${shop.approvedDate}"></td>
+                </tr>
+            </table>
+        </div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script">

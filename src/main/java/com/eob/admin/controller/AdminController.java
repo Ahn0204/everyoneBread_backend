@@ -92,7 +92,11 @@ public class AdminController {
 
     // 입점신청 내역 페이지
     @GetMapping("/user/shopApproval-list")
-    public String getShopApprovalList() {
+    public String getShopApprovalList(Model model) {
+        // shop레코드 전체 조회
+        shopRepository.
+
+                model.addAttribute("shopList", shopList);
         return "admin/user/shopApproval-list";
     }
 

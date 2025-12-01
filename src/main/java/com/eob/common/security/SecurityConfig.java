@@ -344,8 +344,12 @@ public class SecurityConfig {
                                                 /* 인증 없이 접근 가능한 요청 목록 */
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
                                                                                                               // 페이지(GET)
-                                                .requestMatchers(
-                                                                "/", "/member/register", // 회원가입 페이지(GET/POST)
+                                                .requestMatchers( // 예솔: 메인 홈페이지에서 비회원도 접근가능한 링크 추가했습니다.
+                                                                "/", // 메인 페이지
+                                                                "/shopList/**", // 상점 목록 페이지
+                                                                "/shopList/detail", // 상품 선택페이지
+                                                                "/shopList/detail/**", // 상품 선택페이지
+                                                                "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
                                                                 "/member/check-id", // 아이디 중복 체크 AJAX
@@ -363,7 +367,8 @@ public class SecurityConfig {
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
                                                 .anyRequest().authenticated())
-
+                                // 예솔: role='user'인 사용자만 로그인되도록 나중에 변경
+                                // .anyRequest().hasRole("USER"))
                                 /* 로그인 설정 */
                                 .formLogin(login -> login
                                                 /* 로그인 페이지(GET) 경로 지정 */

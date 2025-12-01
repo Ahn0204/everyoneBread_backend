@@ -47,6 +47,8 @@
         //sessionStorage에 카테고리List가 있는지 확인
         //sessionStorage는 브라우저에 저장됨
         //sessionStorage에서 꺼내는 값은 무조건 String으로, 객체를 저장, 꺼낼 때 jsonStringfy가 필요하다.
+        // let category = sessionStorage.getItem('category') ? sessionStorage.getItem('category') : null;
+        // 작업용 category변수 공동DB연결 후 삭제 예정
         let category = sessionStorage.getItem('category') ? sessionStorage.getItem('category') : null;
         //category == null
         if (category == null) {
