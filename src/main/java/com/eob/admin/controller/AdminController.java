@@ -1,15 +1,28 @@
 package com.eob.admin.controller;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
+import com.eob.rider.model.data.ApprovalStatus;
+import com.eob.rider.model.data.RiderEntity;
+import com.eob.rider.model.repository.RiderRepository;
+import com.eob.shop.model.data.ShopApprovalStatus;
+import com.eob.shop.model.data.ShopEntity;
+import com.eob.shop.repository.ShopRepository;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -23,6 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminController {
 
     public final AdminService adminService;
+    public final ShopRepository shopRepository;
+    public final RiderRepository riderRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -93,10 +108,26 @@ public class AdminController {
     // 입점신청 내역 페이지
     @GetMapping("/user/shopApproval-list")
     public String getShopApprovalList(Model model) {
-        // shop레코드 전체 조회
-        shopRepository.
 
-                model.addAttribute("shopList", shopList);
+        // DB에 shop이 있으면
+        if (shopRepository.findAll().size() != 0) {
+            // shop레코드 status별 조회
+            List<ShopEntity> reviewList = shopRepository
+                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_REVIEW); // 미검토
+            List<ShopEntity> rejectedList = shopRepository
+                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_REJECT); // 반려
+            List<ShopEntity> approvedList = shopRepository
+                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_APPROVED); // 승인완료
+
+            // 뷰에 list전달
+            model.addAttribute("shopList", reviewList); // 미검토
+            model.addAttribute("rejectedList", rejectedList); // 반려
+            model.addAttribute("approvedList", approvedList); // 승인완료
+        } else if (shopRepository.findAll().size() == 0) {
+            // DB에 shop이 없으면
+            model.addAttribute("noShop", "조회된 내역이 없습니다.");
+
+        }
         return "admin/user/shopApproval-list";
     }
 
@@ -108,7 +139,54 @@ public class AdminController {
 
     // 라이더승인 내역 페이지
     @GetMapping("/user/riderApproval-list")
-    public String getRiderApprovalList() {
+    public String getRiderApprovalList(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 라이더 내역 - 페이징 객체로 리턴
+        Page<RiderEntity> riderP = riderRepository.findAll(pageable);
+
+        // 라이더 내역이 존재 하지 않을 때
+        if (riderP.getTotalElements() == 0) { // riderP의 요소의 총 갯수가 0이면
+            model.addAttribute("noRider", "조회된 내역이 없습니다.");
+        } else {
+            // 라이더 내역이 존재한다면,
+            // riderP의 값을 반복하며 aStatus별로 구분하여 출력될 리스트에 대입
+            List<RiderEntity> pendingList = riderP.getContent().stream()
+                    .filter(r -> r.getAStatus() == ApprovalStatus.PENDING
+                            || r.getAStatus() == ApprovalStatus.UNDER_REVIEW)
+                    .toList(); // 미검토
+            List<RiderEntity> rejectedList = riderP.getContent().stream()
+                    .filter(r -> r.getAStatus() == ApprovalStatus.REVISION_REQUIRED).toList(); // 반려
+            List<RiderEntity> approvedList = riderP.getContent().stream()
+                    .filter(r -> r.getAStatus() == ApprovalStatus.APPROVED).toList(); // 승인완료
+
+            // aStatus에 따라 뷰에 출력될 리스트 분리
+
+            // rider 페이징처리 없을 때
+            // DB에 rider가 있으면
+            // if (riderRepository.findAll().size() > 0) {
+            // // rider레코드 status별 조회
+            // List<RiderEntity> pendingList = riderRepository
+            // .findByaStatusIn(List.of(ApprovalStatus.PENDING,
+            // ApprovalStatus.UNDER_REVIEW)); // 미검토
+            // List<RiderEntity> rejectedList = riderRepository
+            // .findByaStatusIn(List.of(ApprovalStatus.REVISION_REQUIRED)); // 반려
+            // List<RiderEntity> approvedList = riderRepository
+            // .findByaStatusIn(List.of(ApprovalStatus.APPROVED)); // 승인완료
+
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
+            model.addAttribute("rejectedList", rejectedList); // 반려
+            model.addAttribute("approvedList", approvedList); // 승인완료
+        }
+        // } else if (riderRepository.findAll().size() == 0) {
+        // // DB에 rider가 없으면
+        // model.addAttribute("noRider", "조회된 내역이 없습니다.");
+        // }
+        // 페이징 정보 전달
+        model.addAttribute("riderP", riderP);
         return "admin/user/riderApproval-list";
     }
 

@@ -1,5 +1,6 @@
 package com.eob.shop.repository;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.eob.member.model.data.MemberEntity;
+import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 
 public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
@@ -24,4 +26,10 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
      * (s.member.memberNo)
      */
     Optional<ShopEntity> findByMember_MemberNo(Long memberNo);
+
+    /**
+     * 상점 status별 조회 - 등록일Desc순
+     * (예솔 추가)
+     */
+    ArrayList<ShopEntity> findByStatusOrderByCreatedAtDesc(ShopApprovalStatus status);
 }
