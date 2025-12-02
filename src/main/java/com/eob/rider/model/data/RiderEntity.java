@@ -5,12 +5,16 @@ import java.time.LocalDateTime;
 
 import com.eob.member.model.data.MemberEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -38,7 +42,7 @@ public class RiderEntity {
     /**
      * 회원 참조번호
      */
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private MemberEntity member;
 
     /**
@@ -76,4 +80,10 @@ public class RiderEntity {
      * 라이더 주소 기반 좌표 (위도 Y)
      */
     private double latitude;
+
+    @OneToOne(cascade = CascadeType.ALL, // 부모 삭제시 자식도 삭제
+            orphanRemoval = true, // 부모와의 연결이 끊기면 자식 삭제
+            fetch = FetchType.LAZY)
+    @JoinColumn(name = "rider_file_no")
+    private RiderLicenseFileEntity riderLicenseFile;
 }

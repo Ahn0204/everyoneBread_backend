@@ -20,6 +20,9 @@
         Swal.close(); // 열려 있으면 닫기
     }
     
+    
+    focusAlert(icon = 'success', title = '', html = '', element = null)
+
 	사용법 :  메세지 , url
 	showSuccessAlert(msg,url);
 	showErrorAlert(msg,url);
