@@ -3,6 +3,8 @@ package com.eob.rider.model.data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +18,7 @@ public class RiderRegisterForm {
 
     private LocalDate licenseCreatedAt;
 
-    private String licenseFile;
+    // input="file" 이기 때문에 MultipartFile 객체로 받아준다.
+    private MultipartFile licenseFile;
 
 }

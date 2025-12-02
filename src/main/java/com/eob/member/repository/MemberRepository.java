@@ -33,4 +33,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
     // 라이더
     MemberEntity findByMemberId(String memberId);
 
+    // 라이더 아이디 찾기(memberName,memberEmail)
+    Optional<MemberEntity> findByMemberNameAndMemberEmailAndMemberRole(String memberName, String memberEmail,
+            MemberRoleStatus rider);
+
+    // 라이더 아이디 찾기(memberName,memberPhone)
+    Optional<MemberEntity> findByMemberNameAndMemberPhoneAndMemberRole(String memberName, String memberPhone,
+            MemberRoleStatus rider);
+
 }

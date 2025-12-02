@@ -1,6 +1,8 @@
 package com.eob.rider.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,16 +13,19 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.eob.common.util.FileUpload;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.service.RiderService;
 
+import jakarta.mail.Multipart;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
@@ -30,11 +35,18 @@ public class RiderController {
 
     private final RiderService riderService;
 
+    // 메인 페이지 이동 메서드
+    @GetMapping("/")
+    public String mainPage() {
+        return "rider/rider-main";
+    }
+
     // 로그인 페이지 이동 메서드
     @GetMapping("/login")
     public String loginForm(HttpSession session, Model model) {
+        // session에 저장된 loginErrorMessage 가져오기
         String errorMsg = (String) session.getAttribute("loginErrorMessage");
-
+        // 저장된 errorMsg가 있을 경우 Model을 통해 페이지로 값 전송 및 해당 에러 메세지 지우기 (flashAttribute처럼 행동)
         if (errorMsg != null) {
             model.addAttribute("errorMsg", errorMsg);
             session.removeAttribute("loginErrorMessage");
@@ -95,15 +107,42 @@ public class RiderController {
     @PostMapping("/register/step")
     public String registerStep(@Valid RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
             HttpSession session) {
+        // @RequestParam("file") MultipartFile file,
         if (bindingResult.hasErrors()) {
             System.out.println(bindingResult.hasErrors());
             System.out.println(bindingResult.getAllErrors());
-            return "redirect:/rider/register/start";
+            return "redirect:/rider/register/step";
+        }
+        MultipartFile file = riderRegisterForm.getLicenseFile();
+        if (file.isEmpty()) {
+            bindingResult.rejectValue("licenseFile", "empty", "파일은 필수입니다.");
+            return "rider/rider-register-step";
+
+        }
+        // 2. MIME 타입 검사
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            bindingResult.rejectValue("licenseFile", "type", "이미지 파일만 업로드 가능합니다.");
+            return "rider/rider-register-step";
+        }
+
+        // 3. 확장자 검사 (보안상 중요)
+        String originalName = file.getOriginalFilename();
+        String lowerName = originalName.toLowerCase();
+
+        if (!(lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
+                lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
+                lowerName.endsWith(".webp"))) {
+
+            bindingResult.rejectValue("licenseFile", "ext",
+                    "허용된 이미지 확장자(jpg, jpeg, png, gif, webp)만 가능합니다.");
+            return "rider/rider-register-step";
         }
 
         MemberRegisterForm memberForm = (MemberRegisterForm) session.getAttribute("registerMember");
 
         try {
+            // 회원/라이더 정보 저장
             this.riderService.registerMember(memberForm, riderRegisterForm);
 
             return "redirect:/register/complete";
@@ -139,9 +178,32 @@ public class RiderController {
         return "redirect:/rider/";
     }
 
-    @GetMapping("/")
-    public String mainPage() {
-        return "rider/rider-main";
+    // =======================================================================================================
+    // 아이디/비밀번호 찾기 로직
+    @PostMapping("/ajaxFindById")
+    @ResponseBody
+    public HashMap<String, String> ajaxFindById(@RequestParam("memberName") String memberName,
+            @RequestParam(value = "memberEmail", required = false) String memberEmail,
+            @RequestParam(value = "memberPhone", required = false) String memberPhone) {
+
+        HashMap<String, String> result = new HashMap<String, String>();
+        // 두개의 값 모두 서버로 오지 않았을 경우 해당 오류 메세지 출력
+        if (memberEmail == null && memberPhone == null) {
+            result.put("result", "false");
+            result.put("msg", "parameter missing");
+            return result;
+        }
+        System.out.println("memberPhone : " + memberPhone);
+        System.out.println("memberEmail : " + memberEmail);
+
+        result = this.riderService.ajaxFindById(memberName, memberEmail, memberPhone);
+
+        return result;
+    }
+
+    @GetMapping("/modalTest")
+    public String modalTest() {
+        return "rider/modalTest";
     }
 
     @GetMapping("/passwordChange")
