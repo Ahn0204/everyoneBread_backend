@@ -1,17 +1,22 @@
 package com.eob.rider.model.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.eob.common.util.FileUpload;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.member.repository.MemberRepository;
+import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
+import com.eob.rider.model.data.RiderLicenseFileEntity;
 import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.repository.RiderRepository;
@@ -31,23 +36,33 @@ public class RiderService {
 
     @Transactional
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
+        MultipartFile file = riderForm.getLicenseFile();
+        // 라이더 운전면허증 파일 저장
+        String saveFileName = FileUpload.uploadImage(file, "rider/licenseFile");
+
         MemberEntity member = new MemberEntity();
         member.setMemberId(memberForm.getMemberId());
-        member.setMemberPw(memberForm.getMemberPw());
+        member.setMemberPw(passwordEncoder.encode(memberForm.getMemberPw()));
         member.setMemberName(memberForm.getMemberName());
         member.setMemberJumin(memberForm.getMemberJuminFront() + "-" + memberForm.getMemberJuminBack());
         member.setMemberPhone(memberForm.getMemberPhone().replace("-", ""));
         member.setMemberEmail(memberForm.getMemberEmail());
         member.setMemberAddress(memberForm.getRoadAddress() + memberForm.getDetailAddress());
+        member.setMemberRole(MemberRoleStatus.RIDER);
         member.setStatus(MemberApprovalStatus.PENDING);
         member.setCreatedAt(LocalDateTime.now());
         this.memberRepository.save(member);
 
-        RiderEntity rider = RiderEntity.builder().member(member).riderLicense(riderForm.getDriverLicense())
-                .licenseCreatedAt(riderForm.getLicenseCreatedAt()).createdAt(LocalDateTime.now()).build();
+        RiderLicenseFileEntity fileEntity = new RiderLicenseFileEntity();
+        fileEntity.setCreatedAt(LocalDateTime.now());
+        fileEntity.setLicenseFile(saveFileName);
+
+        RiderEntity rider = RiderEntity.builder().member(member).aStatus(ApprovalStatus.PENDING)
+                .riderLicense(riderForm.getDriverLicense()).licenseCreatedAt(riderForm.getLicenseCreatedAt())
+                .createdAt(LocalDateTime.now()).riderLicenseFile(fileEntity).build();
+        fileEntity.setRider(rider);
 
         this.riderRepository.save(rider);
-
     }
 
     public void passwordChange() {
@@ -64,6 +79,28 @@ public class RiderService {
     // 이메일 중복확인 AJAX
     public boolean ajaxDuplicationEmail(String memberEmail) {
         return this.memberRepository.existsByMemberEmail(memberEmail);
+    }
+
+    // 아이디 찾기 AJAX (memberName,memberEmail)
+    public HashMap<String, String> ajaxFindById(String memberName, String memberEmail, String memberPhone) {
+        Optional<MemberEntity> _member = Optional.empty();
+        HashMap<String, String> result = new HashMap<String, String>();
+        if (memberEmail != null) {
+            _member = this.memberRepository.findByMemberNameAndMemberEmailAndMemberRole(memberName, memberEmail,
+                    MemberRoleStatus.RIDER);
+        } else if (memberPhone != null) {
+            _member = this.memberRepository.findByMemberNameAndMemberPhoneAndMemberRole(memberName, memberPhone,
+                    MemberRoleStatus.RIDER);
+        }
+
+        if (_member.isEmpty()) {
+            result.put("result", "false");
+            result.put("value", "일치하는 회원이 없습니다.");
+        } else {
+            result.put("result", "true");
+            result.put("value", _member.get().getMemberId());
+        }
+        return result;
     }
 
 }
