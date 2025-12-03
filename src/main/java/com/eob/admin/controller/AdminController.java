@@ -162,29 +162,12 @@ public class AdminController {
             List<RiderEntity> approvedList = riderP.getContent().stream()
                     .filter(r -> r.getAStatus() == ApprovalStatus.APPROVED).toList(); // 승인완료
 
-            // aStatus에 따라 뷰에 출력될 리스트 분리
-
-            // rider 페이징처리 없을 때
-            // DB에 rider가 있으면
-            // if (riderRepository.findAll().size() > 0) {
-            // // rider레코드 status별 조회
-            // List<RiderEntity> pendingList = riderRepository
-            // .findByaStatusIn(List.of(ApprovalStatus.PENDING,
-            // ApprovalStatus.UNDER_REVIEW)); // 미검토
-            // List<RiderEntity> rejectedList = riderRepository
-            // .findByaStatusIn(List.of(ApprovalStatus.REVISION_REQUIRED)); // 반려
-            // List<RiderEntity> approvedList = riderRepository
-            // .findByaStatusIn(List.of(ApprovalStatus.APPROVED)); // 승인완료
-
             // // 뷰에 list전달
             model.addAttribute("pendingList", pendingList); // 미검토
             model.addAttribute("rejectedList", rejectedList); // 반려
             model.addAttribute("approvedList", approvedList); // 승인완료
         }
-        // } else if (riderRepository.findAll().size() == 0) {
-        // // DB에 rider가 없으면
-        // model.addAttribute("noRider", "조회된 내역이 없습니다.");
-        // }
+
         // 페이징 정보 전달
         model.addAttribute("riderP", riderP);
         return "admin/user/riderApproval-list";
