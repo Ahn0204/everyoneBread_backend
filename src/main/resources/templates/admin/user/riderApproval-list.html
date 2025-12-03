@@ -10,19 +10,30 @@
         <th:block layout:fragment="head">
             <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
         </th:block>
+        <style>
+            /*부트스트랩보다 우선 적용*/
+            tbody,
+            td,
+            tfoot,
+            th,
+            thead,
+            tr {
+                border-width: 1px !important;
+            }
+        </style>
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
         <div layout:fragment="content">
             <h3>라이더 승인 내역</h3>
-            <div calss="m-2" width="80%" max-width="900px" min-width="700px">
+            <div calss="m-2" style="max-width: 1000px; min-width: 800px">
                 <div class="d-flex flex-row border-bottom border-3 border-dark fw-b text-center">
                     <div class="p-2 flex-fill fw-bold">번호</div>
                     <div class="p-2 flex-fill fw-bold">상태</div>
                     <div class="p-2 flex-fill fw-bold">아이디</div>
                     <div class="p-2 flex-fill fw-bold">이름</div>
-                    <div class="p-2 flex-fill fw-bold">신청일시</div>
-                    <div class="p-2 flex-fill fw-bold">승인일시</div>
+                    <div class="p-2 flex-fill fw-bold">&nbsp;신청일시&nbsp;</div>
+                    <div class="p-2 flex-fill fw-bold">&nbsp;승인일시&nbsp;</div>
                     <div>&nbsp;&nbsp;</div>
                 </div>
                 <!--라이더 내역이 없을 때-->
@@ -41,29 +52,70 @@
                                 <!--collapse용 버튼 : -->
                                 <button class="d-flex flex-row border-bottom text-center accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#pending-'+${loop.count}" aria-expanded="false" th:aria-controls="'pending-'+${loop.count}">
                                     <!--항목 제목-->
-                                    <div class="p-2 flex-fill" th:text="${rider.riderNo}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.aStatus.label}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.member.memberId}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.member.memberName}"></div>
-                                    <div class="p-2 flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                                    <div class="p-2 flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
+                                    <div class="flex-fill" th:text="${rider.riderNo}"></div>
+                                    <div class="flex-fill" th:text="${rider.aStatus.label}"></div>
+                                    <div class="flex-fill" th:text="${rider.member.memberId}"></div>
+                                    <div class="flex-fill" th:text="${rider.member.memberName}"></div>
+                                    <div class="flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
+                                    <div class="flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
                                 </button>
                             </div>
                             <!--바디 : collapse기능용 div > 실제 내용이 담긴 아코디언 바디-->
                             <!--collapse기능용 div : -->
                             <div th:id="pending-+${loop.count}" class="accordion-collapse collapse" th:aria-labelledby="'heading-'+${loop.count}" data-bs-parent="#riderApproval-List">
                                 <!--아코디언 바디-->
-                                <div class="accordion-body"></div>
+                                <div class="accordion-body">
+                                    <table style="border: 1px solid black !important; border-width: 1px !important">
+                                        <tr>
+                                            <th>이름</th>
+                                            <td>ㅇㅇㅇ</td>
+                                            <th>연락처</th>
+                                            <td>ㅇㅇㅇㅇㅇㅇㅇㅇ</td>
+                                            <th>메일</th>
+                                            <td>ㅇㅇㅇㅇㅇㅇㅇ</td>
+                                        </tr>
+                                        <tr>
+                                            <th>운전면허 번호</th>
+                                            <td>ㅇㅇㅇㅇㅇㅇ</td>
+                                            <td></td>
+                                            <th>운전면허 발급일자</th>
+                                            <td>ㅇㅇㅇㅇㅇㅇㅇ</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td>사진</td>
+                                            <td>사진</td>
+                                            <td>번호 진위조회 버튼</td>
+                                            <th>보완 요청 사유</th>
+                                            <td>ㅇㅇㅇㅇㅇㅇㅇ</td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                    <form th:action="@{/admin/user/riderApproval}">
+                                        <div class="d-flex flex-row gap-3 justify-content-end">
+                                            <div>
+                                                <select name="reject-reason" id="reject-reason">
+                                                    <option value="" selected hidden>보완 사유</option>
+                                                    <option value="photo">사진 식별 불가</option>
+                                                    <option value="license">면허 번호 인증불가</option>
+                                                    <option value="info">올바르지 못한 정보</option>
+                                                </select>
+                                            </div>
+                                            <div><button type="button">보완</button></div>
+                                            <div><button type="submit">승인</button></div>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         <!--보완요청 REVISION_REQUIRED 리스트-->
-                        <div class="d-flex flex-row border-bottom text-center" th:each="rider : ${rejectedList}">
-                            <div class="p-2 flex-fill" th:text="${rider.riderNo}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.aStatus.label}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberId}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberName}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
+                        <div class="d-flex flex-row gap-2 border-bottom text-center" th:each="rider : ${rejectedList}">
+                            <div class="flex-fill" th:text="${rider.riderNo}"></div>
+                            <div class="flex-fill" th:text="${rider.aStatus.label}"></div>
+                            <div class="flex-fill" th:text="${rider.member.memberId}"></div>
+                            <div class="flex-fill" th:text="${rider.member.memberName}"></div>
+                            <div class="flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
+                            <div class="flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
                         </div>
                         <!--승인완료 APPROVED 리스트-->
                         <div class="d-flex flex-row border-bottom text-center" th:each="rider : ${approvedList}">
@@ -99,7 +151,7 @@
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script">
-            console.log('fragment 됨');
+            //confirm
         </script>
     </body>
 </html>
