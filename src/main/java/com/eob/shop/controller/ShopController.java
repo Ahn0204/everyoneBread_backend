@@ -1,11 +1,13 @@
 package com.eob.shop.controller;
 
+import java.io.File;
 import java.time.LocalDateTime;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.model.data.MemberEntity;
@@ -67,14 +69,13 @@ public class ShopController {
         상점 정보 입력 화면
     */
     @GetMapping("register/step")
-    public String registerStepForm(@RequestParam("memberNo") Long memberNo, Model model, HttpSession session) {
+    public String registerStepForm(Model model, HttpSession session) {
 
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
         if(temp == null){
             return "redirect:/shop/register/start";
         }
 
-        model.addAttribute("memberNo", memberNo);
         return "shop/shop-register-step";
     }
 
@@ -82,7 +83,7 @@ public class ShopController {
         상점 정보 저장
     */
     @PostMapping("register/step")
-    public String registerStep(ShopEntity shop, @RequestParam("memberNo") Long memberNo, HttpSession session) {
+    public String registerStep(ShopEntity shop,HttpSession session, @RequestParam("bizFile") MultipartFile bizFile) throws Exception {
 
         // 세션에 담아둔 회원 정보 가져오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
@@ -92,10 +93,19 @@ public class ShopController {
         // 회원 저장
         MemberEntity member = memberService.registerShop(temp,null);
 
+        // 파일 저장
+        String fileName = null;
+        if(!bizFile.isEmpty()){
+            fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
+            String savePath = "C:/upload/shop/" + fileName;
+            bizFile.transferTo(new File(savePath));
+        }
+
         // ShopEntity 세팅
         shop.setMember(member);
         shop.setSellerName(member.getMemberName());
         shop.setCreatedAt(LocalDateTime.now());
+        shop.setBizImg(fileName);
         shopService.saveShop(shop);
 
         // 세션 삭제
