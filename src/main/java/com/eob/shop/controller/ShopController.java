@@ -13,6 +13,7 @@ import com.eob.member.service.MemberService;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ShopService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -46,10 +47,7 @@ public class ShopController {
         판매자 회원 저장
     */
     @PostMapping("register/start")
-    public String registerStart(
-            @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
-            BindingResult bindingResult,
-            Model model) {
+    public String registerStart(@Valid @ModelAttribute("registerRequest") RegisterRequest dto, BindingResult bindingResult, Model model, HttpSession session) {
 
         // Valid 검증 실패
         if (bindingResult.hasErrors()) {
@@ -59,15 +57,9 @@ public class ShopController {
         // ROLE 강제 SHOP 주입
         dto.setMemberRole("SHOP");
 
-        // registerShop 호출 (이제 bindingResult 필요)
-        MemberEntity newMember = memberService.registerShop(dto, bindingResult);
+        // DB에 저장하지 않고 세션에 임시 저장
+        session.setAttribute("tempShopMember", dto);
 
-        // registerShop 내부 검증 실패
-        if (bindingResult.hasErrors()) {
-            return "shop/shop-register-start";
-        }
-
-        model.addAttribute("memberNo", newMember.getMemberNo());
         return "shop/shop-register-step";
     }
 
@@ -75,7 +67,12 @@ public class ShopController {
         상점 정보 입력 화면
     */
     @GetMapping("register/step")
-    public String registerStepForm(@RequestParam("memberNo") Long memberNo, Model model) {
+    public String registerStepForm(@RequestParam("memberNo") Long memberNo, Model model, HttpSession session) {
+
+        RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
+        if(temp == null){
+            return "redirect:/shop/register/start";
+        }
 
         model.addAttribute("memberNo", memberNo);
         return "shop/shop-register-step";
@@ -85,19 +82,24 @@ public class ShopController {
         상점 정보 저장
     */
     @PostMapping("register/step")
-    public String registerStep(
-            ShopEntity shop,
-            @RequestParam("memberNo") Long memberNo) {
+    public String registerStep(ShopEntity shop, @RequestParam("memberNo") Long memberNo, HttpSession session) {
 
-        // 회원 조회
-        MemberEntity member = memberService.findById(memberNo);
+        // 세션에 담아둔 회원 정보 가져오기
+        RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
+        if(temp == null){
+            return "redirect:/shop/register/start";
+        }
+        // 회원 저장
+        MemberEntity member = memberService.registerShop(temp,null);
 
         // ShopEntity 세팅
         shop.setMember(member);
         shop.setSellerName(member.getMemberName());
         shop.setCreatedAt(LocalDateTime.now());
-
         shopService.saveShop(shop);
+
+        // 세션 삭제
+        session.removeAttribute("tempShopMember");
 
         return "redirect:/shop";
     }
