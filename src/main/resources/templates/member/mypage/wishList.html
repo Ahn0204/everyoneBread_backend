@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title>즐겨찾기</title>
+
+    <style>
+        .wish-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        .wish-item {
+            display: flex;
+            border: 2px solid #000;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            align-items: center;
+        }
+
+        /* 왼쪽 가게 이미지 */
+        .wish-img-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            margin-right: 20px;
+        }
+
+        .wish-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 상점 정보 */
+        .wish-info {
+            flex: 1;
+        }
+
+        .wish-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .wish-desc {
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* 오른쪽 즐겨찾기 버튼(하트) */
+        .wish-heart {
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body layout:decorate="~{/member/mypage/mypage-layout}">
+
+<!-- content 영역만 채우기 -->
+<section layout:fragment="content">
+
+    <h2 class="wish-title">즐겨찾기</h2>
+
+    <!-- ===== 샘플 1개 ===== -->
+    <div class="wish-item">
+
+        <div class="wish-img-box">
+            <img src="/images/sample/store.png" alt="가게 사진">
+        </div>
+
+        <div class="wish-info">
+            <div class="wish-name">성진이 빵집</div>
+            <div class="wish-desc">인기 메뉴: 소금빵, 크루아상, 바게트</div>
+        </div>
+
+        <!-- 활성화된 즐겨찾기 아이콘 -->
+        <img class="wish-heart"
+             src="/images/icon/heart-fill.png"
+             alt="즐겨찾기 해제"
+             data-shopNo="1"
+             onclick="toggleWish(this)">
+    </div>
+
+    <!-- 여기서부터 시작 -->
+    <th:block th:each="wish : ${wishList}">
+        <div class="wish-item">
+
+            <div class="wish-img-box">
+                <img th:src="@{${wish.shopImg}}" alt="가게 사진">
+            </div>
+
+            <div class="wish-info">
+                <div class="wish-name" th:text="${wish.shopName}">가게이름</div>
+                <div class="wish-desc" th:text="${wish.description}">설명</div>
+            </div>
+
+            <img class="wish-heart"
+                 src="/images/icon/heart-fill.png"
+                 alt="즐겨찾기 해제"
+                 th:attr="data-shopNo=${wish.shopNo}"
+                 onclick="toggleWish(this)">
+        </div>
+    </th:block>
+
+</section>
+
+</body>
+</html>

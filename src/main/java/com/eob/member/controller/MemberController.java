@@ -89,4 +89,66 @@ public class MemberController {
     public boolean checkEmail(@RequestParam("memberEmail") String memberEmail){
         return memberService.isMemberEmailAvailable(memberEmail);
     }
+
+    /**
+     * 마이페이지
+     */
+    @GetMapping("mypage")
+    public String mypage(){
+        return "redirect:/member/mypage/orderList";
+    }
+
+    /**
+     * 마이페이지 - 주문 내역
+     */
+    @GetMapping("mypage/orderList")
+    public String orderList(Model model){
+        model.addAttribute("menu","orderList");
+        return "member/mypage/orderList";
+    }
+
+    /**
+     * 마이페이지 - 즐겨찾기
+     */
+    @GetMapping("mypage/wishList")
+    public String wishList(Model model) {
+        model.addAttribute("menu", "wishList");
+        return "member/mypage/wishList";
+    }
+
+    /**
+     * 마이페이지 - 후기
+     */
+    @GetMapping("mypage/reviewList")
+    public String reviewList(Model model) {
+        model.addAttribute("menu", "reviewList");
+        return "member/mypage/reviewList";
+    }
+
+    /**
+     * 마이페이지 - 문의
+     */
+    @GetMapping("mypage/qnaList")
+    public String qnaList(Model model) {
+        model.addAttribute("menu", "qnaList");
+        return "member/mypage/qnaList";
+    }
+
+    /**
+     * 마이페이지 - 배송지 관리
+     */
+    @GetMapping("mypage/delivery")
+    public String delivery(Model model) {
+        model.addAttribute("menu", "delivery");
+        return "member/mypage/delivery";
+    }
+
+    /**
+     * 마이페이지 - 개인정보수정
+     */
+    @GetMapping("mypage/info")
+    public String info(Model model) {
+        model.addAttribute("menu", "info");
+        return "member/mypage/info";
+    }
 }
