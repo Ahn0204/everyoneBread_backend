@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title>리뷰관리</title>
+
+    <style>
+        .review-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        /* 리뷰 박스 */
+        .review-item {
+            display: flex;
+            border: 2px solid #000;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            gap: 20px;
+        }
+
+        /* 왼쪽 상품 이미지 */
+        .review-img-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .review-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 중앙 내용 */
+        .review-middle {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .review-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .review-date {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .review-status {
+            font-size: 14px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #e1f0ff;
+            color: #3069d9;
+        }
+
+        /* 상품명 링크 */
+        .review-product a {
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .review-product a:hover {
+            text-decoration: underline;
+        }
+
+        /* 리뷰 내용 */
+        .review-content {
+            margin-top: 10px;
+            font-size: 15px;
+            color: #444;
+            white-space: pre-line;
+        }
+
+        /* 삭제 버튼 */
+        .review-right {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .review-delete-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 2px solid #000;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .review-delete-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body layout:decorate="~{/member/mypage/mypage-layout}">
+
+<section layout:fragment="content">
+
+    <h2 class="review-title">리뷰관리</h2>
+
+    <!-- ===== 샘플 리뷰 1개 ===== -->
+    <div class="review-item">
+
+        <!-- 왼쪽 이미지 -->
+        <div class="review-img-box">
+            <img src="/images/sample/bread.png" alt="상품 사진">
+        </div>
+
+        <!-- 중앙 내용 -->
+        <div class="review-middle">
+
+            <div>
+                <!-- 작성일 & 답변 여부 -->
+                <div class="review-top-row">
+                    <div class="review-date">작성일자 : 2025-12-03</div>
+                    <div class="review-status">답변 완료</div>
+                </div>
+
+                <!-- 상품명 (링크) -->
+                <div class="review-product">
+                    <a href="#">상품명 외 2개</a>
+                </div>
+
+                <!-- 리뷰 내용 -->
+                <div class="review-content">
+                    빵이 정말 맛있었습니다! 다음에도 구매하고 싶어요.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 오른쪽 삭제 버튼 -->
+        <div class="review-right">
+            <button class="review-delete-btn" onclick="deleteReview(1)">
+                삭제
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== 동적 반복 ===== -->
+    <th:block th:each="review : ${reviewList}">
+        <div class="review-item">
+
+            <div class="review-img-box">
+                <img th:src="@{${review.productImg}}" alt="상품 사진">
+            </div>
+
+            <div class="review-middle">
+
+                <div class="review-top-row">
+                    <div class="review-date" th:text="'작성일자 : ' + ${review.regDate}"></div>
+                    <div class="review-status" 
+                         th:text="${review.replyYn == 'Y'} ? '답변 완료' : '답변 대기'"></div>
+                </div>
+
+                <div class="review-product">
+                    <a th:href="@{/order/detail(orderNo=${review.orderNo})}"
+                       th:text="${review.productName}">상품명</a>
+                </div>
+
+                <div class="review-content" th:text="${review.content}"></div>
+
+            </div>
+
+            <div class="review-right">
+                <button class="review-delete-btn"
+                        th:onclick="|deleteReview(${review.reviewNo})|">
+                    삭제
+                </button>
+            </div>
+
+        </div>
+    </th:block>
+
+</section>
+
+<script>
+    function deleteReview(reviewNo) {
+        if (!confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
+
+        $.ajax({
+            url: "/member/mypage/review/delete",
+            type: "POST",
+            data: { reviewNo: reviewNo },
+            success: function () {
+                alert("리뷰가 삭제되었습니다.");
+                location.reload();
+            },
+            error: function () {
+                alert("리뷰 삭제 중 오류가 발생했습니다.");
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

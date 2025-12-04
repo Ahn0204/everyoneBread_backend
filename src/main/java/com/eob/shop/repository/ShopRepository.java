@@ -13,6 +13,7 @@ import com.eob.shop.model.data.ShopEntity;
 
 public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
 
+    // 로그인한 MemberEntity 로 상점 조회
     @Query("select s from ShopEntity s where s.member = :member")
     Optional<ShopEntity> loginShop(@Param("member") MemberEntity member);
 

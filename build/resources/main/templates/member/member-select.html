@@ -5,59 +5,87 @@
     <title>회원가입 유형 선택</title>
 
     <style>
-        body {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
             font-family: 'Noto Sans KR', sans-serif;
-            padding: 40px;
+        }
+
+        body {
+            background: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 430px;
+            padding: 40px 35px;
+            background: #fff;
+            border: 2px solid #000;
+            border-radius: 12px;
+            text-align: center;
         }
 
         h1 {
+            font-size: 28px;
+            font-weight: 700;
             margin-bottom: 10px;
         }
 
+        p {
+            font-size: 15px;
+            color: #444;
+            margin-bottom: 30px;
+        }
+
         .btn {
-            width: 200px;
-            height: 50px;
-            font-size: 16px;
+            width: 100%;
+            height: 55px;
+            font-size: 17px;
             font-weight: 700;
-            border: 2px solid #000;
+            border: 2px solid #79C3FF;
             background: #fff;
             cursor: pointer;
-            border-radius: 8px;
+            border-radius: 10px;
+            transition: 0.15s;
         }
 
         .btn:hover {
-            background: #000;
+            background: #79C3FF;
             color: #fff;
         }
 
-        /* 비즈니스 드롭다운 래퍼 */
         .business-wrapper {
             position: relative;
-            display: inline-block;
+            width: 100%;
         }
 
-        /* 드롭다운 */
         .dropdown-box {
             display: none;
             position: absolute;
             top: 60px;
-            width: 200px;
-            border: 2px solid #000;
+            left: 0;
+            width: 100%;
+            border: 2px solid #79C3FF;
             background: #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
-            z-index: 100;
+            z-index: 20;
         }
 
         .dropdown-item {
-            display: block;
+            padding: 15px 0;
             text-align: center;
-            padding: 14px 0;
             font-weight: 700;
-            cursor: pointer;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #eee;
             text-decoration: none;
-            color: #000;
+            color: #79C3FF;
+            display: block;
+            transition: 0.15s;
         }
 
         .dropdown-item:last-child {
@@ -65,69 +93,82 @@
         }
 
         .dropdown-item:hover {
-            background: #f0f0f0;
+            background: #79C3FF;
+            color: #fff;
+        }
+
+        .spacer {
+            height: 20px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>회원가입 유형 선택</h1>
-<hr>
-
-<div>
+<div class="container">
+    <h1>회원가입 유형 선택</h1>
     <p>가입할 계정 유형을 선택해주세요.</p>
-</div>
 
-<br><br>
-
-<!-- 일반 계정 -->
-<div>
+    <!-- 일반 계정 -->
     <a href="/member/register?role=USER">
         <button class="btn">일반 계정</button>
     </a>
-</div> 
 
-<br><br>
+    <div class="spacer"></div>
 
-<!-- 비즈니스 계정(dropdown) -->
-<div class="business-wrapper">
-    <button class="btn" id="businessBtn">비즈니스 계정</button>
+    <!-- 비즈니스 계정(dropdown) -->
+    <!-- 비즈니스 계정(dropdown) -->
+    <div class="business-wrapper">
+        <button class="btn" id="businessBtn">비즈니스 계정</button>
 
-    <div class="dropdown-box" id="dropdownBox">
-        <a href="/shop/register/start?role=SHOP" class="dropdown-item">판매자 회원가입</a>
-        <a href="/rider/register/start?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+        <div class="dropdown-box" id="dropdownBox">
+            <a href="/shop/register/start?role=SHOP" class="dropdown-item">판매자 회원가입</a>
+            <a href="/rider/register/start?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+        </div>
     </div>
 </div>
 
 <script>
-// 비즈니스 계정 버튼 hover 시 메뉴 열기
-const businessBtn = document.getElementById("businessBtn");
-const dropdownBox = document.getElementById("dropdownBox");
+    // 비즈니스 계정 버튼 요소 (hover 시 드롭다운 열기)
+    const businessBtn = document.getElementById("businessBtn");
+    // 실제로 펼쳐지는 드롭다운 박스 요소
+    const dropdownBox = document.getElementById("dropdownBox");
 
-// 버튼 hover → 드롭다운 열림
-businessBtn.addEventListener("mouseover", () => {
-    dropdownBox.style.display = "block";
-});
+    /**
+     * 1. businewssBtn Hover -> 드롭다운 열기
+     *    버튼 위에 마우스를 올리면 드롭다운 박스를 보이도록 변경
+     */
+    businessBtn.addEventListener("mouseover", () => {
+        dropdownBox.style.display = "block";
+    });
 
-// 드롭다운 hover 중이면 유지
-dropdownBox.addEventListener("mouseover", () => {
-    dropdownBox.style.display = "block";
-});
+    /**
+     * 2. 드롭다운 영역 Hover 유지
+     *    드롭다운 위에 마우스를 올리면 드롭다운이 계속 열린 상태를 유지
+     */
+    dropdownBox.addEventListener("mouseover", () => {
+        dropdownBox.style.display = "block";
+    });
 
-// 버튼/드롭다운에서 벗어나면 닫기
-businessBtn.addEventListener("mouseout", () => {
-    setTimeout(() => {
-        if (!dropdownBox.matches(":hover")) {
-            dropdownBox.style.display = "none";
-        }
-    }, 150);
-});
+    /**
+     * 3. businewssBtn Hover 해제 -> 드롭다운 닫기
+     *    버튼에서 마우스가 벗어나면 일정 시간 후 드롭다운 박스를 숨김
+     */
+    businessBtn.addEventListener("mouseout", () => {
+        setTimeout(() => {
+            if (!dropdownBox.matches(":hover")) {
+                dropdownBox.style.display = "none";
+            }
+        }, 150);
+    });
 
-dropdownBox.addEventListener("mouseout", () => {
-    dropdownBox.style.display = "none";
-});
+    /**
+     * 4. 드롭다운 영역 Hover 해제 -> 드롭다운 닫기
+     *    드롭다운에서 마우스가 벗어나면 드롭다운 박스를 숨김
+     */
+    dropdownBox.addEventListener("mouseout", () => {
+        dropdownBox.style.display = "none";
+    });
 </script>
-
 </body>
 </html>

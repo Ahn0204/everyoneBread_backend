@@ -38,6 +38,8 @@ public class SecurityConfig {
         @Bean
         @Order(1)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
+                // 성진 : 콘솔로그 확인용 추가
+                System.out.println("[RIDER CHAIN] LOADED");
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
                 // anyRequest().permitAll(s) : 현재 체인의 매칭 범위 안에 포함된 모든 요청을 인증/인가 절차 없이 허용
@@ -200,8 +202,15 @@ public class SecurityConfig {
         @Bean
         @Order(2)
         SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
+                // 성진 : 콘솔로그 확인용
+                System.out.println("[SHOP CHAIN] LOADED");
+                http.addFilterBefore((request, response, chain) -> {
+                System.out.println("🟦 [SHOP CHAIN ACTIVE] → " + request.getRequestId());
+                chain.doFilter(request, response);
+                }, org.springframework.web.filter.CorsFilter.class);
 
                 http
+                
                                 /*
                                  * 이 필터체인이 적용될 URL 패턴 지정
                                  * /shop/** 로 시작하는 모든 URL은 여기에서 처리됨
@@ -219,14 +228,13 @@ public class SecurityConfig {
                                                  */
                                                 .requestMatchers(
                                                                 "/shop/register/start", // 가입 폼 GET
-                                                                "/shop/register/start/**", // 가입 처리 POST
+                                                                "/shop/register/start/**",              // 가입 처리 POST
                                                                 "/shop/register/step",
                                                                 "/shop/register/step/**",
-                                                                "/shop/login", // 판매자 로그인 페이지
+                                                                "/shop/login",                          // 판매자 로그인 페이지
                                                                 "/shop/check-name",
-                                                                "/css/**", "/js/**",
-                                                                "/image/**", "/fonts/**", "/lib/**")
-                                                .permitAll()
+                                                                "/css/**", "/js/**", "/image/**", "/fonts/**", "/lib/**"
+                                                ).permitAll()
 
                                                 /*
                                                  * /shop/** 내부의 모든 요청은 판매자(SHOP)권한만 접근 가능
@@ -259,6 +267,8 @@ public class SecurityConfig {
         @Bean
         @Order(3)
         SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+                // 성진 : 콘솔로그 확인용 추가
+                System.out.println("[ADMIN CHAIN] LOADED");
                 http
                                 // url이 /admin/~인 요청에 이 필터체인 적용
                                 .securityMatcher("/admin/**")
@@ -329,18 +339,31 @@ public class SecurityConfig {
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
         @Order(4)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
+                // 성진 : 콘솔로그 확인용 추가
+                System.out.println("[DEFAULT CHAIN] LOADED");
                 http
                                 /**
                                  * Security가 적용될 URL 범위 지정
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                // .securityMatcher("/member/**","/**")
+                                .securityMatcher("/member/**","/**")
                                 // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
                                 // /**이라고 경로를 지정하는게 보안에 의미가 없고,
                                 // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.
                                 // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
                                 // "/image/**")
+                                /**
+                                 * 성진
+                                 * securityMatcher 없는 체인은 모든 URL을 대상으로 하기 때문에
+                                 * 특정 URL이 예상치 못하게 막히거나 리다이렉트가 발생함
+                                 * 
+                                 * 모든 FilterChain에 대해 securityMatcher를 명시적으로 지정하는 것이 좋음
+                                 * 그러지 않으면 defaultChain이 전체 URL 보안을 가져가서 대부분의 요청이 로그인으로 튕긴다.
+                                 * 
+                                 * 2025/12/04
+                                 * 회원가입 - 일반/비즈니스 계정 선택 시 지속적으로 로그인 페이지로 튕기는 문제 발생
+                                 */
 
                                 .authenticationProvider(customAuthenticationProvider())
 
@@ -369,7 +392,9 @@ public class SecurityConfig {
                                                                 "/js/**",
                                                                 "/image/**",
                                                                 "/fonts/**",
-                                                                "/lib/**")
+                                                                "/lib/**",
+                                                                "/shop/**"        
+                                                )
                                                 .permitAll()
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
