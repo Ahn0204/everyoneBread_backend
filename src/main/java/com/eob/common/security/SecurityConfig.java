@@ -176,7 +176,8 @@ public class SecurityConfig {
                                 // CSRF(Cross-Site Request Forgery)
                                 // 사용자가 로그인 된 상태에서 악의적인 사이트가 몰래 요청을 보내 유도하는 공격
                                 .csrf(csrf -> csrf
-
+                                                // .ignoringRequestMatchers("")
+                                                // .ignoringRequestMatchers("/rider/logout")
                                                 // csrfTokenRepository(new HttpSessionCsrfTokenRepository())
                                                 // CSRF 토큰을 서버 세션(HttpSession)에 저장하도록 설정한다.
                                                 // - 폼이나 AJAX 요청을 보낼 때 마다 CSRF 토큰을 자동적으로 검증한다.
