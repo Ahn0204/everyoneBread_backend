@@ -18,7 +18,6 @@ import com.eob.common.util.FileValidationException;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
-import com.eob.rider.model.data.RiderLicenseFileEntity;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.service.RiderService;
 
@@ -124,7 +123,7 @@ public class RiderController {
 
             return "redirect:/register/complete";
         } catch (FileValidationException e) {
-            bindingResult.rejectValue("licenseFile", "empty", "파일은 필수입니다.");
+            bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
             return "rider/rider-register-step";
         } catch (Exception e) {
             return "rider/rider-register-step";
