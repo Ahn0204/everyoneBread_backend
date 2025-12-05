@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.eob.common.util.FileUpload;
+import com.eob.common.util.FileValidationException;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
+import com.eob.rider.model.data.RiderLicenseFileEntity;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.service.RiderService;
 
@@ -113,31 +115,6 @@ public class RiderController {
             System.out.println(bindingResult.getAllErrors());
             return "redirect:/rider/register/step";
         }
-        MultipartFile file = riderRegisterForm.getLicenseFile();
-        if (file.isEmpty()) {
-            bindingResult.rejectValue("licenseFile", "empty", "파일은 필수입니다.");
-            return "rider/rider-register-step";
-
-        }
-        // 2. MIME 타입 검사
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            bindingResult.rejectValue("licenseFile", "type", "이미지 파일만 업로드 가능합니다.");
-            return "rider/rider-register-step";
-        }
-
-        // 3. 확장자 검사 (보안상 중요)
-        String originalName = file.getOriginalFilename();
-        String lowerName = originalName.toLowerCase();
-
-        if (!(lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") ||
-                lowerName.endsWith(".png") || lowerName.endsWith(".gif") ||
-                lowerName.endsWith(".webp"))) {
-
-            bindingResult.rejectValue("licenseFile", "ext",
-                    "허용된 이미지 확장자(jpg, jpeg, png, gif, webp)만 가능합니다.");
-            return "rider/rider-register-step";
-        }
 
         MemberRegisterForm memberForm = (MemberRegisterForm) session.getAttribute("registerMember");
 
@@ -146,9 +123,11 @@ public class RiderController {
             this.riderService.registerMember(memberForm, riderRegisterForm);
 
             return "redirect:/register/complete";
+        } catch (FileValidationException e) {
+            bindingResult.rejectValue("licenseFile", "empty", "파일은 필수입니다.");
+            return "rider/rider-register-step";
         } catch (Exception e) {
             return "rider/rider-register-step";
-
         }
 
     }
@@ -170,12 +149,15 @@ public class RiderController {
     }
 
     // 회원가입 완료
-    @PostMapping("/register/complete")
-    public String registerStep2(HttpSession session) {
+    @GetMapping("/register/complete")
+    public String registerStep2(HttpSession session, Model model) {
 
         session.removeAttribute("registerMember");
-
-        return "redirect:/rider/";
+        model.addAttribute("title", "회원가입 성공");
+        model.addAttribute("msg", "회원가입에 성공했습니다.");
+        model.addAttribute("icon", "success");
+        model.addAttribute("loc", "/rider/login");
+        return "comm/msg";
     }
 
     // =======================================================================================================

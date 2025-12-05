@@ -16,7 +16,6 @@ import com.eob.member.repository.MemberRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
-import com.eob.rider.model.data.RiderLicenseFileEntity;
 import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.repository.RiderRepository;
@@ -53,14 +52,10 @@ public class RiderService {
         member.setCreatedAt(LocalDateTime.now());
         this.memberRepository.save(member);
 
-        RiderLicenseFileEntity fileEntity = new RiderLicenseFileEntity();
-        fileEntity.setCreatedAt(LocalDateTime.now());
-        fileEntity.setLicenseFile(saveFileName);
-
         RiderEntity rider = RiderEntity.builder().member(member).aStatus(ApprovalStatus.PENDING)
                 .riderLicense(riderForm.getDriverLicense()).licenseCreatedAt(riderForm.getLicenseCreatedAt())
-                .createdAt(LocalDateTime.now()).riderLicenseFile(fileEntity).build();
-        fileEntity.setRider(rider);
+                .licenseFile(saveFileName)
+                .createdAt(LocalDateTime.now()).build();
 
         this.riderRepository.save(rider);
     }
