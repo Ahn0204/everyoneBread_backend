@@ -41,6 +41,8 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         CustomSecurityDetail principal = (CustomSecurityDetail) authentication.getPrincipal();
         MemberEntity member = principal.getMember();
 
+        String redirectURL;
+
         // * - USER : 일반 소비자 (회원 기능)
         // * - SHOP : 판매자(상점) - 상품 등록/관리, 주문 처리 가능
         // * - RIDER : 배달 기사 - 배달/수령 상태 처리
@@ -50,7 +52,7 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
                 response.sendRedirect("/");
                 break;
             case SHOP:
-                response.sendRedirect("/shop/");
+                redirectURL = "/shop/?success=login-ok";
                 break;
             case RIDER:
                 response.sendRedirect("/rider/");

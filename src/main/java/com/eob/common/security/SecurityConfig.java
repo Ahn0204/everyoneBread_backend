@@ -347,7 +347,7 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                .securityMatcher("/member/**","/**")
+                                .securityMatcher("/member/**")
                                 // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
                                 // /**이라고 경로를 지정하는게 보안에 의미가 없고,
                                 // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.

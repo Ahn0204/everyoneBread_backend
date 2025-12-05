@@ -134,4 +134,28 @@ public class MemberService {
         return memberRepository.findById(memberNo)
                 .orElseThrow(() -> new IllegalArgumentException("회원 정보를 찾을 수 없습니다."));
     }
+
+    /**
+     * 상점가입 2단계 전용 회원 생성 메서드
+     * - BindingResult 사용하지 않음
+     * - 1단계에서 이미 검증이 끝났기 때문에 중복검사 필요 없음
+     */
+    public MemberEntity createShopMember(RegisterRequest dto) {
+
+        // 중복검사 (선택) — 세션이 조작되는 경우 방지
+        if (!isMemberIdAvailable(dto.getMemberId())) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        }
+        if (!isMemberEmailAvailable(dto.getMemberEmail())) {
+            throw new IllegalArgumentException("이미 등록된 이메일입니다.");
+        }
+
+        MemberEntity entity = toEntity(dto);
+
+        entity.setMemberRole(MemberRoleStatus.SHOP);
+        entity.setStatus(MemberApprovalStatus.ACTIVE);
+
+        return memberRepository.save(entity);
+    }
+
 }
