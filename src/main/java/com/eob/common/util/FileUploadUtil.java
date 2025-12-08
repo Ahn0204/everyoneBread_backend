@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileUpload {
+public class FileUploadUtil {
 
     /**
      * 파일 검사 메서드

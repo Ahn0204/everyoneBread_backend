@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.eob.common.util.FileUpload;
+import com.eob.common.util.FileUploadUtil;
 import com.eob.common.util.FileValidationException;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
@@ -40,6 +40,12 @@ public class RiderController {
     @GetMapping("/")
     public String mainPage() {
         return "rider/rider-main";
+    }
+
+    // 내정보 페이지 이동 메서드
+    @GetMapping("/myInfo")
+    public String myInfoPage() {
+        return "rider/rider-myInfo";
     }
 
     // 로그인 페이지 이동 메서드
@@ -121,7 +127,7 @@ public class RiderController {
             // 회원/라이더 정보 저장
             this.riderService.registerMember(memberForm, riderRegisterForm);
 
-            return "redirect:/register/complete";
+            return "redirect:/rider/register/complete";
         } catch (FileValidationException e) {
             bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
             return "rider/rider-register-step";

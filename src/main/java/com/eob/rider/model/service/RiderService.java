@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eob.common.util.FileUpload;
+import com.eob.common.util.FileUploadUtil;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
@@ -37,7 +37,7 @@ public class RiderService {
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
         MultipartFile file = riderForm.getLicenseFile();
         // 라이더 운전면허증 파일 저장
-        String saveFileName = FileUpload.uploadImage(file, "rider/licenseFile");
+        String saveFileName = FileUploadUtil.uploadImage(file, "rider/licenseFile");
 
         MemberEntity member = new MemberEntity();
         member.setMemberId(memberForm.getMemberId());
