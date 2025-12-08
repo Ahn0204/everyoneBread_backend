@@ -54,7 +54,7 @@ public class TimeAgoUtil {
 			return days + "일 전";
 		}
 
-		// 그 이상의 경우 , 날짜 출력
+		// 그 이상의 경우 시간차의 경우 , 날짜 출력
 		return time.toLocalDate().toString();
 	}
 }
