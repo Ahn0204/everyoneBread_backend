@@ -1,0 +1,39 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 28.
+*  File : msg.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>모두의 빵</title>
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <div style="display: none">
+            <div id="title" th:text="${title}"></div>
+            <div id="msg" th:text="${msg}"></div>
+            <div id="icon" th:text="${icon}"></div>
+            <div id="loc" th:text="${loc}"></div>
+        </div>
+        <script>
+            const titleVal = $('#title').text();
+            console.log(titleVal);
+            const title = document.querySelector('#title').innerText;
+            const msg = document.querySelector('#msg').innerText;
+            const icon = document.querySelector('#icon').innerText;
+            const loc = document.querySelector('#loc').innerText;
+            Swal.fire({
+                title: title,
+                text: msg,
+                icon: icon,
+                confirmButtonColor: '#6495ed', // 강조 버튼
+            }).then(function () {
+                location.href = loc;
+            });
+        </script>
+    </body>
+</html>

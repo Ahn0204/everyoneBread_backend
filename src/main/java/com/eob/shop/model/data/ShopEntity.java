@@ -147,6 +147,11 @@ public class ShopEntity {
      */
     private String rejectReason;
 
+    /**
+     * 파일 경로
+     */
+    private String bizImg;
+
     @PrePersist
     public void PrePersist(){
 

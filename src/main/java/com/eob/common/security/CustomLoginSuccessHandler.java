@@ -40,6 +40,7 @@ public class CustomLoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         // 로그인 성공 후 역할(ROLE)에 따라 리다이렉트 분기 처리
         CustomSecurityDetail principal = (CustomSecurityDetail) authentication.getPrincipal();
         MemberEntity member = principal.getMember();
+
         // * - USER : 일반 소비자 (회원 기능)
         // * - SHOP : 판매자(상점) - 상품 등록/관리, 주문 처리 가능
         // * - RIDER : 배달 기사 - 배달/수령 상태 처리

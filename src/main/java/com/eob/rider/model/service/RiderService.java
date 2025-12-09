@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eob.common.util.FileUpload;
+import com.eob.common.util.FileUploadUtil;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
@@ -16,7 +16,6 @@ import com.eob.member.repository.MemberRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
-import com.eob.rider.model.data.RiderLicenseFileEntity;
 import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.repository.RiderRepository;
@@ -38,7 +37,7 @@ public class RiderService {
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
         MultipartFile file = riderForm.getLicenseFile();
         // 라이더 운전면허증 파일 저장
-        String saveFileName = FileUpload.uploadImage(file, "rider/licenseFile");
+        String saveFileName = FileUploadUtil.uploadImage(file, "rider/licenseFile");
 
         MemberEntity member = new MemberEntity();
         member.setMemberId(memberForm.getMemberId());
@@ -53,14 +52,10 @@ public class RiderService {
         member.setCreatedAt(LocalDateTime.now());
         this.memberRepository.save(member);
 
-        RiderLicenseFileEntity fileEntity = new RiderLicenseFileEntity();
-        fileEntity.setCreatedAt(LocalDateTime.now());
-        fileEntity.setLicenseFile(saveFileName);
-
         RiderEntity rider = RiderEntity.builder().member(member).aStatus(ApprovalStatus.PENDING)
                 .riderLicense(riderForm.getDriverLicense()).licenseCreatedAt(riderForm.getLicenseCreatedAt())
-                .createdAt(LocalDateTime.now()).riderLicenseFile(fileEntity).build();
-        fileEntity.setRider(rider);
+                .licenseFile(saveFileName)
+                .createdAt(LocalDateTime.now()).build();
 
         this.riderRepository.save(rider);
     }

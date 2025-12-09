@@ -1,0 +1,74 @@
+<!--
+******************************************
+*  Created On : 2025. 11. 27.
+*  File : shop-list.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/comm/admin-layout}">
+    <head>
+        <th:block layout:fragment="head">
+            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+        </th:block>
+    </head>
+    <body>
+        <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
+        <div layout:fragment="content">
+            <h3>입점승인 내역</h3>
+            <!--입점승인 신청내역 출력-->
+            <div calss="m-2" width="80%" max-width="1000px" min-width="700px">
+                <div class="d-flex flex-row border-bottom border-3 border-dark fw-b">
+                    <div class="p-2 flex-fill fw-bold">번호</div>
+                    <div class="p-2 flex-fill fw-bold">상태</div>
+                    <div class="p-2 flex-fill fw-bold">아이디</div>
+                    <div class="p-2 flex-fill fw-bold">이름</div>
+                    <div class="p-2 flex-fill fw-bold">상점명</div>
+                    <div class="p-2 flex-fill fw-bold">신청일시</div>
+                    <div class="p-2 flex-fill fw-bold">승인일시</div>
+                </div>
+                <!--상점 내역이 없을 때-->
+                <div class="d-flex" th:if="${noShop}">
+                    <div class="p-2 flex-fill" th:text="${noShop}"></div>
+                </div>
+                <!--상점 내역이 있을 때-->
+                <div th:unless="${noShop}">
+                    <!--미검토 APPLY_REVIEW 리스트-->
+                    <div class="d-flex flex-row border-bottom" th:each="shop : ${reviewList}">
+                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+                    </div>
+                    <!--보완요청 APPLY_REJECT 리스트-->
+                    <div class="d-flex flex-row border-bottom" th:each="shop : ${rejectedList}">
+                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+                    </div>
+                    <!--승인완료 APPLY_APPROVED 리스트-->
+                    <div class="d-flex flex-row border-bottom" th:each="shop : ${approvedList}">
+                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
+                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
+                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
+        <script layout:fragment="script">
+            console.log('fragment 됨');
+        </script>
+    </body>
+</html>

@@ -21,9 +21,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -56,6 +60,10 @@ public class RiderEntity {
     private LocalDate licenseCreatedAt;
 
     /**
+     * 운전면허 등록증 사
+     */
+    private String licenseFile;
+    /**
      * 라이더 회원의 등록일
      */
     private LocalDateTime createdAt;
@@ -81,9 +89,4 @@ public class RiderEntity {
      */
     private double latitude;
 
-    @OneToOne(cascade = CascadeType.ALL, // 부모 삭제시 자식도 삭제
-            orphanRemoval = true, // 부모와의 연결이 끊기면 자식 삭제
-            fetch = FetchType.LAZY)
-    @JoinColumn(name = "rider_file_no")
-    private RiderLicenseFileEntity riderLicenseFile;
 }

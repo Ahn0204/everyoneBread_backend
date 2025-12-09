@@ -141,7 +141,7 @@
         </div>
 
         <!-- 판매자 단계 1: 기본 회원 정보 -->
-        <form method="post" action="/shop/register/start">
+        <form method="post" th:object="${registerRequest}" action="/shop/register/start">
 
             <!-- 역할 고정 -->
             <input type="hidden" name="memberRole" value="SHOP">
@@ -149,10 +149,11 @@
             <div class="form-row">
                 <label class="form-label">아이디</label>
                 <div class="input-with-btn">
-                    <input type="text" name="memberId" class="input-text" required>
+                    <input type="text" th:field="*{memberId}" class="input-text" required>
                     <button type="button" class="btn-small" id="id-chk-btn">중복확인</button>
                 </div>
             </div>
+            <div class="error" th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></div>
 
             <div class="form-row">
                 <label class="form-label">비밀번호</label>

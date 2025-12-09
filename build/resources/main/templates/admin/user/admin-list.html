@@ -19,23 +19,26 @@
                     <!--유효성 검증에 에러 발생 시 에러 출력 -->
                     <div th:replace="~{comm/formErrors :: formErrorsInsertAdmin}"></div>
 
-                    <label for="adminName">이름</label>&nbsp;
-                    <input type="text" th:field="*{adminName}" class="me-1" placeholder="한글 2~20자"/>
+                    <label for="adminName">이름</label>
+                    &nbsp;
+                    <input type="text" th:field="*{adminName}" class="me-1" placeholder="한글 2~20자" />
 
-                    <label for="adminId">아이디</label>&nbsp;
-                    <input type="text" th:field="*{adminId}" class="me-1" placeholder="영문+숫자 5~20자"/>
-                    
-                    <label for="adminPassword">비밀번호</label>&nbsp;
-                    <input type="password" th:field="*{adminPassword}" class="me-1" placeholder="영문+숫자+특문 8~20자"/>
-                    
+                    <label for="adminId">아이디</label>
+                    &nbsp;
+                    <input type="text" th:field="*{adminId}" class="me-1" placeholder="영문+숫자 5~20자" />
+
+                    <label for="adminPassword">비밀번호</label>
+                    &nbsp;
+                    <input type="password" th:field="*{adminPassword}" class="me-1" placeholder="영문+숫자+특문 8~20자" />
+
                     <!--type=button인 input은 클릭 시 자동으로 submit되지 않음!!-->
                     <input type="button" value="계정 추가" class="btn insertAdmin btn-secondary" />
                     <th:block th:if="${isSucceeded} != null">
                         <script th:if="${isSucceeded}">
-                                showToast('추가 완료', 'success');
+                            showToast('추가 완료', 'success');
                         </script>
                         <script th:unless="${isSucceeded}">
-                                showToast('다시시도해주세요.','error');
+                            showToast('다시 시도해주세요.', 'error');
                         </script>
                     </th:block>
                 </form>
@@ -46,11 +49,13 @@
             $('.insertAdmin').on('click', function () {
                 showConfirmAlert(
                     '관리자 계정을\n추가하시겠습니까?', // 표시할 메시지
-                    () => { //예
+                    () => {
+                        //예
                         //documnet.insertAdminForm.submit();
                         $('form[name="insertAdminForm"]').submit(); //폼 제출
                     },
-                    () => { //아니오
+                    () => {
+                        //아니오
                         showToast('취소되었습니다.', 'warning');
                     }
                 );

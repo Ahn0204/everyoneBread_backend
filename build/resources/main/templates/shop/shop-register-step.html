@@ -106,6 +106,13 @@
             background-color: #000;
             color: #fff;
         }
+        .file-info {
+            font-size: 12px;
+            color: #555;
+            margin-left: 130px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 
@@ -117,9 +124,7 @@
             <hr>
         </div>
 
-        <form method="post" action="/shop/register/step">
-
-            <input type="hidden" name="memberNo" th:value="${memberNo}">
+        <form method="post" action="/shop/register/step" enctype="multipart/form-data">
 
             <!-- 상점명 -->
             <div class="form-row">
@@ -144,9 +149,15 @@
                 <label class="form-label">사업자 등록번호</label>
                 <div class="input-with-btn">
                     <input type="text" name="bizNo" class="input-text" required>
-                    <button type="button" class="btn-small">사진첨부</button>
+                    <!-- 숨겨진 파일 업로드 input -->
+                    <input type="file" id="bizFile" name="bizFile" accept="image/*" style="display:none;">
+
+                    <button type="button" class="btn-small" id="bizFileBtn">사진첨부</button>
                 </div>
             </div>
+
+            <!-- 선택된 파일명 출력 -->
+            <div class="file-info" id="fileInfo"><span id="fileNameDisplay"></span></div>
 
             <div class="action-buttons">
                 <button type="submit" class="btn-submit">가입</button>
@@ -229,9 +240,30 @@
             }).open();
         }
 
+        /* ------------------------------
+           4) 파일 첨부 처리
+        ------------------------------ */
+        $("#bizFileBtn").click(function () {
+            $("#bizFile").click();
+        });
+
+        $("#bizFile").on("change", function () {
+
+            let file = this.files[0];
+            if (!file) return;
+
+            if (!file.type.match("image.*")) {
+                alert("이미지 파일만 업로드 가능합니다.");
+                $(this).val("");
+                $("#fileNameDisplay").text("");
+                return;
+            }
+
+            $("#fileNameDisplay").text("선택된 파일: " + file.name);
+        });
 
         /* ------------------------------
-           4) 최종 submit 검사
+           5) 최종 submit 검사
         ------------------------------ */
         $("form").submit(function() {
 

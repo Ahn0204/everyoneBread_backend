@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+
+<head>
+    <meta charset="UTF-8">
+    <title>문의내역</title>
+
+    <style>
+        .qna-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        /* 탭 영역 */
+        .qna-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .qna-tab {
+            padding: 10px 20px;
+            border: 2px solid #000;
+            background: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.15s;
+        }
+
+        .qna-tab.active {
+            background: #79C3FF;
+            color: #fff;
+        }
+
+        /* 문의 박스 */
+        .qna-item {
+            border: 2px solid #000;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .qna-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .qna-date {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .qna-shop {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        /* 내부 내용 */
+        .qna-body {
+            display: flex;
+            gap: 20px;
+        }
+
+        .qna-img-box {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .qna-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .qna-info {
+            flex: 1;
+        }
+
+        .qna-product {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .qna-content {
+            font-size: 14px;
+            color: #444;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+
+<body layout:decorate="~{/member/mypage/mypage-layout}">
+
+<section layout:fragment="content">
+
+    <h2 class="qna-title">문의내역</h2>
+
+    <!-- 탭 -->
+    <div class="qna-tabs">
+        <div class="qna-tab active" id="tabSeller">판매자 문의</div>
+        <div class="qna-tab" id="tabAdmin">관리자 문의</div>
+    </div>
+
+    <!-- ======================== 판매자 문의 리스트 ======================== -->
+    <div id="sellerQnaList">
+
+        <!-- 샘플 -->
+        <div class="qna-item">
+            <div class="qna-top">
+                <div class="qna-date">2025-12-03</div>
+                <div class="qna-shop">성진이 빵집</div>
+            </div>
+
+            <div class="qna-body">
+                <div class="qna-img-box">
+                    <img src="/images/sample/bread.png">
+                </div>
+
+                <div class="qna-info">
+                    <div class="qna-product">소금빵 외 2개</div>
+                    <div class="qna-content">
+                        문의드립니다. 배송이 언제쯤 도착하나요?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 동적 반복 -->
+        <th:block th:each="q : ${sellerQna}">
+            <div class="qna-item">
+                <div class="qna-top">
+                    <div class="qna-date" th:text="${q.regDate}"></div>
+                    <div class="qna-shop" th:text="${q.shopName}"></div>
+                </div>
+
+                <div class="qna-body">
+                    <div class="qna-img-box">
+                        <img th:src="@{${q.productImg}}" />
+                    </div>
+
+                    <div class="qna-info">
+                        <div class="qna-product" th:text="${q.productName}"></div>
+                        <div class="qna-content" th:text="${q.content}"></div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+    <!-- ======================== 관리자 문의 리스트 ======================== -->
+    <div id="adminQnaList" style="display: none;">
+
+        <th:block th:each="q : ${adminQna}">
+            <div class="qna-item">
+                <div class="qna-top">
+                    <div class="qna-date" th:text="${q.regDate}"></div>
+                    <div class="qna-shop">관리자 문의</div>
+                </div>
+
+                <div class="qna-body">
+                    <div class="qna-img-box">
+                        <img th:src="@{${q.productImg}}" />
+                    </div>
+
+                    <div class="qna-info">
+                        <div class="qna-product" th:text="${q.title}"></div>
+                        <div class="qna-content" th:text="${q.content}"></div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+</section>
+
+<script>
+    // 탭 전환
+    const tabSeller = document.getElementById("tabSeller");
+    const tabAdmin = document.getElementById("tabAdmin");
+
+    const sellerQnaList = document.getElementById("sellerQnaList");
+    const adminQnaList = document.getElementById("adminQnaList");
+
+    tabSeller.addEventListener("click", () => {
+        tabSeller.classList.add("active");
+        tabAdmin.classList.remove("active");
+        sellerQnaList.style.display = "block";
+        adminQnaList.style.display = "none";
+    });
+
+    tabAdmin.addEventListener("click", () => {
+        tabAdmin.classList.add("active");
+        tabSeller.classList.remove("active");
+        sellerQnaList.style.display = "none";
+        adminQnaList.style.display = "block";
+    });
+</script>
+
+</body>
+</html>
