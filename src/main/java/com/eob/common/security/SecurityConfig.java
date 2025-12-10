@@ -399,7 +399,7 @@ public class SecurityConfig {
                                                 .permitAll()
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
-                                                .anyRequest().authenticated())
+                                                .anyRequest().permitAll())
                                 // 예솔: role='user'인 사용자만 로그인되도록 나중에 변경
                                 // .anyRequest().hasRole("USER"))
 

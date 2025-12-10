@@ -36,20 +36,18 @@ public class mainController {
     @GetMapping("getCategory")
     @ResponseBody
     public List<String> getCategory() {
+        System.out.println("카테고리 불러오기 실행");
 
-        // 리턴 객체 선언
-        List<String> category = new ArrayList<String>();
-        // 카테고리 DB에서 대분류명 List 가져오기
-        Optional<ArrayList<String>> _category = categoryRepository.findByDepth(0); // Optional객체 리턴
-        if (_category != null) { // Optional객체에 값이 있다면
-            System.out.println(_category.get());
-            // Optional에서 값만 꺼내서 category에 add
-            ArrayList<String> cateList = _category.get();
-            for (String cate : cateList) {
-                category.add(cate);
-            }
+        List<String> category = new ArrayList<>();
+
+        Optional<ArrayList<String>> optional = categoryRepository.findByDepth(0);
+
+        if (optional.isPresent() && !optional.get().isEmpty()) {
+            System.out.println(optional.get());
+            category.addAll(optional.get());
         }
-        // 카테고리 List보내기
+
+        System.out.println(category);
         return category;
     }
 
