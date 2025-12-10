@@ -1,6 +1,7 @@
 package com.eob.admin.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,13 +11,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
+import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.repository.RiderRepository;
@@ -166,11 +170,91 @@ public class AdminController {
             model.addAttribute("pendingList", pendingList); // 미검토
             model.addAttribute("rejectedList", rejectedList); // 반려
             model.addAttribute("approvedList", approvedList); // 승인완료
-        }
 
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int rejectedCount = rejectedList.size();
+            int approvedCount = approvedList.size();
+            int total = pendingCount + rejectedCount + approvedCount;
+
+            int pendingStart = total;
+            int rejectedStart = total - pendingCount;
+            int approvedStart = total - rejectedCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("rejectedStart", rejectedStart);
+            model.addAttribute("approvedStart", approvedStart);
+
+        }
         // 페이징 정보 전달
         model.addAttribute("riderP", riderP);
         return "admin/user/riderApproval-list";
+    }
+
+    /**
+     * 라이더/입점신청 - 보완 요청
+     * 
+     * @param param        엔티티구분(rider 또는 shop)
+     * @param riderNo      라이더번호
+     * @param rejectReason 보완사유
+     * @return 알림사항에 띄울 메세지
+     */
+    @PostMapping("/user/{param}/revision")
+    @ResponseBody
+    public String ajaxApplyRevision(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo,
+            @RequestParam("rejectReason") String rejectReason) {
+        try {
+            if (param.equals("rider")) {
+                // rider보완 요청일 경우
+                Optional<RiderEntity> _rider = riderRepository.findById(objectNo);
+                RiderEntity rider = (RiderEntity) _rider.get();
+                rider.setAStatus(ApprovalStatus.REVISION_REQUIRED);
+                // 보완 사유 저장
+                this.riderRepository.save(rider);
+                System.out.println(rider.getAStatus());
+            } else if (param.equals("shop")) {
+                // shop보완 요청일 경우
+                Optional<ShopEntity> _shop = shopRepository.findById(objectNo);
+                ShopEntity shop = (ShopEntity) _shop.get();
+                shop.setStatus(ShopApprovalStatus.APPLY_REJECT);
+                // 보완 사유 저장
+                this.shopRepository.save(shop);
+            }
+            return "보완이 요청되었습니다.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    /**
+     * 라이더/입점신청 - 승인
+     * 
+     * @param param   엔티티구분(rider 또는 shop)
+     * @param riderNo 라이더번호
+     * @return 알림사항에 띄울 메세지
+     */
+    @PostMapping("/user/{param}/approval")
+    @ResponseBody
+    public String ajaxApplyApproval(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo) {
+        try {
+            if (param.equals("rider")) {
+                // rider승인일 경우
+                Optional<RiderEntity> _rider = riderRepository.findById(objectNo);
+                RiderEntity rider = (RiderEntity) _rider.get();
+                rider.setAStatus(ApprovalStatus.APPROVED);
+                this.riderRepository.save(rider);
+            } else if (param.equals("shop")) {
+                // shop승인일 경우
+                Optional<ShopEntity> _shop = shopRepository.findById(objectNo);
+                ShopEntity shop = (ShopEntity) _shop.get();
+                shop.setStatus(ShopApprovalStatus.APPLY_APPROVED);
+                this.shopRepository.save(shop);
+            }
+            return "가입이 승인되었습니다.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     // 관리자 계정 내역(추가) 페이지
