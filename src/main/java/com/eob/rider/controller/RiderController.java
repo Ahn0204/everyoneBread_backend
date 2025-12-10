@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
+import com.eob.common.security.CustomDetailService;
+import com.eob.common.security.CustomSecurityDetail;
 import com.eob.common.util.FileUploadUtil;
 import com.eob.common.util.FileValidationException;
+import com.eob.common.util.StringUtil;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
 import com.eob.rider.model.data.RiderEntity;
@@ -44,7 +48,10 @@ public class RiderController {
 
     // 내정보 페이지 이동 메서드
     @GetMapping("/myInfo")
-    public String myInfoPage() {
+    public String myInfoPage(@AuthenticationPrincipal CustomSecurityDetail principal, Model model) {
+        StringUtil util = new StringUtil();
+        MemberEntity member = util.maskMemberEntity(principal.getMember());
+        model.addAttribute("maskInfo", member);
         return "rider/rider-myInfo";
     }
 

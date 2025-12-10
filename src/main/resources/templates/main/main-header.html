@@ -82,7 +82,7 @@
             console.log('출력될 카테고리들:' + mainCate);
             //category반복문으로 html에 출력
             mainCate.forEach((element) => {
-                let a = $(`<a class="nav-link" href='/shopList?category=${element}'>${element}</a>`);
+                let a = $(`<a class="nav-link" href="/shopList?category=${element}">${element}</a>`);
                 categoryDiv.append(a);
             });
         }

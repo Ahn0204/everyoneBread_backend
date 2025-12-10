@@ -5,64 +5,57 @@
             <div class="bottom-main">
                 <div class="delivery_detail card px-3">
                     <div class="delivery_title">
-                        <span>매장연락처</span>
+                        <span>이름</span>
                         <div class="d-flex">
-                            <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
+                            <input type="text" name="sidebar-memberName" id="sidebar-memberName" class="custom-h-input" th:value="${#authentication.principal.member.memberName}" />
                         </div>
                     </div>
                     <div class="delivery_title">
-                        <span>매장주소</span>
-                        <div id="shop_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
-                    </div>
-                    <div class="delivery_title">
-                        <span>금액</span>
+                        <span>아이디</span>
                         <div class="d-flex">
-                            <input type="text" name="orderPrice" id="orderPrice" class="custom-h-input order-price" value="100,000" />
+                            <input type="text" name="sidebar-memberId" id="sidebar-memberId" class="custom-h-input" th:value="${#authentication.principal.member.memberId}" />
                         </div>
                     </div>
                     <div class="delivery_title">
-                        <span>고객연락처</span>
+                        <span>이메일</span>
                         <div class="d-flex">
-                            <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
+                            <input type="text" name="sidebar-memberEmail" id="sidebar-memberEmail" class="custom-h-input" th:value="${#authentication.principal.member.memberEmail}" />
                         </div>
                     </div>
                     <div class="delivery_title">
-                        <span>배달주소</span>
-                        <div id="delivery_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
+                        <span>주소</span>
+                        <div id="shop_address" th:text="${#authentication.principal.member.memberAddress}"></div>
                     </div>
-                    <div class="delivery_title flex-column">
-                        <span>고객 메모</span>
-                        <div>
-                            <div class="order-box order-request">
-                                <p>배달 완료시 노크/벨 누르지 말아주세요.</p>
-                            </div>
+                    <div class="delivery_title">
+                        <span>가입일</span>
+                        <div class="d-flex">
+                            <input type="text" name="sidebar-createdAt" id="sidebar-createdAt" class="custom-h-input" th:value="${#temporals.format(#authentication.principal.member.createdAt,'yyyy년 MM월 dd일')}" />
                         </div>
                     </div>
-                    <div class="delivery_title flex-column">
-                        <span>주문 내역</span>
-                        <div>
-                            <div class="order-box order-details">
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                                <p>호빵 4개 11,000원</p>
-                            </div>
-                        </div>
-                    </div>
+                    <h2 th:text="${maskInfo.memberAddress}"></h2>
                 </div>
             </div>
         </div>
 
-        <div layout:fragment="content">
-            <div></div>
-        </div>
+        <th:block layout:fragment="content">
+            <style>
+                .main-content {
+                    overflow: auto;
+                }
+                .page_load {
+                    display: none;
+                }
+            </style>
+            <div class="d-flex justify-content-end gap-2 mb-2">
+                <select name="" id="">
+                    <option value="1">2025년</option>
+                </select>
+                <select name="" id="">
+                    <option value="1">1월</option>
+                </select>
+            </div>
+            <div class="mb-2" style="width: 100%; height: 45%; border: 1px solid black"></div>
+            <div class="mb-2" style="width: 100%; height: 45%; border: 1px solid black"></div>
+        </th:block>
     </body>
 </html>
