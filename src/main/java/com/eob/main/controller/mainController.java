@@ -34,44 +34,27 @@ public class mainController {
     }
 
     // 헤더 카테고리 항목 불러오기
-    // 헤더 카테고리 항목 불러오기
     @GetMapping("getCategory")
     @ResponseBody
     public List<String> getCategory() {
-        System.out.println("카테고리 불러오기 실행");
-
+        // 리턴 객체 선언
         List<String> category = new ArrayList<>();
-
-        Optional<ArrayList<String>> optional = categoryRepository.findByDepth(0);
-
-        if (optional.isPresent() && !optional.get().isEmpty()) {
-            System.out.println(optional.get());
-            category.addAll(optional.get());
+        try {            
+            // 카테고리 DB에서 대분류명 List 가져오기
+            Optional<ArrayList<String>> _category = categoryRepository.findByDepth(0);
+            
+            // DB에 값이 존재하고 && Optional객체가 비어있지 않다면
+            if (_category.isPresent() && !_category.get().isEmpty()) {
+                //category에 Optional의 값 모두 add
+                category.addAll(_category.get());
+            }
+            System.out.println("카테고리 불러오기 실행:"+category);
+            // 카테고리 List보내기
+            return category;
+            
+        } catch (Exception e) {
         }
-
-        System.out.println(category);
-        return category;
     }
-    // @PostMapping("getCategory")
-    // @ResponseBody
-    // public List<String> getCategory() {
-
-    // // 리턴 객체 선언
-    // List<String> category = new ArrayList<String>();
-    // // 카테고리 DB에서 대분류명 List 가져오기
-    // Optional<ArrayList<String>> _category = categoryRepository.findByDepth(0); //
-    // Optional객체 리턴
-    // if (_category.isPresent()) { // Optional객체에 값이 있다면
-    // System.out.println(_category.get());
-    // // Optional에서 값만 꺼내서 category에 add
-    // ArrayList<String> cateList = _category.get();
-    // for (String cate : cateList) {
-    // category.add(cate);
-    // }
-    // }
-    // // 카테고리 List보내기
-    // return category;
-    // }
 
     // 상점 목록
     @GetMapping("shopList")

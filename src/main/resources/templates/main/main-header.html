@@ -64,7 +64,6 @@
                     getCategory(sessionStorage.getItem('category'));
                 },
                 error: function (error) {
-                    console.error(error);
                     showToast('카테고리를 불러올 수 없습니다.', 'error');
                 },
             });
