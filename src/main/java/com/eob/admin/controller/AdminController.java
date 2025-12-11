@@ -1,7 +1,6 @@
 package com.eob.admin.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,13 +19,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
-import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.repository.RiderRepository;
+import com.eob.rider.model.service.RiderService;
 import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ShopRepository;
+import com.eob.shop.service.ShopService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -40,7 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminController {
 
     public final AdminService adminService;
+    public final ShopService shopService;
     public final ShopRepository shopRepository;
+    public final RiderService riderService;
     public final RiderRepository riderRepository;
 
     // 로그인 페이지
@@ -202,29 +204,13 @@ public class AdminController {
      */
     @PostMapping("/user/{param}/revision")
     @ResponseBody
-    public String ajaxApplyRevision(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo,
+    public boolean ajaxApplyRevision(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo,
             @RequestParam("rejectReason") String rejectReason) {
-        try {
-            if (param.equals("rider")) {
-                // rider보완 요청일 경우
-                Optional<RiderEntity> _rider = riderRepository.findById(objectNo);
-                RiderEntity rider = (RiderEntity) _rider.get();
-                rider.setAStatus(ApprovalStatus.REVISION_REQUIRED);
-                // 보완 사유 저장
-                this.riderRepository.save(rider);
-                System.out.println(rider.getAStatus());
-            } else if (param.equals("shop")) {
-                // shop보완 요청일 경우
-                Optional<ShopEntity> _shop = shopRepository.findById(objectNo);
-                ShopEntity shop = (ShopEntity) _shop.get();
-                shop.setStatus(ShopApprovalStatus.APPLY_REJECT);
-                // 보완 사유 저장
-                this.shopRepository.save(shop);
-            }
-            return "보완이 요청되었습니다.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+        boolean result = false;
+        result = adminService.doRevision(param, objectNo, rejectReason);
+
+        return result;
+
     }
 
     /**
@@ -236,25 +222,11 @@ public class AdminController {
      */
     @PostMapping("/user/{param}/approval")
     @ResponseBody
-    public String ajaxApplyApproval(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo) {
-        try {
-            if (param.equals("rider")) {
-                // rider승인일 경우
-                Optional<RiderEntity> _rider = riderRepository.findById(objectNo);
-                RiderEntity rider = (RiderEntity) _rider.get();
-                rider.setAStatus(ApprovalStatus.APPROVED);
-                this.riderRepository.save(rider);
-            } else if (param.equals("shop")) {
-                // shop승인일 경우
-                Optional<ShopEntity> _shop = shopRepository.findById(objectNo);
-                ShopEntity shop = (ShopEntity) _shop.get();
-                shop.setStatus(ShopApprovalStatus.APPLY_APPROVED);
-                this.shopRepository.save(shop);
-            }
-            return "가입이 승인되었습니다.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
+    public boolean ajaxApplyApproval(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo) {
+        boolean result = false;
+        result = adminService.doApproval(param, objectNo);
+
+        return result;
     }
 
     // 관리자 계정 내역(추가) 페이지

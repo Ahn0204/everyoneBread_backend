@@ -35,14 +35,14 @@
                 <td colspan="3">
                     <span class="p-2" th:text="${rider.riderLicense}"></span>
                     <button type="button" class="check-license btn btn-secondary">면허 인증</button>
-                    <button type="button" class="show-license btn btn-secondary">사진 보기</button>
+                    <button type="button" class="show-license btn btn-secondary" th:data-file="${rider.licenseFile}" th:data-license="${rider.riderLicense}" th:data-date="${rider.licenseCreatedAt}">사진 보기</button>
                 </td>
                 <th class="text-center p-2">
                     운전면허
                     <br />
                     발급일자
                 </th>
-                <td class="p-2" th:text="${rider.LicenseCreatedAt}"></td>
+                <td class="p-2" th:text="${rider.licenseCreatedAt}"></td>
             </tr>
             <!--보완요청인 내역만 출력-->
             <tr th:if="${rider.aStatus.label == '보완요청'}">
@@ -55,7 +55,7 @@
             </tr>
         </table>
         <!--승인완료된 내역은 출력X-->
-        <form th:unless="${rider.aStatus=='APPROVED'}" th:action="@{/admin/user/riderApproval}">
+        <form th:unless="${rider.aStatus.label == '승인'}">
             <input type="hidden" name="riderNo" class="riderNo" th:value="${rider.riderNo}" />
             <div class="d-flex flex-row gap-3 justify-content-end">
                 <select name="reject-reason" class="reject-reason">
