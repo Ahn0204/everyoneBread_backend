@@ -1,38 +1,41 @@
-    <!--헤더 fragment-->
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/admin/}">
-                <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="200" />
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
-                <div class="navbar-nav nav-pills">
-                    <a class="nav-link" id="settlement" th:href="@{/admin/settlement}">정산</a>
-                    <a class="nav-link" id="user" th:href="@{/admin/user}">회원</a>
-                    <a class="nav-link" id="inquiry" th:href="@{/admin/inquiry}">문의</a>
-                    <a class="nav-link" id="homePage" th:href="@{/admin/homePage}">홈페이지 관리</a>
-                </div>
-                <div class="navbar-util">
-                    <!--#인증된 사용자 정보 객체.사용자 정보.member.memberName-->
-                    <!--CustomUserDetails에서 get메서드로 꺼내주고 있기때문에 authentication.principal에서 꺼내쓸 수 있음-->
-                    <span class="util-text" th:text="${#authentication.principal.member.memberName}"></span>
+<!--헤더 fragment-->
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/admin/}">
+            <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="100vw" />
+            관리자
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
+            <div class="navbar-nav nav-pills headerNav">
+                <a class="nav-link headerNav-1" id="settlement" th:href="@{/admin/settlement}">정산</a>
+                <a class="nav-link headerNav-2" id="user" th:href="@{/admin/user}">회원</a>
+                <a class="nav-link headerNav-3" id="inquiry" th:href="@{/admin/inquiry}">문의</a>
+                <a class="nav-link headerNav-4" id="homePage" th:href="@{/admin/homePage}">홈페이지 관리</a>
+            </div>
+            <div class="navbar-util d-flex flex-row gap-3">
+                <!--#인증된 사용자 정보 객체.사용자 정보.member.memberName-->
+                <!--CustomUserDetails에서 get메서드로 꺼내주고 있기때문에 authentication.principal에서 꺼내쓸 수 있음-->
+                <button type="button" class="util-text btn" style="pointer-events: none">
+                    <span class="util-text-name" th:text="${#authentication.principal.member.memberName}"></span>
                     <span class="util-text">님</span>
-                    <form th:action="@{/admin/logout}" method="post" name="logoutForm">
-                        <!--csrf토큰 파라미터 -->
-                        <!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" /> 는 Security6이전 버전인가보다-->
-                        <!--layout.html의 헤더에서도 아래와 같은 이름으로 전달 중임-->
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />                
-                        <button type="button" class="util-logout">로그아웃</button>
-                    </form>
-                    <button class="btn btn-secondary util-alert pb-2">알림함</button>
-                </div>
+                </button>
+                <form th:action="@{/admin/logout}" method="post" name="logoutForm">
+                    <!--csrf토큰 파라미터 -->
+                    <!-- <input type="hidden" id="csrfToken" name="_csrf" th:value="${csrfToken}" /> 는 Security6이전 버전인가보다-->
+                    <!--layout.html의 헤더에서도 아래와 같은 이름으로 전달 중임-->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="button" class="btn util-logout btn btn-outline-light">로그아웃</button>
+                </form>
+                <button class="btn btn-secondary util-alert pb-2">알림함</button>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- 
+<!-- 
     <script layout:fragment="script">
         console.log('헤더 fragment됨');
         헤더보다 나중에 fragment되는 main의 script fragment에 덮어쓰기되므로 layout.html의 script에 직접 작성하기로!!
