@@ -21,9 +21,16 @@ public class CustomSecurityDetail implements UserDetails {
     // 실제 우리 시스템에서 사용하는 회원 정보 객체 (MemberDTO)
     private final MemberEntity member;
 
+    // 사용자 권한 목록
+    // - ROLE_USER, ROLE_ADMIN 등 권한을 담는 리스트
+    private final List<GrantedAuthority> authorities = new java.util.ArrayList<>();
+
     // 생성자: 로그인한 사용자(MemberDTO)를 받아 세션에 저장
     public CustomSecurityDetail(MemberEntity member) {
         this.member = member;
+
+        // 사용자 권한 설정
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole()));
     }
 
     // 세션에서 직접 MemberDTO를 꺼내 쓰고 싶을 때 사용

@@ -343,6 +343,10 @@
 
                 console.log(data);
                 console.log('/rider/ajaxFindBy' + (mainSelector === '#memberName' ? 'Id' : 'Password'));
+
+                // 아이디/비밀번호 찾기인지에 따른 인증번호 전송 ajax 위치
+
+                // 인증번호가 일치 할 경우 사용할 ajax
                 $.ajax({
                     url: '/rider/ajaxFindBy' + (mainSelector === '#memberName' ? 'Id' : 'Password'),
                     type: 'POST',
