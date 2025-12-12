@@ -257,6 +257,13 @@ public class SecurityConfig {
                                                 .successHandler(customLoginSuccessHandler) // 로그인 성공 시 처리
                                                 .failureHandler(customAuthFailureHandler) // 로그인 실패 시 처리
                                 )
+                                .logout(logout -> logout
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/shop/logout", "GET"))
+                                                .logoutSuccessUrl("/shop/login")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID")
+                                )
+
 
                                 /* 개발 단계에서 CSRF 비활성화 */
                                 .csrf(csrf -> csrf.disable());
