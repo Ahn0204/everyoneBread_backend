@@ -24,6 +24,8 @@
         <style>
             /*헤더 바탕색*/
             .bg-body-tertiary {
+                height: 10vh;
+                /* max-height: 90px; */
                 background-color: cornflowerblue !important;
             }
             /*헤더 네비게이션바*/
@@ -71,18 +73,24 @@
                 color: white;
             }
             .nav-link:focus,
-            .nav-link:hover {
+            .nav-link:hover,
+            .nav-pills .nav-link.active,
+            .nav-pills .show > .nav-link {
                 color: white;
                 background-color: cornflowerblue;
             }
             /*메인색 변경*/
-            .btn-primary {
-                background-color: cornflowerblue;
-                border-color: white;
-            }
+            .btn-primary,
             .nav-link :active {
                 background-color: cornflowerblue;
                 border-color: white;
+            }
+
+            /*페이지블록*/
+            .active > .page-link,
+            .page-link.active {
+                background-color: rgb(75, 75, 75);
+                border-color: rgb(75, 75, 75);
             }
         </style>
         <title>모두의 빵</title>
