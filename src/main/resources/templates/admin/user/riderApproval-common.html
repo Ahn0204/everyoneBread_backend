@@ -3,13 +3,12 @@
     <!--collapse용 버튼 : -->
     <button class="d-flex flex-row border-bottom text-center accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#pending-'+${rider.riderNo}" aria-expanded="false" th:aria-controls="'pending-'+${rider.riderNo}">
         <!--항목 제목-->
-        <!-- ${riderP.getTotalElements - (riderP.number * riderP.size) - loop.index}" -->
-        <div class="flex-fill" th:text="${start - loop.index}"></div>
-        <div class="flex-fill" th:text="${rider.aStatus.label}"></div>
-        <div class="flex-fill" th:text="${rider.member.memberId}"></div>
-        <div class="flex-fill" th:text="${rider.member.memberName}"></div>
-        <div class="flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd HH:mm')}"></div>
-        <div class="flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd HH:mm')}"></div>
+        <div class="div-col-1" th:text="${start - loop.index}"></div>
+        <div class="div-col-2" th:text="${rider.aStatus.label}"></div>
+        <div class="div-col-3" th:text="${rider.member.memberId}"></div>
+        <div class="div-col-4" th:text="${rider.member.memberName}"></div>
+        <div class="div-col-5" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd HH:mm')}"></div>
+        <div class="div-col-6" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd HH:mm')}"></div>
     </button>
 </div>
 <!--바디 : collapse기능용 div > 실제 내용이 담긴 아코디언 바디-->

@@ -21,6 +21,70 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
         <!--자식페이지에서 추가로 삽입될 head내용-->
         <th:block layout:fragment="head"></th:block>
+        <style>
+            /*헤더 바탕색*/
+            .bg-body-tertiary {
+                background-color: cornflowerblue !important;
+            }
+            /*헤더 네비게이션바*/
+            .headerNav {
+                display: flex;
+                flex-direction: row;
+                width: 50%;
+                text-align: center;
+            }
+            .headerNav-1,
+            .headerNav-2,
+            .headerNav-3 {
+                min-width: 85px;
+                flex: 0.8;
+            }
+            .headerNav-4 {
+                min-width: 150px;
+                flex: 1.5;
+            }
+            .headerNav > .nav-link,
+            .util-text {
+                color: white;
+                font-size: 18px;
+                font-weight: 600;
+            }
+            .headerNav > .active {
+                background-color: white !important;
+                color: cornflowerblue !important;
+            }
+            /*헤더 사용자이름*/
+            .util-text-name {
+                color: white;
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+            /*사이드바+본문 여백 설정*/
+            .container-fluid.flex-grow-1 {
+                padding-left: 0 !important;
+                padding-right: 12px !important;
+            }
+
+            /*사이드바*/
+            .nav-link {
+                color: white;
+            }
+            .nav-link:focus,
+            .nav-link:hover {
+                color: white;
+                background-color: cornflowerblue;
+            }
+            /*메인색 변경*/
+            .btn-primary {
+                background-color: cornflowerblue;
+                border-color: white;
+            }
+            .nav-link :active {
+                background-color: cornflowerblue;
+                border-color: white;
+            }
+        </style>
         <title>모두의 빵</title>
     </head>
 
@@ -36,9 +100,8 @@
             <div class="row">
                 <!--사이드바-->
                 <div th:replace="~{/admin/comm/admin-sidebar}"></div>
-
                 <!--본문-->
-                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <main class="col-md-9 ms-sm-auto col-lg-10 p-md-4">
                     <!--admin-layout상속한 페이지의 content 출력부-->
                     <th:block layout:fragment="content"></th:block>
                 </main>
@@ -111,7 +174,6 @@
                     }
                     break;
                 case 'inquiry':
-                    console.log(uri[2]+uri[3]);
                     $('#inquiry').addClass('active').attr('aria-current', 'page');
                     $('#menuInquiry').addClass('show');
                     switch (uri[3]) {
@@ -134,24 +196,27 @@
                             $('#menuHomePage ul li').eq(1).find('a').addClass('active');
                             break;
                     }
-                    default: //메인일 때
-                        //모든 사이드바 항목 펼치기
-                        $('ul li .collapse').addClass('show');
                     break;
-                }
+                default: //메인일 때
+                    //모든 사이드바 항목 펼치기
+                    $('ul li .collapse').addClass('show');
+                    break;
+            }
             //로그아웃 버튼클릭 시 confirm알림
-            $(document).ready(function(){
-                $('.util-logout').on('click',function(){
+            $(document).ready(function () {
+                $('.util-logout').on('click', function () {
                     showConfirmAlert(
                         '로그아웃 하시겠습니까?\n로그인 페이지로 이동합니다.',
-                        () => { //예
+                        () => {
+                            //예
                             $('form[name="logoutForm"]').submit();
                         },
-                        () => { //아니오
+                        () => {
+                            //아니오
                         }
                     );
                 });
-            });            
+            });
         </script>
         <!--자식 script 삽입부-->
         <script layout:fragment="script" type="text/javascript"></script>

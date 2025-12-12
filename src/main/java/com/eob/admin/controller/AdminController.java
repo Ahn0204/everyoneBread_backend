@@ -210,7 +210,6 @@ public class AdminController {
         result = adminService.doRevision(param, objectNo, rejectReason);
 
         return result;
-
     }
 
     /**
