@@ -3,6 +3,8 @@ package com.eob.shop.repository;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -33,4 +35,17 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
      * (예솔 추가)
      */
     ArrayList<ShopEntity> findByStatusOrderByCreatedAtDesc(ShopApprovalStatus status);
+
+    /**
+     * 전체 입점 신청내역 조회 - 페이징 객체 리턴
+     * (예솔 추가)
+     */
+    Page<ShopEntity> findAll(Pageable pageable);
+
+    /**
+     * 폐점 신청내역 조회 - 페이징 객체 리턴
+     * (예솔 추가)
+     */
+    @Query("select s from ShopEntity s where s.status='CLOSE_REVIEW'")
+    Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
 }

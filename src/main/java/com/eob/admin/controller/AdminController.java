@@ -113,33 +113,96 @@ public class AdminController {
 
     // 입점신청 내역 페이지
     @GetMapping("/user/shopApproval-list")
-    public String getShopApprovalList(Model model) {
+    public String getShopApprovalList(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 입점신청 내역 - 페이징 객체로 리턴
+        Page<ShopEntity> shopP = shopRepository.findAll(pageable);
 
-        // DB에 shop이 있으면
-        if (shopRepository.findAll().size() != 0) {
-            // shop레코드 status별 조회
-            List<ShopEntity> reviewList = shopRepository
-                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_REVIEW); // 미검토
-            List<ShopEntity> rejectedList = shopRepository
-                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_REJECT); // 반려
-            List<ShopEntity> approvedList = shopRepository
-                    .findByStatusOrderByCreatedAtDesc(ShopApprovalStatus.APPLY_APPROVED); // 승인완료
+        // 입점 신청 내역이 없으면,
+        if (shopP.getTotalElements() == 0) { // shopP의 요소의 총 갯수가 0이면
+            model.addAttribute("noShop", "조회된 내역이 없습니다.");
+        } else {
+            // 입점 신청 내역이 존재한다면,
+            // shopP의 값을 반복하며 aStatus별로 구분하여 출력될 리스트에 대입
+            List<ShopEntity> pendingList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.APPLY_REVIEW).toList(); // 미검토
+            List<ShopEntity> rejectedList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.APPLY_REJECT).toList(); // 반려
+            List<ShopEntity> approvedList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.APPLY_APPROVED).toList(); // 승인완료
 
-            // 뷰에 list전달
-            model.addAttribute("shopList", reviewList); // 미검토
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
             model.addAttribute("rejectedList", rejectedList); // 반려
             model.addAttribute("approvedList", approvedList); // 승인완료
-        } else if (shopRepository.findAll().size() == 0) {
-            // DB에 shop이 없으면
-            model.addAttribute("noShop", "조회된 내역이 없습니다.");
+
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int rejectedCount = rejectedList.size();
+            int approvedCount = approvedList.size();
+            int total = pendingCount + rejectedCount + approvedCount;
+
+            int pendingStart = total;
+            int rejectedStart = total - pendingCount;
+            int approvedStart = total - rejectedCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("rejectedStart", rejectedStart);
+            model.addAttribute("approvedStart", approvedStart);
 
         }
+        // 페이징 정보 전달
+        model.addAttribute("shopP", shopP);
         return "admin/user/shopApproval-list";
     }
 
     // 폐점신청 내역 페이지
     @GetMapping("/user/shopClose-list")
-    public String getShopCloseList() {
+    public String getShopCloseList(@RequestParam(name = "page", defaultValue = "0") int page, Model model) {
+        // 페이징 설정 객체 초기화
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 폐점신청 내역 - 페이징 객체로 리턴
+        Page<ShopEntity> shopP = shopRepository.findByStatusOrderByCreatedAtDesc(pageable);
+
+        // 폐점신청 내역이 없으면,
+        if (shopP.getTotalElements() == 0) { // shopP의 요소의 총 갯수가 0이면
+            model.addAttribute("noShop", "조회된 내역이 없습니다.");
+        } else {
+            // 폐점신청 내역이 존재한다면,
+            // shopP의 값을 반복하며 Status별로 구분하여 출력될 리스트에 대입
+            List<ShopEntity> pendingList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.CLOSE_REVIEW).toList(); // 미검토
+            List<ShopEntity> rejectedList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.CLOSE_REJECT).toList(); // 반려
+            List<ShopEntity> approvedList = shopP.getContent().stream()
+                    .filter(r -> r.getStatus() == ShopApprovalStatus.CLOSE_APPROVED).toList(); // 승인완료
+
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
+            model.addAttribute("rejectedList", rejectedList); // 반려
+            model.addAttribute("approvedList", approvedList); // 승인완료
+
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int rejectedCount = rejectedList.size();
+            int approvedCount = approvedList.size();
+            int total = pendingCount + rejectedCount + approvedCount;
+
+            int pendingStart = total;
+            int rejectedStart = total - pendingCount;
+            int approvedStart = total - rejectedCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("rejectedStart", rejectedStart);
+            model.addAttribute("approvedStart", approvedStart);
+
+        }
+        // 페이징 정보 전달
+        model.addAttribute("shopP", shopP);
         return "admin/user/shopClose-list";
     }
 

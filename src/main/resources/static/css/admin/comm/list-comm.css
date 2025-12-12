@@ -1,0 +1,86 @@
+/*부트스트랩보다 우선 적용*/
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr {
+    border-width: 1px !important;
+}
+
+/*모달*/
+.dimmed {
+    position: fixed;
+    inset: 0; /* top, right, bottom, left 0 */
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1030; /*admin-header보다 위*/
+    display: none; /* JS로 제어 */
+}
+.modal-layer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: #fff;
+
+    transform: translate(-50%, -50%); /* 화면 정중앙 배치 */
+    border-radius: 10px;
+    display: none; /* 모달 기본 숨김 */
+    z-index: 1031; /* dimmed 위로 */
+    overflow: hidden; /* 내용 넘침 방지 */
+}
+
+/* 모달 전체 컨테이너 */
+.modal {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #fff;
+}
+
+/* 모달 상단 영역 */
+.modal-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: 60px;
+    padding: 0 20px;
+
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-top #license-info {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.closeBtn {
+    font-size: 28px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    color: #555;
+    transition: 0.2s;
+}
+
+.closeBtn:hover {
+    color: #000;
+}
+
+/* 모달 내용 영역 */
+.modal-content {
+    flex: 1; /* 남은 모든 공간을 차지 */
+    padding: 20px; /* 여백 */
+    overflow-y: auto; /* 내용 많을 때 스크롤 */
+    background: #fff; /* 배경색 */
+    box-sizing: border-box; /* 패딩 포함한 안정적 레이아웃 */
+    border-radius: 0;
+}
