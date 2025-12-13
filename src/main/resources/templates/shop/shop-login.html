@@ -7,7 +7,7 @@
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
     <title>모두의빵 - 판매자 로그인</title>
 
@@ -179,7 +179,7 @@
        =========================== */
     if (params.get("success") === "login-ok") {
 
-        showSuccessAlert("로그인 성공!", null);
+        Swal.fire("로그인 성공!", null);
 
         // 알럿 한 번만 뜨도록 URL 파라미터 제거
         const cleanUrl = window.location.origin + window.location.pathname;
@@ -193,7 +193,7 @@
 
         let msg = params.get("error");
 
-        showErrorAlert(msg, null);
+        Swal.fire(msg, null);
 
         // 중복 알럿 방지
         const cleanUrl = window.location.origin + window.location.pathname;
