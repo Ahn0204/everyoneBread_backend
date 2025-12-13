@@ -297,12 +297,37 @@
                 contentType: false,
 
                 success: function() {
-                    Swal.fire("입점 신청이 완료되었습니다!", "/shop/login");
+                    Swal.fire({
+                        icon: "success",
+                        title: "입점 신청이 완료되었습니다!",
+                        confirmButtonText: "확인"
+                    }).then(() => {
+                        window.location.href = "/shop/login";
+                    });
                 },
 
                 error: function() {
-                    Swal.fire("서버 오류가 발생했습니다. 다시 시도해주세요.");
+                    Swal.fire({
+                        icon: "error",
+                        title: "서버 오류가 발생했습니다.",
+                        text: "잠시 후 다시 시도해주세요.",
+                        confirmButtonText: "확인"
+                    }).then(() => {
+
+                        // form 내부 입력값 전체 초기화
+                        $("form")[0].reset();
+
+                        // 파일명 표시 영역도 초기화
+                        $("#fileNameDisplay").text("");
+
+                        // 중복확인 상태 초기화
+                        shopNameOk = false;
+
+                        // 페이지 다시 로드하여 완전 초기화
+                        window.location.href = "/shop/register/step";
+                    });
                 }
+
             });
 
             return false;
