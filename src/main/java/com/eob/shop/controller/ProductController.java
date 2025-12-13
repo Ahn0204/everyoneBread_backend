@@ -83,7 +83,7 @@ public class ProductController {
      */
     @PostMapping("products/add")
     public String addProduct(@ModelAttribute ProductEntity product,
-                            @RequestParam("imgFile") MultipartFile imgFile,
+                            @RequestParam("image") MultipartFile imageFile,
                             @AuthenticationPrincipal CustomSecurityDetail principal) throws Exception {
 
         // 로그인 회원 정보
@@ -91,14 +91,22 @@ public class ProductController {
         ShopEntity shop = shopService.findByMemberNo(loginMember.getMemberNo());
 
         // 1) 필수값 세팅
+        // 상점 연결
         product.setShop(shop);
         product.setCreatedAt(LocalDateTime.now());
 
         // 2) 이미지 저장 처리
-        if (!imgFile.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + imgFile.getOriginalFilename();
+        if (!imageFile.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
             String savePath = "C:/upload/product/" + fileName;
-            imgFile.transferTo(new File(savePath));
+
+            File directory = new File("C:/upload/product/");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            imageFile.transferTo(new File(savePath));
+            // 엔티티에 파일명 저장
             product.setImgUrl(fileName);
         }
 
