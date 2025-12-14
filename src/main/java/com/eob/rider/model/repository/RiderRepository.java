@@ -28,4 +28,6 @@ public interface RiderRepository extends JpaRepository<RiderEntity, Long> {
      * 예솔 추가
      */
     Page<RiderEntity> findAll(Pageable pageable);
+
+    RiderEntity findByRiderNo(Long riderNo);
 }

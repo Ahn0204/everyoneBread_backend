@@ -73,7 +73,8 @@ public class SecurityConfig {
                                                 // - 정적리소스(css,js,image,fonts,lib 등) 정적인 리소스는 접근 가능하도록 설정
                                                 // 로그인 페이지에 접근하기 위해서는 로그인하지 않아도 접근(접속)할 수 있도록 설정하는 것.
                                                 // - permitAll()은 Security가 내부적으로 익명의 사용자(AnonymousUser)도 접근 허용하게 만들어준다.
-                                                .requestMatchers("/rider/login", "/rider/register/*", "/css/**",
+                                                .requestMatchers("/rider/login", "/rider/register/*",
+                                                                "/rider/revision-request/*", "/css/**",
                                                                 "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()

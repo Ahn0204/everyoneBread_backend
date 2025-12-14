@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eob.common.util.FileUploadUtil;
+import com.eob.common.util.FileUtil;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
@@ -20,6 +20,7 @@ import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.repository.RiderRepository;
 
+import jakarta.persistence.Transient;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class RiderService {
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
         MultipartFile file = riderForm.getLicenseFile();
         // 라이더 운전면허증 파일 저장
-        String saveFileName = FileUploadUtil.uploadImage(file, "rider/licenseFile");
+        String saveFileName = FileUtil.uploadImage(file, "rider/licenseFile");
 
         MemberEntity member = new MemberEntity();
         member.setMemberId(memberForm.getMemberId());
@@ -96,6 +97,35 @@ public class RiderService {
             result.put("value", _member.get().getMemberId());
         }
         return result;
+    }
+
+    public RiderEntity getRider(Long riderNo) {
+        RiderEntity rider = this.riderRepository.findByRiderNo(riderNo);
+        return rider;
+
+    }
+
+    @Transactional
+    public void updateRevisionRequest(RiderRegisterForm riderRegisterForm, Long riderNo) {
+        RiderEntity rider = this.getRider(riderNo);
+        MultipartFile file = riderRegisterForm.getLicenseFile();
+        // FileUtil 규칙에 맞는 folderPath
+        String folderPath = "rider/licenseFile";
+
+        // 기존 파일 삭제
+        FileUtil.deleteFile(folderPath, rider.getLicenseFile());
+
+        // 새 파일 업로드 (null 또는 empty 검사 생략)
+        String saveFileName = FileUtil.uploadImage(file, folderPath);
+
+        // 엔티티 업데이트
+        rider.setAStatus(ApprovalStatus.PENDING);
+        rider.setCreatedAt(LocalDateTime.now());
+        rider.setLicenseCreatedAt(riderRegisterForm.getLicenseCreatedAt());
+        rider.setRiderLicense(riderRegisterForm.getDriverLicense());
+        rider.setLicenseFile(saveFileName);
+
+        this.riderRepository.save(rider);
     }
 
 }

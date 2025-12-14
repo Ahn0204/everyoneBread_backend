@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class FileUploadUtil {
+public class FileUtil {
 
     /**
      * 파일 검사 메서드
@@ -16,7 +16,7 @@ public class FileUploadUtil {
      * </ul>
      * 
      * @param file : 사용자가 업로드한 파일 객체
-     * @throws FileValidationException 파일이 없거나, 이미지가 아니거나, 확장자가 허용되지 않을 경우
+     * @throws CustomFileException 파일이 없거나, 이미지가 아니거나, 확장자가 허용되지 않을 경우
      */
     public static void validateImageFile(MultipartFile file) {
 
@@ -24,7 +24,7 @@ public class FileUploadUtil {
         // - 업로드된 파일이 없으면 커스텀 예외(FileValidationException)를 발생시켜 컨트롤러로 알림
         // - 업로드된 파일이 있는 경우 MIME 타입 검사로 이동
         if (file == null || file.isEmpty()) {
-            throw new FileValidationException("파일은 필수입니다.");
+            throw new CustomFileException("파일은 필수입니다.");
         }
 
         // 2. MIME 타입 검사 (이미지 파일의 경우 image/확장자명)
@@ -32,7 +32,7 @@ public class FileUploadUtil {
         // - 이미지 파일이 맞을 경우 확장자 검사로 이동
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {
-            throw new FileValidationException("이미지 파일만 업로드 가능합니다.");
+            throw new CustomFileException("이미지 파일만 업로드 가능합니다.");
         }
 
         // 3. 확장자 검사 (보안상 중요)
@@ -43,7 +43,7 @@ public class FileUploadUtil {
         if (!(name.endsWith(".jpg") || name.endsWith(".jpeg") ||
                 name.endsWith(".png") || name.endsWith(".gif") ||
                 name.endsWith(".webp"))) {
-            throw new FileValidationException("허용된 확장자만 업로드 가능합니다.");
+            throw new CustomFileException("허용된 확장자만 업로드 가능합니다.");
         }
         // 3. 확장자 검사 List처리 방법
         // List<String> allowTypes = Arrays.asList("image/jpeg",
@@ -153,10 +153,37 @@ public class FileUploadUtil {
             file.transferTo(saveFile);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new FileValidationException("파일 저장 실패");
+            throw new CustomFileException("파일 저장 실패");
         }
 
         // 8. DB에 저장할 업로드된 실제 파일명 반환
         return newName;
+    }
+
+    /**
+     * 업로드된 파일 삭제 메서드
+     * 
+     * @param saveDir  파일이 저장된 폴더 경로 (마지막에 File.separator 포함)
+     * @param fileName 삭제할 파일명
+     */
+    public static void deleteFile(String folderPath, String fileName) {
+        // 1. 파일의 저장 경로 생성
+        String saveDir = Paths.get(
+                System.getProperty("user.dir"), "src", "main", "resources", "static", "upload", folderPath).toString()
+                + File.separator;
+
+        // 2. 삭제 대상 파일 객체 생성
+        File file = new File(saveDir + fileName);
+
+        // 3. 해당 파일의 존재 여부 검사 (존재하지 않을 시 예외 발생)
+        if (!file.exists()) {
+            throw new CustomFileException("파일이 존재하지 않습니다.");
+        }
+
+        // 4. 파일 삭제 시도 (실패시 예외 발생)
+        if (!file.delete()) {
+            throw new CustomFileException("파일 삭제 실패");
+        }
+
     }
 }
