@@ -9,10 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 /**
  * 상품 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -44,8 +44,8 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ProductEntity> findByShopNo(Long shopNo, int page, int size) {
 
-        // 페이징 정보 생성
-        Pageable pageable = PageRequest.of(page, size);
+        // 페이지 요청 정보 생성 (페이지 번호, 페이지 크기, 정렬 기준)
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         // Repository를 통해 페이징된 상품 목록 조회
         return productRepository.findByShop_ShopNo(shopNo, pageable);
