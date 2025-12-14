@@ -6,6 +6,9 @@ import com.eob.shop.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,15 +33,22 @@ public class ProductService {
 
 
     /**
-     * 특정 상점(shopNo)의 전체 상품 목록 조회
-     * - ProductController#list() 에서 호출됨
-     * - "/shop/products" 페이지에서 상품 목록을 보여줄 때 사용
+     * 특정 상점(shopNo)의 상품 목록 페이징 조회
+     * - 한 페이지당 size 개씩 조회
+     * - 상품 관리 페이지에서 사용
      *
-     * @param shopNo 상점 고유 번호 (FK)
-     * @return 해당 상점의 모든 상품 리스트
+     * @param shopNo 상점 고유 번호
+     * @param page   현재 페이지 (0부터 시작)
+     * @param size   페이지당 상품 수
      */
-    public List<ProductEntity> findByShopNo(Long shopNo) {
-        return productRepository.findByShop_ShopNo(shopNo);
+    @Transactional(readOnly = true)
+    public Page<ProductEntity> findByShopNo(Long shopNo, int page, int size) {
+
+        // 페이징 정보 생성
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Repository를 통해 페이징된 상품 목록 조회
+        return productRepository.findByShop_ShopNo(shopNo, pageable);
     }
 
 
@@ -51,6 +61,7 @@ public class ProductService {
      * @return 조회된 상품 엔티티
      */
     public ProductEntity findById(Long productNo) {
+        // 상품이 존재하지 않을 경우 예외 발생
         return productRepository.findById(productNo)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
     }
@@ -70,6 +81,7 @@ public class ProductService {
      * @return 저장된 상품 엔티티
      */
     public ProductEntity save(ProductEntity product) {
+        // 상품 저장 (등록 또는 수정)
         return productRepository.save(product);
     }
 
