@@ -115,6 +115,7 @@ public class ShopController {
      * - /shop 이동
      */
     @PostMapping("register/step")
+    @ResponseBody
     public String registerStep(
             ShopEntity shop,
             HttpSession session,
@@ -123,17 +124,23 @@ public class ShopController {
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
         if (temp == null) {
-            return "redirect:/shop/register/start";
+            return "NO_SESSION";
         }
 
         // 회원 저장 (MemberEntity 생성)
-        MemberEntity member = memberService.registerShop(temp, null);
+        MemberEntity member = memberService.createShopMember(temp);
+        System.out.println("저장된 MemberNo ="+member.getMemberNo());
 
         // 파일 업로드 처리
         String fileName = null;
         if (!bizFile.isEmpty()) {
             fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
             String savePath = "C:/upload/shop/" + fileName;
+
+            File folder = new File("C:/upload/shop/");
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
             bizFile.transferTo(new File(savePath));
         }
 
@@ -143,13 +150,24 @@ public class ShopController {
         shop.setCreatedAt(LocalDateTime.now());
         shop.setBizImg(fileName);
 
+        // shop.setStatus(ShopApprovalStatus.PENDING); // 승인대기 상태
+
+        // 저장 전 필드 확인
+        System.out.println("Shop 저장 전 확인");
+        System.out.println("shop 정보 = " + shop);
+        System.out.println("shopName = " + shop.getShopName());
+        System.out.println("shopAddress = " + shop.getShopAddress());
+        System.out.println("bizNo = " + shop.getBizNo());
+
         // 저장
         shopService.saveShop(shop);
+        ShopEntity saved = shopService.findByMemberNo(member.getMemberNo());
+        System.out.println("저장된 Shop No =" + saved.getShopNo());
 
         // 세션 초기화
         session.removeAttribute("tempShopMember");
 
-        return "redirect:/shop";
+        return "OK";
     }
 
     /**

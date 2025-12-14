@@ -8,98 +8,303 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/comm/admin-layout}">
     <head>
         <th:block layout:fragment="head">
-            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+            <style>
+                /*부트스트랩보다 우선 적용*/
+                tbody,
+                td,
+                tfoot,
+                th,
+                thead,
+                tr {
+                    border-width: 1px !important;
+                }
+
+                /*항목 너비 설정하는 레이아웃css*/
+                .div-cols {
+                    /*항목을 담는 div에 지정*/
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    padding: 20px 10px 10px 20px;
+                }
+                .div-col-1 {
+                    flex: 0.7;
+                } /* 번호 */
+                .div-col-2 {
+                    flex: 1;
+                } /* 상태 */
+                .div-col-3 {
+                    flex: 1.2;
+                } /* 아이디 */
+                .div-col-4 {
+                    flex: 1;
+                } /* 이름 */
+                .div-col-5 {
+                    flex: 1.5;
+                } /* 신청일시 */
+                .div-col-6 {
+                    flex: 1.5;
+                } /* 승인일시 */
+                .div-col-7 {
+                    flex: 0.2;
+                } /* 옵션 버튼 영역 */
+
+                /*모달*/
+                .dimmed {
+                    position: fixed;
+                    inset: 0; /* top, right, bottom, left 0 */
+                    background: rgba(0, 0, 0, 0.7);
+                    z-index: 1030; /*admin-header보다 위*/
+                    display: none; /* JS로 제어 */
+                }
+                .modal-layer {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    width: 600px;
+                    height: 600px;
+                    background: #fff;
+
+                    transform: translate(-50%, -50%); /* 화면 정중앙 배치 */
+                    border-radius: 10px;
+                    display: none; /* 모달 기본 숨김 */
+                    z-index: 1031; /* dimmed 위로 */
+                    overflow: hidden; /* 내용 넘침 방지 */
+                }
+
+                /* 모달 전체 컨테이너 */
+                .modal {
+                    width: 100%;
+                    height: 100%;
+
+                    display: flex;
+                    flex-direction: column;
+
+                    background: #fff;
+                }
+
+                /* 모달 상단 영역 */
+                .modal-top {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+
+                    height: 60px;
+                    padding: 0 20px;
+
+                    background: #f5f5f5;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+
+                .modal-top #license-info {
+                    margin: 0;
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                }
+
+                .closeBtn {
+                    font-size: 28px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    user-select: none;
+                    color: #555;
+                    transition: 0.2s;
+                }
+
+                .closeBtn:hover {
+                    color: #000;
+                }
+
+                /* 모달 내용 영역 */
+                .modal-content {
+                    flex: 1; /* 남은 모든 공간을 차지 */
+                    padding: 20px; /* 여백 */
+                    overflow-y: auto; /* 내용 많을 때 스크롤 */
+                    background: #fff; /* 배경색 */
+                    box-sizing: border-box; /* 패딩 포함한 안정적 레이아웃 */
+                    border-radius: 0;
+                }
+            </style>
         </th:block>
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
         <div layout:fragment="content">
-            <h3>라이더 승인 내역</h3>
-            <div calss="m-2" width="80%" max-width="900px" min-width="700px">
-                <div class="d-flex flex-row border-bottom border-3 border-dark fw-b text-center">
-                    <div class="p-2 flex-fill fw-bold">번호</div>
-                    <div class="p-2 flex-fill fw-bold">상태</div>
-                    <div class="p-2 flex-fill fw-bold">아이디</div>
-                    <div class="p-2 flex-fill fw-bold">이름</div>
-                    <div class="p-2 flex-fill fw-bold">신청일시</div>
-                    <div class="p-2 flex-fill fw-bold">승인일시</div>
-                    <div>&nbsp;&nbsp;</div>
-                </div>
-                <!--라이더 내역이 없을 때-->
-                <div th:if="${noRider}">
-                    <div class="p-2 flex-fill" th:text="${noRider}"></div>
-                </div>
-                <!--라이더 내역이 있을 때-->
-                <div th:unless="${noRider}">
-                    <!--아코디언 속성이 적용된 리스트-->
-                    <div class="accordion" id="riderApproval-List">
-                        <!--미검토 PENDING, UNDER_REVIEW 리스트-->
-                        <!--항목 1개 : 목록에서 보이는 헤더 + 클릭 시 나타나는 바디 구성-->
-                        <div class="accordion-item" th:each="rider, loop : ${pendingList}">
-                            <!--아코디언 헤더 : collapse기능용 버튼 > 항목 제목-->
-                            <div class="accordion-header" th:id="heading-+${loop.count}">
-                                <!--collapse용 버튼 : -->
-                                <button class="d-flex flex-row border-bottom text-center accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#pending-'+${loop.count}" aria-expanded="false" th:aria-controls="'pending-'+${loop.count}">
-                                    <!--항목 제목-->
-                                    <div class="p-2 flex-fill" th:text="${rider.riderNo}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.aStatus.label}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.member.memberId}"></div>
-                                    <div class="p-2 flex-fill" th:text="${rider.member.memberName}"></div>
-                                    <div class="p-2 flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                                    <div class="p-2 flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
-                                </button>
+            <div class="listAndList-header m-2">
+                <div class="list-header"><h3>라이더 승인 내역</h3></div>
+                <div calss="list" style="max-width: 1000px; min-width: 800px">
+                    <div class="div-cols border-bottom border-3 border-dark fw-b text-center">
+                        <div class="div-col-1 fw-bold">번호</div>
+                        <div class="div-col-2 fw-bold">상태</div>
+                        <div class="div-col-3 fw-bold">아이디</div>
+                        <div class="div-col-4 fw-bold">이름</div>
+                        <div class="div-col-5 fw-bold">&nbsp;신청일시&nbsp;</div>
+                        <div class="div-col-6 fw-bold">&nbsp;승인일시&nbsp;</div>
+                        <div class="div-col-7"></div>
+                    </div>
+                    <!--라이더 내역이 없을 때-->
+                    <div th:if="${noRider}">
+                        <div class="p-2 flex-fill" th:text="${noRider}"></div>
+                    </div>
+                    <!--라이더 내역이 있을 때-->
+                    <div th:unless="${noRider}">
+                        <!--아코디언 속성이 적용된 리스트-->
+                        <div class="accordion" id="riderApproval-List">
+                            <!--미검토 PENDING, UNDER_REVIEW 리스트-->
+                            <!--항목 1개 : 목록에서 보이는 헤더 + 클릭 시 나타나는 바디 구성-->
+                            <div class="accordion-item" th:each="rider, loop : ${pendingList}">
+                                <!--내역마다 반복되는 출력부 fragment, 글번호 시작값 전달-->
+                                <div th:replace="~{/admin/user/riderApproval-common(start=${pendingStart})}"></div>
                             </div>
-                            <!--바디 : collapse기능용 div > 실제 내용이 담긴 아코디언 바디-->
-                            <!--collapse기능용 div : -->
-                            <div th:id="pending-+${loop.count}" class="accordion-collapse collapse" th:aria-labelledby="'heading-'+${loop.count}" data-bs-parent="#riderApproval-List">
-                                <!--아코디언 바디-->
-                                <div class="accordion-body"></div>
+                            <!--보완요청 REVISION_REQUIRED 리스트-->
+                            <div class="accordion-item" th:each="rider,loop : ${rejectedList}">
+                                <div th:replace="~{/admin/user/riderApproval-common(start=${rejectedStart})}"></div>
                             </div>
-                        </div>
-                        <!--보완요청 REVISION_REQUIRED 리스트-->
-                        <div class="d-flex flex-row border-bottom text-center" th:each="rider : ${rejectedList}">
-                            <div class="p-2 flex-fill" th:text="${rider.riderNo}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.aStatus.label}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberId}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberName}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
-                        </div>
-                        <!--승인완료 APPROVED 리스트-->
-                        <div class="d-flex flex-row border-bottom text-center" th:each="rider : ${approvedList}">
-                            <div class="p-2 flex-fill" th:text="${rider.riderNo}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.aStatus.label}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberId}"></div>
-                            <div class="p-2 flex-fill" th:text="${rider.member.memberName}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                            <div class="p-2 flex-fill" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd hh:mm')}"></div>
+                            <!--승인완료 APPROVED 리스트-->
+                            <div class="accordion-item" th:each="rider,loop : ${approvedList}">
+                                <div th:replace="~{/admin/user/riderApproval-common(start=${approvedStart})}"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!--페이지 블럭-->
-                <div th:unless="${noRider}">
-                    <ul class="pagination justify-content-center p-2">
-                        <!--이전 버튼-->
-                        <li class="page-item" th:classappend="${!riderP.hasPrevious} ? 'disabled' ">
-                            <a class="page-link" th:text="이전" th:href="@{|?page=${riderP.number-1}|}"></a>
-                        </li>
-                        <!--페이지 숫자 버튼-->
-                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,riderP.totalPages-1)}" th:classappend="${pageNum == riderP.number} ? 'active'">
-                            <a class="page-link" th:href="@{|?page=${pageNum}|}" th:text="${pageNum}+1"></a>
-                        </li>
-                        <!--다음 버튼-->
-                        <li class="page-item" th:classappend="${!riderP.hasNext} ? 'disabled'">
-                            <a class="page-link" th:href="@{|?page=${riderP.number+1}|}" th:text="다음"></a>
-                        </li>
-                    </ul>
+                    <!--면허증 사진 모달-->
+                    <!--모달 출력 시 뒷배경-->
+                    <div class="dimmed" aria-hidden="true" id="dimmed" style="display: none"></div>
+                    <!--사진 출력 모달-->
+                    <div class="modal-layer" id="modal-photo" style="display: none">
+                        <div class="modal">
+                            <div class="modal-top justyfy-content-between">
+                                <!--입력받은 정보-->
+                                <div id="license-info"></div>
+                                <!--닫기버튼-->
+                                <div class="closeBtn">&times;</div>
+                            </div>
+                            <!--사진-->
+                            <div class="modal-content">
+                                <img id="license-img" alt="면허증" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--페이지 블럭-->
+                    <div th:unless="${noRider}">
+                        <ul class="pagination justify-content-center p-2">
+                            <!--이전 버튼-->
+                            <li class="page-item" th:classappend="${!riderP.hasPrevious} ? 'disabled' ">
+                                <a class="page-link" th:text="이전" th:href="@{|?page=${riderP.number-1}|}"></a>
+                            </li>
+                            <!--페이지 숫자 버튼-->
+                            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,riderP.totalPages-1)}" th:classappend="${pageNum == riderP.number} ? 'active'">
+                                <a class="page-link" th:href="@{|?page=${pageNum}|}" th:text="${pageNum}+1"></a>
+                            </li>
+                            <!--다음 버튼-->
+                            <li class="page-item" th:classappend="${!riderP.hasNext} ? 'disabled'">
+                                <a class="page-link" th:href="@{|?page=${riderP.number+1}|}" th:text="다음"></a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
-        <script layout:fragment="script">
-            console.log('fragment 됨');
+        <script layout:fragment="script" th:inline="javascript">
+            //사진 보기
+            $('.show-license').on('click', function () {
+                const fileName = $(this).data('file');
+                const licenseNo = $(this).data('license');
+                const licenseCreatedAt = $(this).data('date');
+                if (fileName) {
+                    //면허 정보 가져오기
+                    $('#license-info').html(`<span>[` + licenseNo + ']&nbsp;' + licenseCreatedAt + `</span>`);
+                    //사진 가져오기
+                    $('#license-img').attr('src', '/upload/rider/licenseFile/' + fileName);
+                    //배경, 모달 보이기
+                    $('#dimmed, #modal-photo').show();
+                } else {
+                    //fileName이 없다면
+                    showToast('등록된 사진이 없습니다.', 'error');
+                }
+            });
+            //모달 - 닫기 버튼, dimmed 클릭
+            $('.closeBtn, #dimmed').on('click', function () {
+                //기존값 초기화
+                $('#license-img').removeAttr('src');
+                //배경, 모달 숨김
+                $('#dimmed, #modal-photo').hide();
+            });
+
+            //보완요청
+            $('.revision').on('click', function () {
+                //보완 버튼의.가장 가까운 조상'form'의.클래스riderNo 요소의.값;
+                const objectNo = $(this).closest('form').find('.riderNo').val();
+                const rejectReason = $(this).closest('form').find('.reject-reason').val();
+                if (rejectReason) {
+                    //보완 사유 선택됨
+                    const reasonText = $(this).closest('form').find('.reject-reason option:selected').text();
+                    showConfirmAlert(
+                        //자바스크립트 - ``(백틱) 내부에서 ${} 사용 가능
+                        `아래 사유로 보완을 요청합니다.\n[${reasonText}]`,
+                        //예
+                        () => {
+                            $.ajax({
+                                url: '/admin/user/rider/revision',
+                                type: 'POST',
+                                data: { objectNo: objectNo, rejectReason: rejectReason },
+                                success: function (success) {
+                                    if (success == true) {
+                                        showToast('보완이 요청되었습니다.', 'success');
+                                    } else {
+                                        showToast('다시 시도해주세요.', 'error');
+                                    }
+                                },
+                                error: function (error) {
+                                    showToast('다시 시도해주세요.', 'error');
+                                },
+                            });
+                        },
+                        //아니오
+                        () => {
+                            showToast('보완 요청이 취소되었습니다.', 'warning');
+                        }
+                    );
+                } else {
+                    //보완 사유 선택 안됨
+                    showToast('보완 사유를 선택해주세요.', 'warning');
+                }
+            });
+
+            //승인
+            $('.approval').on('click', function () {
+                //보완 버튼의.가장 가까운 조상'form'의.클래스riderNo 요소의.값;
+                const objectNo = $(this).closest('form').find('.riderNo').val();
+                showConfirmAlert(
+                    '해당 라이더의 \n가입이 승인됩니다.',
+                    //예
+                    () => {
+                        $.ajax({
+                            url: '/admin/user/rider/approval',
+                            type: 'POST',
+                            data: { objectNo: objectNo },
+                            success: function (success) {
+                                if (success == true) {
+                                    showToast('가입이 승인되었습니다.', 'success');
+                                } else {
+                                    showToast('다시 시도해주세요.', 'error');
+                                }
+                            },
+                            error: function (error) {
+                                showToast('다시 시도해주세요.', 'error');
+                            },
+                        });
+                    },
+                    //아니오
+                    () => {
+                        showToast('승인이 취소되었습니다.', 'warning');
+                    }
+                );
+            });
         </script>
     </body>
 </html>

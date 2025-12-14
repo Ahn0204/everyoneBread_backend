@@ -136,7 +136,7 @@
                         등록일
                     </div>
 
-                    <div class="product-name" th:text="${p.name}">
+                    <div class="product-name" th:text="${p.productName}">
                         상품 이름
                     </div>
 
@@ -149,7 +149,7 @@
                 <div class="product-actions">
 
                     <select class="status-select"
-                            th:data-id="${p.id}"
+                            th:data-id="${p.productNo}"
                             th:value="${p.status}">
                         <option value="SELLING">판매중</option>
                         <option value="STOPPED">중지</option>
@@ -157,12 +157,12 @@
                     </select>
 
                     <button class="btn-small"
-                            th:onclick="|location.href='@{/shop/products/edit/{id}(id=${p.id})}'|">
+                            th:onclick="|location.href='@{/shop/products/edit/{id}(id=${p.productNo})}'|">
                         수정
                     </button>
 
                     <button class="btn-small"
-                            th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/shop/products/delete/{id}(id=${p.id})}'|">
+                            th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/shop/products/delete/{id}(id=${p.productNo})}'|">
                         삭제
                     </button>
                 </div>

@@ -10,9 +10,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
@@ -20,9 +22,11 @@ import com.eob.admin.model.service.AdminService;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.repository.RiderRepository;
+import com.eob.rider.model.service.RiderService;
 import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ShopRepository;
+import com.eob.shop.service.ShopService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -36,7 +40,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminController {
 
     public final AdminService adminService;
+    public final ShopService shopService;
     public final ShopRepository shopRepository;
+    public final RiderService riderService;
     public final RiderRepository riderRepository;
 
     // 로그인 페이지
@@ -166,11 +172,60 @@ public class AdminController {
             model.addAttribute("pendingList", pendingList); // 미검토
             model.addAttribute("rejectedList", rejectedList); // 반려
             model.addAttribute("approvedList", approvedList); // 승인완료
-        }
 
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int rejectedCount = rejectedList.size();
+            int approvedCount = approvedList.size();
+            int total = pendingCount + rejectedCount + approvedCount;
+
+            int pendingStart = total;
+            int rejectedStart = total - pendingCount;
+            int approvedStart = total - rejectedCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("rejectedStart", rejectedStart);
+            model.addAttribute("approvedStart", approvedStart);
+
+        }
         // 페이징 정보 전달
         model.addAttribute("riderP", riderP);
         return "admin/user/riderApproval-list";
+    }
+
+    /**
+     * 라이더/입점신청 - 보완 요청
+     * 
+     * @param param        엔티티구분(rider 또는 shop)
+     * @param riderNo      라이더번호
+     * @param rejectReason 보완사유
+     * @return 알림사항에 띄울 메세지
+     */
+    @PostMapping("/user/{param}/revision")
+    @ResponseBody
+    public boolean ajaxApplyRevision(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo,
+            @RequestParam("rejectReason") String rejectReason) {
+        boolean result = false;
+        result = adminService.doRevision(param, objectNo, rejectReason);
+
+        return result;
+    }
+
+    /**
+     * 라이더/입점신청 - 승인
+     * 
+     * @param param   엔티티구분(rider 또는 shop)
+     * @param riderNo 라이더번호
+     * @return 알림사항에 띄울 메세지
+     */
+    @PostMapping("/user/{param}/approval")
+    @ResponseBody
+    public boolean ajaxApplyApproval(@PathVariable("param") String param, @RequestParam("objectNo") long objectNo) {
+        boolean result = false;
+        result = adminService.doApproval(param, objectNo);
+
+        return result;
     }
 
     // 관리자 계정 내역(추가) 페이지

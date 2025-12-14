@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -35,20 +38,25 @@ public class mainController {
     // 헤더 카테고리 항목 불러오기
     @GetMapping("getCategory")
     @ResponseBody
-    public List<String> getCategory() {
-        System.out.println("카테고리 불러오기 실행");
-
+    public ResponseEntity<?> getCategory() {
+        // 리턴 객체 선언
         List<String> category = new ArrayList<>();
 
-        Optional<ArrayList<String>> optional = categoryRepository.findByDepth(0);
+        // 카테고리 DB에서 대분류명 List 가져오기
+        Optional<ArrayList<String>> _category = categoryRepository.findByDepth(0);
 
-        if (optional.isPresent() && !optional.get().isEmpty()) {
-            System.out.println(optional.get());
-            category.addAll(optional.get());
+        // DB에 값이 존재하고 && Optional객체가 비어있지 않다면
+        if (_category.isPresent() && !_category.get().isEmpty()) {
+            // category에 Optional의 값 모두 add
+            category.addAll(_category.get());
+            System.out.println("카테고리 불러오기 실행:" + category);
+            // 카테고리 List보내기
+            return ResponseEntity.ok(category);
+        } else {
+            // Optional값이 없다면
+            return ResponseEntity.status(500).body("카테고리가 존재하지 않습니다.");
         }
 
-        System.out.println(category);
-        return category;
     }
 
     // 상점 목록

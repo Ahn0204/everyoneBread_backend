@@ -18,7 +18,7 @@ public class ShopService {
     /**
      * 상점 저장
      */
-    public ShopEntity saveShop(ShopEntity shop){
+    public ShopEntity saveShop(ShopEntity shop) {
         return shopRepository.save(shop);
     }
 
@@ -27,7 +27,7 @@ public class ShopService {
      * return true = 이미 존재
      * return false = 사용 가능
      */
-    public boolean existsByShopName(String shopName){
+    public boolean existsByShopName(String shopName) {
         return shopRepository.existsByShopName(shopName);
     }
 
@@ -42,8 +42,9 @@ public class ShopService {
     /**
      * 상점 번호로 조회
      */
-    public ShopEntity findByShopNo(Long shopNo){
+    public ShopEntity findByShopNo(Long shopNo) {
         return shopRepository.findById(shopNo)
                 .orElseThrow(() -> new IllegalArgumentException("상점 정보를 찾을 수 없습니다."));
     }
+
 }

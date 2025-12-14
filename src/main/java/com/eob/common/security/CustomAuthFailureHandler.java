@@ -39,11 +39,14 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
         String loginURI = request.getRequestURI();
         String redirectURL;
 
+        // 에러 메시지 URL 인코딩
+        String errorMsg = URLEncoder.encode(exception.getMessage(), StandardCharsets.UTF_8);
+
         // 3. URI에 따른 URL 분기
         if (loginURI.contains("/rider/login")) {
             redirectURL = "/rider/login";
         } else if (loginURI.contains("/shop/login")) {
-            redirectURL = "/shop/login";
+            redirectURL = "/shop/login?error=" + errorMsg;
         } else if (loginURI.contains("/admin/login")) {
             redirectURL = "/admin/login";
         } else {

@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/shop/products")
+@RequestMapping("/shop/**")
 public class ProductController {
 
     private final ProductService productService;
@@ -37,7 +37,7 @@ public class ProductController {
      * - 해당 상점의 모든 상품을 조회하여
      * - product-list.html 에 전달한다.
      */
-    @GetMapping("")
+    @GetMapping("products")
     public String list(Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
 
         // 1) 로그인 정보 가져오기
@@ -46,12 +46,17 @@ public class ProductController {
         // 2) 로그인한 회원의 상점 정보 조회
         ShopEntity shop = shopService.findByMemberNo(loginMember.getMemberNo());
 
+        if(shop == null){
+            // 상점 정보가 없으면 에러 페이지 or 상점 등록 페이지로 리다이렉트
+            return "redirect:/shop/register/step"; // 예: 상점 등록 페이지로 리다이렉트
+        }
+
         // 3) 해당 상점의 상품 목록 조회
         model.addAttribute("productList",
                 productService.findByShopNo(shop.getShopNo()));
 
         // 4) 목록 화면으로 이동
-        return "shop/products/product-list";
+        return "shop/shop-products";
     }
 
     /**
@@ -61,10 +66,10 @@ public class ProductController {
      * 빈 ProductEntity 를 모델에 넣어
      * form 에서 th:object 로 활용한다.
      */
-    @GetMapping("/add")
+    @GetMapping("products/add")
     public String addForm(Model model) {
         model.addAttribute("product", new ProductEntity());
-        return "shop/products/product-add";
+        return "shop/shop-product-add";
     }
 
     /**
@@ -76,9 +81,9 @@ public class ProductController {
      * - 이미지 파일 저장
      * - 상품 엔티티 생성 및 저장(ProductService.save)
      */
-    @PostMapping("/add")
+    @PostMapping("products/add")
     public String addProduct(@ModelAttribute ProductEntity product,
-                            @RequestParam("imgFile") MultipartFile imgFile,
+                            @RequestParam("image") MultipartFile imageFile,
                             @AuthenticationPrincipal CustomSecurityDetail principal) throws Exception {
 
         // 로그인 회원 정보
@@ -86,14 +91,22 @@ public class ProductController {
         ShopEntity shop = shopService.findByMemberNo(loginMember.getMemberNo());
 
         // 1) 필수값 세팅
+        // 상점 연결
         product.setShop(shop);
         product.setCreatedAt(LocalDateTime.now());
 
         // 2) 이미지 저장 처리
-        if (!imgFile.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + imgFile.getOriginalFilename();
+        if (!imageFile.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
             String savePath = "C:/upload/product/" + fileName;
-            imgFile.transferTo(new File(savePath));
+
+            File directory = new File("C:/upload/product/");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            imageFile.transferTo(new File(savePath));
+            // 엔티티에 파일명 저장
             product.setImgUrl(fileName);
         }
 
@@ -178,3 +191,10 @@ public class ProductController {
         return "redirect:/shop/products";
     }
 }
+
+// 상품 관리 페이지로 넘어가도록 만들었음
+// 하지만 입점 신청 등록이 안된 ID여서 상품 관리 페이지로 넘어가지 못함. shopNo가 null이기 때문.
+// 추후 입점 신청 등록 기능을 만들고 나서 테스트 필요.
+// 내일 할 일
+// 1. 입점 신청 등록 기능 수정하기
+// 2. 상품 관리 페이지로 넘어가는지 테스트 하기
