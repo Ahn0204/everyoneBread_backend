@@ -30,6 +30,10 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
         // 1. session에 메시지 저장
         HttpSession session = request.getSession();
         session.setAttribute("loginErrorMessage", exception.getMessage());
+        // a. 만약 CustomSecurityException을 통해 예외가 발생했을 경우 세션에 라이더 번호와 멤버 번호를 세션에 담음
+        if (exception instanceof CustomSecurityException ex) {
+            session.setAttribute("riderNo", ex.getRiderNo());
+        }
 
         // 2. 로그인한 위치(URI) 가져오기
         String loginURI = request.getRequestURI();
@@ -56,7 +60,7 @@ public class CustomAuthFailureHandler implements AuthenticationFailureHandler {
         // 시켜야함
         // 2. 해당 로그인 Controller에서 session에 loginErrorMessage 체크 후 있으면 model로 전송후 session
         // 지우기
-        
+
     }
 
 }
