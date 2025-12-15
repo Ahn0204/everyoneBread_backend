@@ -8,6 +8,8 @@ import com.eob.shop.model.data.ShopEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -99,8 +101,15 @@ public class OrderHistoryEntity {
     /**
      * 주문 진행 상태
      */
+    @Enumerated(EnumType.STRING)
     @Column(nullable = true)
-    private int status;
+    private OrderStatus status;
+
+    /**
+     * 거절 사유
+     */
+    @Column(nullable = true, length = 4000)
+    private String rejectReason;
 
     /**
      * 배달 기사
