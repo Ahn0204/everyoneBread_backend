@@ -3,6 +3,9 @@ package com.eob.shop.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import ch.qos.logback.core.model.Model;
 
 /**
  * 판매자 주문 관리 컨트롤러
@@ -20,7 +23,15 @@ public class ShopOrderController {
      * URL: GET /shop/orders
      */
     @GetMapping
-    public String orderList() {
+    public String orderList(
+        @RequestParam(required = false) String startDate,
+        @RequestParam(required = false) String endDate,
+        Model model
+    ) {
+
+        // 화면에 전달할 파라미터 설정
+        //model.addAttribute("startDate", startDate);
+        //model.addAttribute("endDate", endDate);
         return "shop/shop-orders";
     }
 }

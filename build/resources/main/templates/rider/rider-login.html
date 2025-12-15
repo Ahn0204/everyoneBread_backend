@@ -305,10 +305,15 @@
     </head>
     <body>
         <h1 th:text="${errorMsg}"></h1>
+        <h1 th:text="${riderNo}"></h1>
         <th:block th:if="${errorMsg}">
             <script th:inline="javascript">
                 const msg = /*[[${errorMsg}]]*/ '';
-                showErrorAlert(msg);
+                const riderNo = /*[[${riderNo}]]*/ '';
+
+                window.addEventListener('DOMContentLoaded', function () {
+                    loginFailer(msg, riderNo);
+                });
             </script>
         </th:block>
 
@@ -379,6 +384,14 @@
                         if (token && header) xhr.setRequestHeader(header, token);
                     });
                 });
+
+                function loginFailer(msg, no) {
+                    if (msg.includes('서류 보완')) {
+                        showErrorTitleAlert('서류 보완 필요', '보완 페이지로 이동합니다.', '/rider/revision-request/' + no);
+                        return;
+                    }
+                    showErrorTitleAlert('로그인 실패', msg);
+                }
 
                 // 비밀번호 보기/숨기기 아이콘
                 $('#pwToggleIcon').on('click', function () {
