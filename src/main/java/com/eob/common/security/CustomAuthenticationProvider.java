@@ -97,7 +97,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                         case UNDER_REVIEW:
                             throw new DisabledException("가입 서류 검토중입니다.");
                         case REVISION_REQUIRED:
-                            throw new DisabledException("보완 요청중입니다.");
+                            throw new CustomSecurityException("서류 보완이 필요합니다.", member.getMemberNo(),
+                                    rider.getRiderNo());
                     }
                 } else if (member.getMemberRole() == MemberRoleStatus.SHOP) {
                     switch (shop.getStatus()) {

@@ -7,10 +7,9 @@ import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
-import jakarta.servlet.http.HttpSession;
-
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +21,7 @@ import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/shop/products")
+@RequestMapping("/shop/**")
 public class ProductController {
 
     private final ProductService productService;
@@ -36,9 +35,10 @@ public class ProductController {
      * - 로그인한 판매자의 상점을 찾고
      * - 해당 상점의 모든 상품을 조회하여
      * - product-list.html 에 전달한다.
+     * - 1~10 페이지 묶음 계산
      */
-    @GetMapping("")
-    public String list(Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
+    @GetMapping("products")
+    public String list(@RequestParam(defaultValue = "0") int page, Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
 
         // 1) 로그인 정보 가져오기
         MemberEntity loginMember = principal.getMember();
@@ -46,12 +46,29 @@ public class ProductController {
         // 2) 로그인한 회원의 상점 정보 조회
         ShopEntity shop = shopService.findByMemberNo(loginMember.getMemberNo());
 
-        // 3) 해당 상점의 상품 목록 조회
-        model.addAttribute("productList",
-                productService.findByShopNo(shop.getShopNo()));
+        if(shop == null){
+            // 상점 정보가 없으면 에러 페이지 or 상점 등록 페이지로 리다이렉트
+            return "redirect:/shop/register/step"; // 예: 상점 등록 페이지로 리다이렉트
+        }
 
-        // 4) 목록 화면으로 이동
-        return "shop/products/product-list";
+        // 3) 페이징 처리된 상품 목록 조회 (한 페이지 당 10개)
+        Page<ProductEntity> productPage = productService.findByShopNo(shop.getShopNo(), page, 10);
+
+        // 4) 1~10 페이지 묶음 계산
+        int currentPage = productPage.getNumber();
+        int totalPages = productPage.getTotalPages();   // 전체 페이지 수 
+        int startPage = (currentPage / 10) * 10;       // 시작 페이지 번호
+        int endPage = Math.min(startPage + 9, totalPages - 1); // 끝 페이지 번호, 총 페이지 수를 넘지 않도록
+
+        // 5) 화면에 전달할 데이터
+        model.addAttribute("productList", productPage.getContent()); // 현재 페이지의 상품 목록
+        model.addAttribute("productPage", productPage);              // 페이지 정보
+        model.addAttribute("currentPage", currentPage); // 현재 페이지 번호
+        model.addAttribute("startPage", startPage);     // 시작 페이지 번호
+        model.addAttribute("endPage", endPage);         // 끝 페이지 번호
+
+        // 6) 상품 관리 화면으로 이동
+        return "shop/shop-products";
     }
 
     /**
@@ -61,10 +78,10 @@ public class ProductController {
      * 빈 ProductEntity 를 모델에 넣어
      * form 에서 th:object 로 활용한다.
      */
-    @GetMapping("/add")
+    @GetMapping("products/add")
     public String addForm(Model model) {
         model.addAttribute("product", new ProductEntity());
-        return "shop/products/product-add";
+        return "shop/shop-product-add";
     }
 
     /**
@@ -76,24 +93,34 @@ public class ProductController {
      * - 이미지 파일 저장
      * - 상품 엔티티 생성 및 저장(ProductService.save)
      */
-    @PostMapping("/add")
+    @PostMapping("products/add")
     public String addProduct(@ModelAttribute ProductEntity product,
-                            @RequestParam("imgFile") MultipartFile imgFile,
+                            @RequestParam("image") MultipartFile imageFile,
                             @AuthenticationPrincipal CustomSecurityDetail principal) throws Exception {
 
         // 로그인 회원 정보
         MemberEntity loginMember = principal.getMember();
+        // 로그인 회원의 상점 정보 조회
         ShopEntity shop = shopService.findByMemberNo(loginMember.getMemberNo());
 
         // 1) 필수값 세팅
+        // 상점 연결
         product.setShop(shop);
         product.setCreatedAt(LocalDateTime.now());
 
         // 2) 이미지 저장 처리
-        if (!imgFile.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + imgFile.getOriginalFilename();
+        if (!imageFile.isEmpty()) {
+            String fileName = System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
             String savePath = "C:/upload/product/" + fileName;
-            imgFile.transferTo(new File(savePath));
+
+            // 디렉토리 없으면 생성
+            File directory = new File("C:/upload/product/");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+
+            imageFile.transferTo(new File(savePath));
+            // 엔티티에 파일명 저장
             product.setImgUrl(fileName);
         }
 
@@ -117,6 +144,7 @@ public class ProductController {
         // 수정할 상품 조회
         ProductEntity product = productService.findById(id);
 
+        // 모델에 상품 정보 담기
         model.addAttribute("product", product);
         return "shop/products/product-edit";
     }
@@ -154,6 +182,7 @@ public class ProductController {
             String savePath = "C:/upload/product/" + fileName;
             imgFile.transferTo(new File(savePath));
 
+            // 엔티티에 파일명 저장
             product.setImgUrl(fileName);
         }
 
@@ -173,6 +202,7 @@ public class ProductController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") Long id) {
 
+        // 상품 삭제 처리 (soft delete)
         productService.delete(id);
 
         return "redirect:/shop/products";

@@ -6,24 +6,23 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Shop Products - 모두의빵 판매자센터</title>
+    <title>상품 관리 - 모두의빵 판매자센터</title>
 
     <style>
-        /* 전체 컨테이너 */
+        /* 전체 레이아웃 */
         .products-container {
             width: 100%;
             padding: 25px;
             box-sizing: border-box;
         }
 
-        /* 제목 */
         .page-title {
             font-size: 22px;
             font-weight: 700;
             margin-bottom: 15px;
         }
 
-        /* 상단 상품 등록 버튼 */
+        /* 상단 버튼 */
         .top-bar {
             display: flex;
             justify-content: flex-end;
@@ -37,7 +36,6 @@
             font-size: 14px;
             cursor: pointer;
             border-radius: 6px;
-            transition: 0.2s;
         }
         .btn-add-product:hover {
             background: #000;
@@ -56,11 +54,10 @@
 
         .product-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
 
-        /* 좌측 정보 */
         .product-info {
             display: flex;
             flex-direction: column;
@@ -83,10 +80,16 @@
             color: #444;
         }
 
-        /* 오른쪽 버튼 그룹 */
+        /* 우측 액션 영역 */
         .product-actions {
             display: flex;
             gap: 8px;
+            align-items: center;
+        }
+
+        .status-select {
+            padding: 6px;
+            font-size: 13px;
         }
 
         .btn-small {
@@ -96,29 +99,42 @@
             font-size: 13px;
             cursor: pointer;
             border-radius: 5px;
-            transition: 0.2s;
         }
         .btn-small:hover {
             background: #000;
             color: #fff;
         }
 
-        .btn-status {
-            background: #f4f4f4;
+        /* 페이징 */
+        .pagination {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .pagination a {
+            margin: 0 4px;
+            text-decoration: none;
+            color: #000;
+        }
+
+        .pagination a.current {
+            font-weight: bold;
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
 
+<!-- 공통 레이아웃 content 영역 -->
 <div layout:fragment="content">
 
     <div class="products-container">
 
-        <!-- 페이지명 -->
+        <!-- 페이지 제목 -->
         <div class="page-title">상품 관리</div>
 
-        <!-- 상단 상품 등록 버튼 -->
+        <!-- 상품 등록 -->
         <div class="top-bar">
             <button class="btn-add-product"
                     th:onclick="|location.href='@{/shop/products/add}'|">
@@ -126,18 +142,20 @@
             </button>
         </div>
 
-        <!-- 상품 리스트 반복 -->
+        <!-- 상품 목록 -->
         <div class="product-card" th:each="p : ${productList}">
             <div class="product-row">
 
-                <!-- 좌측 상품 정보 -->
+                <!-- 상품 정보 -->
                 <div class="product-info">
-                    <div class="product-time" th:text="${p.createdAt}">
+                    <div class="product-time"
+                         th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">
                         등록일
                     </div>
 
-                    <div class="product-name" th:text="${p.name}">
-                        상품 이름
+                    <div class="product-name"
+                         th:text="${p.productName}">
+                        상품명
                     </div>
 
                     <div class="product-price">
@@ -145,39 +163,69 @@
                     </div>
                 </div>
 
-                <!-- 오른쪽 버튼 -->
+                <!-- 상태 / 수정 / 삭제 -->
                 <div class="product-actions">
 
+                    <!-- 상태 변경 (Enum name 기준) -->
                     <select class="status-select"
-                            th:data-id="${p.id}"
-                            th:value="${p.status}">
-                        <option value="SELLING">판매중</option>
-                        <option value="STOPPED">중지</option>
-                        <option value="SOLD_OUT">품절</option>
+                            th:data-id="${p.productNo}">
+
+                        <option value="ON_SALE"
+                                th:selected="${p.status.name() == 'ON_SALE'}">
+                            판매중
+                        </option>
+
+                        <option value="SOLD_OUT"
+                                th:selected="${p.status.name() == 'SOLD_OUT'}">
+                            품절
+                        </option>
+
+                        <option value="DELETED"
+                                th:selected="${p.status.name() == 'DELETED'}">
+                            삭제
+                        </option>
                     </select>
 
                     <button class="btn-small"
-                            th:onclick="|location.href='@{/shop/products/edit/{id}(id=${p.id})}'|">
+                            th:onclick="|location.href='@{/shop/products/edit/{id}(id=${p.productNo})}'|">
                         수정
                     </button>
 
                     <button class="btn-small"
-                            th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/shop/products/delete/{id}(id=${p.id})}'|">
+                            th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/shop/products/delete/{id}(id=${p.productNo})}'|">
                         삭제
                     </button>
                 </div>
-
             </div>
         </div>
 
         <!-- 상품 없을 때 -->
-        <div th:if="${productList.size() == 0}" style="text-align:center; margin-top:40px; color:#777;">
+        <div th:if="${productList.size() == 0}"
+             style="text-align:center; margin-top:40px; color:#777;">
             아직 등록된 상품이 없습니다.
         </div>
 
+        <!-- 페이징 (1~10 묶음) -->
+        <div class="pagination">
+            <a th:if="${startPage > 0}"
+               th:href="@{/shop/products(page=${startPage - 1})}">
+                ◀
+            </a>
+
+            <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                <a th:href="@{/shop/products(page=${i})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == currentPage} ? 'current' : ''">
+                </a>
+            </span>
+
+            <a th:if="${endPage + 1 < productPage.totalPages}"
+               th:href="@{/shop/products(page=${endPage + 1})}">
+                ▶
+            </a>
+        </div>
+        
     </div>
-
 </div>
-
 </body>
 </html>

@@ -73,7 +73,8 @@ public class SecurityConfig {
                                                 // - 정적리소스(css,js,image,fonts,lib 등) 정적인 리소스는 접근 가능하도록 설정
                                                 // 로그인 페이지에 접근하기 위해서는 로그인하지 않아도 접근(접속)할 수 있도록 설정하는 것.
                                                 // - permitAll()은 Security가 내부적으로 익명의 사용자(AnonymousUser)도 접근 허용하게 만들어준다.
-                                                .requestMatchers("/rider/login", "/rider/register/*", "/css/**",
+                                                .requestMatchers("/rider/login", "/rider/register/*",
+                                                                "/rider/revision-request/*", "/css/**",
                                                                 "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
                                                 .permitAll()
@@ -259,6 +260,13 @@ public class SecurityConfig {
                                                 .successHandler(customLoginSuccessHandler) // 로그인 성공 시 처리
                                                 .failureHandler(customAuthFailureHandler) // 로그인 실패 시 처리
                                 )
+                                .logout(logout -> logout
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/shop/logout", "GET"))
+                                                .logoutSuccessUrl("/shop/login")
+                                                .invalidateHttpSession(true)
+                                                .deleteCookies("JSESSIONID")
+                                )
+
 
                                 /* 개발 단계에서 CSRF 비활성화 */
                                 .csrf(csrf -> csrf.disable());
@@ -349,7 +357,10 @@ public class SecurityConfig {
                                  * -> 이 체인은 /member/**, /, /main, /css/**, /js/**, /images/** 경로에 적용
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
-                                // .securityMatcher("/member/**", "/**")
+
+                                .securityMatcher("/member/**")
+                             // .securityMatcher("/member/**", "/**")
+
                                 // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
                                 // /**이라고 경로를 지정하는게 보안에 의미가 없고,
                                 // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.

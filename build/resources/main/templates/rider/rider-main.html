@@ -1,546 +1,78 @@
-<!--
-******************************************
-*  Created On : 2025. 11. 25.
-*  File : rider-main.html
-*******************************************
- -->
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="_csrf" th:content="${_csrf.token}" />
-        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-        <!-- JQuery CDN -->
-        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-        <!-- SweetAlert2 CDN -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <!-- BootStrap CDN -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-        <title>모두의 빵</title>
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
-            }
-
-            body {
-                display: flex;
-                justify-content: center; /* 가로 중앙 */
-                align-items: center; /* 세로 중앙 */
-                background: #f4f4f4; /* 선택 */
-            }
-            /* 페이지 전체 레이아웃 컨테이너 (사이드바 + 메인) */
-            .layout-wrapper {
-                display: flex;
-                flex-direction: row;
-                min-width: 1000px;
-                width: 90vw;
-                height: 90vh;
-                border: 1px solid black;
-            }
-            /* 사이드바 영역 */
-            .wrapper-sidebar {
-                min-width: 300px;
-                flex: 2.5;
-                height: 100%;
-                border: 1px solid red;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .sidebar-top {
-                flex: none; /* flex에 의한 비율 무효화 */
-                height: 20%; /* 부모 높이의 20% 정확히 */
-                padding: 10px; /* 상하좌우 10px */
-                box-sizing: border-box;
-                display: flex;
-                align-items: center;
-                flex-direction: column;
-            }
-
-            .top-timezone {
-                margin: 5px 10px;
-                font-size: 15px;
-                font-weight: 500;
-                color: #0e0e0e; /* 글씨 흰색 */
-            }
-
-            .top-delivery-info {
-                border: 1px solid black;
-                padding: 10px;
-                width: 100%;
-                height: 100%;
-                align-items: center;
-            }
-
-            .top-delivery-info {
-                font-weight: bold;
-                background-color: #444; /* 어두운 배경 */
-                border-radius: 8px;
-                text-align: center;
-                color: #fff;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-            }
-
-            .timeline {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: #111;
-                padding: 10px 15px;
-                border-radius: 10px;
-                gap: 20px;
-            }
-            /* 각 단계 */
-            .step {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                position: relative;
-            }
-
-            /* 시간 */
-            .step .time {
-                font-size: 12px;
-                color: #aaa;
-                margin-bottom: 4px;
-                min-height: 16px; /* 최소 높이 확보 */
-                line-height: 16px; /* 빈 경우에도 공간 유지 */
-            }
-
-            /* 원형 표시 */
-            .step .circle {
-                width: 14px;
-                height: 14px;
-                border-radius: 50%;
-                border: 2px solid #555;
-                background: #111;
-                position: relative;
-            }
-
-            /* 완료된 단계 (초록색) */
-            .step.done .circle {
-                background: #00c853;
-                border-color: #00c853;
-            }
-
-            /* 현재 단계 (흰색) */
-            .step.active .circle {
-                background: #fff;
-                border-color: #fff;
-            }
-
-            /* 텍스트 라벨 */
-            .step .label {
-                font-size: 13px;
-                margin-top: 4px;
-                color: #ddd;
-            }
-
-            /* 연결선 */
-            .step:not(:last-child)::after {
-                content: '';
-                position: absolute;
-                top: 21px;
-                left: 50%;
-                width: 100%;
-                height: 2px;
-                background: #555;
-                z-index: -1;
-            }
-
-            /* 완료된 구간 선 */
-            .step.done:not(:last-child)::after {
-                background: #00c853;
-            }
-
-            .sidebar-bottom {
-                width: 100%;
-                flex: 8;
-                border: 1px solid blueviolet;
-                padding: 10px;
-            }
-            .bottom-main {
-                width: 100%;
-                height: 100%;
-                border: 1px solid black;
-            }
-
-            /* 각 섹션 (금액/연락처/주소/메모) */
-            .delivery_detail {
-                padding: 15px;
-                /* min-height: 490px;
-                max-height: 700px; */
-                height: 100%;
-                border-radius: 10px;
-                background: #222; /* 다크 배경 */
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
-                color: #fff;
-            }
-            .delivery_title {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin: 12px 0;
-                font-size: 14px;
-            }
-            .delivery_title span {
-                font-weight: 600;
-                color: #fff;
-            }
-
-            /* input, textarea */
-            .custom-h-input {
-                color: #eee;
-                border: none;
-                background: transparent;
-                text-align: right;
-                margin-right: 10px;
-                width: 100%;
-                pointer-events: none; /* 읽기전용 */
-            }
-            #delivery_address,
-            #shop_address {
-                padding: 6px 10px;
-                width: 100%;
-                text-align: right;
-                max-width: 250px;
-                font-size: 14px;
-                line-height: 1.5;
-                border-radius: 6px;
-                background: rgba(0, 0, 0, 0);
-                color: #fff;
-                overflow-wrap: break-word; /* 긴 주소 줄바꿈 */
-                white-space: pre-wrap; /* 줄바꿈 유지 */
-            }
-
-            /* 고객 메모 */
-            .delivery_title.flex-column {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .delivery_title.flex-column span {
-                margin-bottom: 6px;
-            }
-            .delivery_title.flex-column .card {
-                width: 100%;
-                padding: 8px;
-                background: #2a2a2a;
-                color: #fff;
-            }
-
-            .order-box {
-                background-color: #111; /* 아주 어두운 배경 */
-                color: #fff; /* 글씨 흰색 */
-                padding: 12px 16px;
-                border-radius: 12px;
-                word-break: break-word;
-                font-size: 14px;
-                line-height: 1.6;
-
-                overflow-y: auto;
-                margin-top: 6px;
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-                width: 100%;
-                max-height: 90px;
-                overflow-y: auto;
-                scrollbar-gutter: stable;
-            }
-
-            /* 부모 div */
-            .delivery_title.flex-column > div {
-                width: 100%;
-            }
-            .delivery_title > div {
-                height: auto;
-            }
-
-            /* 주문 항목 */
-            .order-box p {
-                margin: 0 0 6px 0;
-                padding-left: 8px;
-                font-size: 14px;
-                position: relative;
-            }
-            .order-box p:before {
-                content: '•';
-                position: absolute;
-                left: 0;
-                color: #ffcd39; /* 노란 포인트 */
-                font-size: 14px;
-            }
-            .order-box p:last-child {
-                margin-bottom: 0;
-            }
-
-            /* 스크롤바 */
-            .order-box::-webkit-scrollbar {
-                width: 10px;
-            }
-            .order-box::-webkit-scrollbar-thumb {
-                background: #555;
-                border-radius: 12px;
-            }
-            .order-box::-webkit-scrollbar-track {
-                background: #222;
-                border-radius: 12px;
-            }
-
-            /* 메인 영역 (메인 헤더 + 메인 컨텐츠)*/
-            .wrapper-main {
-                min-width: 700px;
-                flex: 7.5;
-                height: 100%;
-                border: 1px solid orange;
-                display: flex;
-                flex-direction: column;
-            }
-
-            /* 메인 헤더 영역 */
-            .main-header {
-                flex: 2;
-                width: 100%;
-                border: 2px solid purple;
-                display: flex;
-                flex-direction: column;
-            }
-
-            .header-top {
-                display: flex;
-                justify-content: space-between;
-                flex: 4;
-                border: 1px solid red;
-                padding: 10px;
-            }
-            .header-bottom {
-                flex: 6;
-                border: 1px solid silver;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-end;
-                padding: 0px 10px;
-            }
-            .navbar {
-                padding-bottom: 0;
-            }
-            .nav-link {
-                width: 100px;
-                font-size: 1.3em;
-                text-align: center;
-                color: #000000;
-            }
-            .nav-link .active {
-            }
-            .nav-link:hover {
-                background-color: #acabab;
-                color: blue;
-            }
-            .main-content {
-                flex: 8;
-                width: 100%;
-                border: 2px solid green;
-            }
-        </style>
-    </head>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{rider/layout_base}">
     <body>
-        <div class="layout-wrapper">
-            <aside class="wrapper-sidebar">
-                <!-- 사이드바 -->
-                <div class="sidebar-top">
-                    <div class="top-timezone">
-                        <span class="timezone">
-                            <span class="timezone_hour">11</span>
-                            :
-                            <span class="timezone_min">20</span>
-                            :
-                            <span class="timezone_sec">30</span>
-                        </span>
-                    </div>
-                    <div class="top-delivery-info card">
-                        <div class="step requested done">
-                            <div class="time">14:00</div>
-                            <div class="circle"></div>
-                            <div class="label">요청</div>
-                        </div>
-                        <div class="step assigned active">
-                            <div class="time">15:30</div>
-                            <div class="circle"></div>
-                            <div class="label">배차</div>
-                        </div>
-                        <div class="step pickup">
-                            <div class="time"></div>
-                            <div class="circle"></div>
-                            <div class="label">픽업</div>
-                        </div>
-                        <div class="step">
-                            <div class="time"></div>
-                            <div class="circle"></div>
-                            <div class="label">완료</div>
+        <div class="sidebar-bottom" layout:fragment="sidebar-bottom">
+            <div class="bottom-main">
+                <div class="delivery_detail card px-3">
+                    <div class="delivery_title">
+                        <span>매장연락처</span>
+                        <div class="d-flex">
+                            <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
                         </div>
                     </div>
-                </div>
-                <div class="sidebar-bottom">
-                    <div class="bottom-main">
-                        <div class="delivery_detail card px-3">
-                            <div class="delivery_title">
-                                <span>매장연락처</span>
-                                <div class="d-flex">
-                                    <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
-                                </div>
+                    <div class="delivery_title">
+                        <span>매장주소</span>
+                        <div id="shop_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
+                    </div>
+                    <div class="delivery_title">
+                        <span>금액</span>
+                        <div class="d-flex">
+                            <input type="text" name="orderPrice" id="orderPrice" class="custom-h-input order-price" value="100,000" />
+                        </div>
+                    </div>
+                    <div class="delivery_title">
+                        <span>고객연락처</span>
+                        <div class="d-flex">
+                            <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
+                        </div>
+                    </div>
+                    <div class="delivery_title">
+                        <span>배달주소</span>
+                        <div id="delivery_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
+                    </div>
+                    <div class="delivery_title flex-column">
+                        <span>고객 메모</span>
+                        <div>
+                            <div class="order-box order-request">
+                                <p>배달 완료시 노크/벨 누르지 말아주세요.</p>
                             </div>
-                            <div class="delivery_title">
-                                <span>매장주소</span>
-                                <div id="shop_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
-                            </div>
-                            <div class="delivery_title">
-                                <span>금액</span>
-                                <div class="d-flex">
-                                    <input type="text" name="orderPrice" id="orderPrice" class="custom-h-input order-price" value="100,000" />
-                                </div>
-                            </div>
-                            <div class="delivery_title">
-                                <span>고객연락처</span>
-                                <div class="d-flex">
-                                    <input type="text" name="orderPhone" id="orderPhone" class="custom-h-input" value="010-0000-0000" />
-                                </div>
-                            </div>
-                            <div class="delivery_title">
-                                <span>배달주소</span>
-                                <div id="delivery_address">경기도 부천시 소사로 000번길 00 호랑이하우스 000호</div>
-                            </div>
-                            <div class="delivery_title flex-column">
-                                <span>고객 메모</span>
-                                <div>
-                                    <div class="order-box order-request">
-                                        <p>배달 완료시 노크/벨 누르지 말아주세요.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="delivery_title flex-column">
-                                <span>주문 내역</span>
-                                <div>
-                                    <div class="order-box order-details">
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                        <p>호빵 4개 11,000원</p>
-                                    </div>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="delivery_title flex-column">
+                        <span>주문 내역</span>
+                        <div>
+                            <div class="order-box order-details">
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
+                                <p>호빵 4개 11,000원</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- menu -->
-            </aside>
-
-            <main class="wrapper-main">
-                <!-- 메인 콘텐츠 -->
-
-                <section class="main-header">
-                    <!-- 헤더 -->
-                    <div class="header-top">
-                        <div class="top-left">
-                            <span>
-                                보유 포인트 :
-                                <span>10,000 원</span>
-                            </span>
-                        </div>
-                        <div class="top-right">
-                            <button sec:authorize="isAuthenticated()" id="logoutBtn" type="button">로그아웃</button>
-                        </div>
-                    </div>
-                    <div class="header-bottom">
-                        <!-- <nav class="navbar navbar-expand-lg bg-light px-3">
-                            <ul class="navbar-nav">
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page" href="#">전체</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">대기</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">수락</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">배달</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">완료</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="#">내정보</a>
-                                </li>
-                            </ul>
-                        </nav> -->
-                        <nav class="navbar">
-                            <ul class="nav nav-tabs gap-1">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link active" aria-current="page">전체</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">대기</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">수락</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">배달</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">완료</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">내정보</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </section>
-
-                <section class="main-content">
-                    <!-- 내용 -->
-                    ...
-                    <span th:text="${#authentication.principal.member.rider.riderLicenseFile.licenseFile}"></span>
-
-                    <img th:src="" alt="" />
-                </section>
-            </main>
+            </div>
         </div>
 
-        <script th:inline="javascript">
-            // 모든 jQuery AJAX 요청에 CSRF 헤더 자동 첨부
-            $(function () {
-                const token = $('meta[name="_csrf"]').attr('content');
-                const header = $('meta[name="_csrf_header"]').attr('content');
-                $(document).ajaxSend(function (e, xhr) {
-                    if (token && header) xhr.setRequestHeader(header, token);
-                });
-            });
-
-            $('#logoutBtn').on('click', function () {
-                $.ajax({
-                    url: '/rider/logout',
-                    type: 'POST',
-                    success: function () {
-                        window.location.href = '/rider/login';
-                    },
-                });
-            });
-        </script>
+        <th:block layout:fragment="content">
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
+            <h3 th:text="${#authentication.principal.member.rider.licenseFile}"></h3>
+        </th:block>
     </body>
 </html>

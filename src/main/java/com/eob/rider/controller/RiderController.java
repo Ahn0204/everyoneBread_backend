@@ -12,12 +12,13 @@ import org.springframework.validation.BindingResult;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.eob.common.security.CustomDetailService;
 import com.eob.common.security.CustomSecurityDetail;
-import com.eob.common.util.FileUploadUtil;
-import com.eob.common.util.FileValidationException;
+import com.eob.common.util.FileUtil;
+import com.eob.common.util.CustomFileException;
 import com.eob.common.util.StringUtil;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
@@ -60,13 +61,64 @@ public class RiderController {
     public String loginForm(HttpSession session, Model model) {
         // session에 저장된 loginErrorMessage 가져오기
         String errorMsg = (String) session.getAttribute("loginErrorMessage");
+        Long riderNo = (Long) session.getAttribute("riderNo");
         // 저장된 errorMsg가 있을 경우 Model을 통해 페이지로 값 전송 및 해당 에러 메세지 지우기 (flashAttribute처럼 행동)
         if (errorMsg != null) {
             model.addAttribute("errorMsg", errorMsg);
+            model.addAttribute("riderNo", riderNo);
             session.removeAttribute("loginErrorMessage");
         }
 
         return "rider/rider-login";
+    }
+
+    // 라이더 서류 정보 수정 페이지 이동 메서드
+    @GetMapping("/revision-request/{param}")
+    public String revisionRequest(@PathVariable(name = "param") long param, HttpSession session, Model model,
+            RiderRegisterForm riderRegisterForm) {
+        // session에 저장된 riderNo 가져오기
+        Long riderNo = (Long) session.getAttribute("riderNo");
+        // riderNo가 session에 없거나 해당 접근 권한이 없을때
+        if (riderNo == null || riderNo == 0 || param != riderNo) {
+            model.addAttribute("icon", "error");
+            model.addAttribute("title", "접근 차단");
+            model.addAttribute("msg", "잘못된 접근입니다.");
+            model.addAttribute("loc", "/rider/login");
+            return "comm/msg";
+        }
+
+        RiderEntity rider = this.riderService.getRider(riderNo);
+        riderRegisterForm.setDriverLicense(rider.getRiderLicense());
+        riderRegisterForm.setLicenseCreatedAt(rider.getLicenseCreatedAt());
+        model.addAttribute("rider", rider);
+
+        return "rider/rider-revision";
+    }
+
+    // 라이더 서류 정보 저장 메서드
+    @PostMapping("/revision-request")
+    public String revisionRequest(RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
+            HttpSession session, Model model) {
+        // TODO: process POST request
+        Long riderNo = (Long) session.getAttribute("riderNo");
+        if (bindingResult.hasErrors()) {
+            return "redirect:/rider/revision-request/" + riderNo;
+        }
+        try {
+            this.riderService.updateRevisionRequest(riderRegisterForm, riderNo);
+        } catch (CustomFileException e) {
+            bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
+            return "redirect:/rider/revision-request/" + riderNo;
+        } catch (Exception e) {
+            return "redirect:/rider/revision-request/" + riderNo;
+        }
+
+        session.removeAttribute("riderNo");
+        model.addAttribute("icon", "success");
+        model.addAttribute("title", "제출 성공");
+        model.addAttribute("msg", "서류가 정상적으로 제출되었습니다.");
+        model.addAttribute("loc", "/rider/login");
+        return "comm/msg";
     }
 
     // 회원가입 이동 메서드
@@ -135,7 +187,7 @@ public class RiderController {
             this.riderService.registerMember(memberForm, riderRegisterForm);
 
             return "redirect:/rider/register/complete";
-        } catch (FileValidationException e) {
+        } catch (CustomFileException e) {
             bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
             return "rider/rider-register-step";
         } catch (Exception e) {

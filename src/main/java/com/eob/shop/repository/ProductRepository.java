@@ -1,16 +1,14 @@
 package com.eob.shop.repository;
 
 import com.eob.shop.model.data.ProductEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
-    /**
-     * ShopEntity(shopNo) 기준으로 상품 목록 조회
-     * - JPA 규칙에 따라 shop.shopNo 로 접근하는 메서드명
-     */
-    List<ProductEntity> findByShop_ShopNo(Long shopNo);
+    // 특정 상점(shopNo)의 상품 목록 페이징 조회
+    Page<ProductEntity> findByShop_ShopNo(Long shopNo, Pageable pageable);
 
 }

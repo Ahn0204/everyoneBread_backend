@@ -14,14 +14,14 @@ package com.eob.common.util;
  *
  * 위와 같은 상황에서 throw new FileValidationException("메시지") 형태로 사용합니다.
  */
-public class FileValidationException extends RuntimeException {
+public class CustomFileException extends RuntimeException {
 
     /**
      * 예외 메시지를 부모 클래스(RuntimeException)에 전달하는 생성자
      *
      * @param message : 예외 발생 시 전달할 상세 메시지
      */
-    public FileValidationException(String message) {
+    public CustomFileException(String message) {
         super(message);
     }
 }
