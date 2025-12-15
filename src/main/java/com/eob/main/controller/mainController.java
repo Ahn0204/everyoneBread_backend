@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eob.admin.model.data.CategoryEntity;
-import com.eob.admin.repository.CategoryRepository;
+import com.eob.admin.model.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
