@@ -13,7 +13,12 @@
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
-        <div layout:fragment="content">main 페이지 내용내용</div>
+        <div layout:fragment="content">
+            <!--위치 설정 box-->
+            <div class="m-3">
+                <div th:replace="~{main/getLocation}"></div>
+            </div>
+        </div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script">
