@@ -264,9 +264,7 @@ public class SecurityConfig {
                                                 .logoutRequestMatcher(new AntPathRequestMatcher("/shop/logout", "GET"))
                                                 .logoutSuccessUrl("/shop/login")
                                                 .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID")
-                                )
-
+                                                .deleteCookies("JSESSIONID"))
 
                                 /* 개발 단계에서 CSRF 비활성화 */
                                 .csrf(csrf -> csrf.disable());
@@ -358,8 +356,8 @@ public class SecurityConfig {
                                  * -> 즉, 회원 관련 기능과 메인 페이지, 정적 리소스에 대한 보안 설정을 담당
                                  */
 
-                                .securityMatcher("/member/**")
-                             // .securityMatcher("/member/**", "/**")
+                                .securityMatcher("/member/**", "/**")
+                                // .securityMatcher("/member/**", "/**")
 
                                 // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
                                 // /**이라고 경로를 지정하는게 보안에 의미가 없고,
@@ -376,6 +374,12 @@ public class SecurityConfig {
                                  * 
                                  * 2025/12/04
                                  * 회원가입 - 일반/비즈니스 계정 선택 시 지속적으로 로그인 페이지로 튕기는 문제 발생
+                                 */
+
+                                /*
+                                 * 병주
+                                 * 시큐리티 에 "/**" 해당 매처가 없으면 sec:authorize를 사용 못해요..
+                                 * 그래서 해당 securityMatcher가 있어야 함니다..
                                  */
 
                                 .authenticationProvider(customAuthenticationProvider())
