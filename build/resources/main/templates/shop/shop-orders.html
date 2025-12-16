@@ -102,28 +102,28 @@
             <!-- 대기 -->
             <a th:href="@{/shop/orders(status=WAIT)}"
             class="status-tab"
-            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).WAIT} ? 'active'">
+            th:classappend="${status != null and status.name() == 'WAIT'} ? 'active'">
                 대기
             </a>
 
             <!-- 준비 -->
             <a th:href="@{/shop/orders(status=PREPARE)}"
             class="status-tab"
-            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).PREPARE} ? 'active'">
+            th:classappend="${status != null and status.name() == 'PREPARE'} ? 'active'">
                 준비
             </a>
 
             <!-- 배송중 -->
             <a th:href="@{/shop/orders(status=DELIVERING)}"
             class="status-tab"
-            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).DELIVERING} ? 'active'">
+            th:classappend="${status != null and status.name() == 'DELIVERING'} ? 'active'">
                 배송중
             </a>
 
             <!-- 완료 -->
             <a th:href="@{/shop/orders(status=COMPLETE)}"
             class="status-tab"
-            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).COMPLETE} ? 'active'">
+            th:classappend="${status != null and status.name() == 'COMPLETE'} ? 'active'">
                 완료
             </a>
         </div>

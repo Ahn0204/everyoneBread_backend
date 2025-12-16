@@ -1,5 +1,6 @@
 package com.eob.order.model.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -81,6 +82,36 @@ public class OrderService {
         // 3. 거절 처리
         order.setStatus(OrderStatus.REJECT);
         order.setRejectReason(reason);
+    }
+
+    /**
+     * [판매자]
+     * 오늘 주문 수 조회
+     */
+    @Transactional(readOnly = true)
+    public long countTodayOrders(Long shopNo) {
+        // 오늘 날짜의 시작과 끝 시간 계산
+        LocalDateTime start = LocalDateTime.now().toLocalDate().atStartOfDay();
+        // 오늘 날짜의 끝 시간은 내일 00:00:00에서 1나노초 뺀 시간
+        LocalDateTime end = start.plusDays(1).minusNanos(1);
+        // 조회
+        return orderHistoryRepository.countTodayOrders(shopNo, start, end);
+    }
+
+    /**
+     * [판매자]
+     * 상태별 주문 수 조회
+     */
+    @Transactional(readOnly = true)
+    public long countByStatus(Long shopNo, OrderStatus status) {
+        return orderHistoryRepository.countByShop_ShopNoAndStatus(shopNo, status);
+    }
+
+    // 단일 주문 조회
+    @Transactional(readOnly = true)
+    public OrderHistoryEntity findById(Long orderNo) {
+        return orderHistoryRepository.findById(orderNo)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
     }
 
 
