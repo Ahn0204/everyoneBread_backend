@@ -74,6 +74,7 @@ public class SecurityConfig {
                                                 // 로그인 페이지에 접근하기 위해서는 로그인하지 않아도 접근(접속)할 수 있도록 설정하는 것.
                                                 // - permitAll()은 Security가 내부적으로 익명의 사용자(AnonymousUser)도 접근 허용하게 만들어준다.
                                                 .requestMatchers("/rider/login", "/rider/register/*",
+                                                                "/rider/revision-request",
                                                                 "/rider/revision-request/*", "/css/**",
                                                                 "/js/**", "/image/**",
                                                                 "/fonts/**", "/lib/**")
@@ -264,9 +265,7 @@ public class SecurityConfig {
                                                 .logoutRequestMatcher(new AntPathRequestMatcher("/shop/logout", "GET"))
                                                 .logoutSuccessUrl("/shop/login")
                                                 .invalidateHttpSession(true)
-                                                .deleteCookies("JSESSIONID")
-                                )
-
+                                                .deleteCookies("JSESSIONID"))
 
                                 /* 개발 단계에서 CSRF 비활성화 */
                                 .csrf(csrf -> csrf.disable());
@@ -359,7 +358,7 @@ public class SecurityConfig {
                                  */
 
                                 .securityMatcher("/member/**")
-                             // .securityMatcher("/member/**", "/**")
+                                // .securityMatcher("/member/**", "/**")
 
                                 // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
                                 // /**이라고 경로를 지정하는게 보안에 의미가 없고,

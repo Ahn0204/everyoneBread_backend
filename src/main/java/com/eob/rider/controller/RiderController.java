@@ -97,20 +97,21 @@ public class RiderController {
 
     // 라이더 서류 정보 저장 메서드
     @PostMapping("/revision-request")
-    public String revisionRequest(RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
+    public String revisionRequest(@Valid RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
             HttpSession session, Model model) {
+        System.out.println("rider/revision-request 실행");
         // TODO: process POST request
         Long riderNo = (Long) session.getAttribute("riderNo");
         if (bindingResult.hasErrors()) {
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         }
         try {
             this.riderService.updateRevisionRequest(riderRegisterForm, riderNo);
         } catch (CustomFileException e) {
             bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         } catch (Exception e) {
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         }
 
         session.removeAttribute("riderNo");
