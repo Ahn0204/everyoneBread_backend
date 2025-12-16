@@ -177,7 +177,8 @@ public class ShopController {
      */
     @GetMapping("check-id")
     @ResponseBody
-    public boolean checkShopMemberId(@RequestParam String memberId) {
+    public boolean checkShopMemberId(@RequestParam("memberId") String memberId) {
+        System.out.println("check-id 호출, memberId =" + memberId);
         return memberService.isMemberIdAvailable(memberId);
     }
 
@@ -186,7 +187,7 @@ public class ShopController {
      */
     @GetMapping("check-email")
     @ResponseBody
-    public boolean checkShopMemberEmail(@RequestParam String memberEmail) {
+    public boolean checkShopMemberEmail(@RequestParam("memberEmail") String memberEmail) {
         return memberService.isMemberEmailAvailable(memberEmail);
     }
 
