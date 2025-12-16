@@ -92,14 +92,44 @@
 
         <!-- 상태 탭 (더미 유지) -->
         <div class="status-tabs">
-            <a class="status-tab active">전체</a>
-            <a class="status-tab">대기</a>
-            <a class="status-tab">준비</a>
-            <a class="status-tab">배송중</a>
-            <a class="status-tab">완료</a>
+            <!-- 전체 -->
+            <a th:href="@{/shop/orders}"
+            class="status-tab"
+            th:classappend="${status == null} ? 'active'">
+                전체
+            </a>
+
+            <!-- 대기 -->
+            <a th:href="@{/shop/orders(status=WAIT)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).WAIT} ? 'active'">
+                대기
+            </a>
+
+            <!-- 준비 -->
+            <a th:href="@{/shop/orders(status=PREPARE)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).PREPARE} ? 'active'">
+                준비
+            </a>
+
+            <!-- 배송중 -->
+            <a th:href="@{/shop/orders(status=DELIVERING)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).DELIVERING} ? 'active'">
+                배송중
+            </a>
+
+            <!-- 완료 -->
+            <a th:href="@{/shop/orders(status=COMPLETE)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).COMPLETE} ? 'active'">
+                완료
+            </a>
         </div>
 
         <!-- ===== 대기 주문 (버튼 있음) ===== -->
+        <!-- 대기 더미 -->
         <div class="order-card">
             <div class="order-row">
                 <div class="order-left">
@@ -113,7 +143,7 @@
                 <div class="order-actions">
                     <button class="btn">수락</button>
                     <!-- 거절 버튼 → 모달 오픈 -->
-                    <button class="btn" onclick="openRejectModal(1)">거절</button>
+                    <button class="btn" th:onclick="|openRejectModal(${order.orderNo})">거절</button>
                 </div>
             </div>
         </div>
@@ -188,7 +218,7 @@
         <!-- 실제 서버 연동 시 action만 바꾸면 됨 -->
         <form method="post" id="rejectForm">
             <input type="hidden" name="orderNo" id="rejectOrderNo">
-            <textarea name="reason" placeholder="거절 사유를 입력해주세요."></textarea>
+            <textarea name="reason" placeholder="거절 사유를 입력해주세요." required></textarea>
 
             <div class="modal-actions">
                 <button type="button" class="btn" onclick="closeRejectModal()">취소</button>
@@ -198,12 +228,16 @@
     </div>
 </div>
 
-<!-- ===== JS (아주 최소) ===== -->
 <script>
     // 거절 모달 열기
     function openRejectModal(orderNo) {
-        document.getElementById('rejectModal').style.display = 'flex';
-        document.getElementById('rejectOrderNo').value = orderNo;
+        const modal = document.getElementById('rejectModal');
+        const form = document.getElementById('rejectForm');
+
+        // orderNo를 URL에 꽂아줌
+        form.action = `/shop/orders/${orderNo}/reject`;
+
+        modal.style.display = 'flex';
     }
 
     // 거절 모달 닫기
@@ -211,6 +245,5 @@
         document.getElementById('rejectModal').style.display = 'none';
     }
 </script>
-
 </body>
 </html>
