@@ -171,6 +171,26 @@ public class ShopController {
     }
 
     /**
+     * 판매자 회원가입 - 아이디 중복 확인
+     * true  : 사용 가능
+     * false : 이미 존재
+     */
+    @GetMapping("check-id")
+    @ResponseBody
+    public boolean checkShopMemberId(@RequestParam String memberId) {
+        return memberService.isMemberIdAvailable(memberId);
+    }
+
+    /**
+     * 판매자 회원가입 - 이메일 중복 확인
+     */
+    @GetMapping("check-email")
+    @ResponseBody
+    public boolean checkShopMemberEmail(@RequestParam String memberEmail) {
+        return memberService.isMemberEmailAvailable(memberEmail);
+    }
+
+    /**
      * 상점명 중복 체크
      * return true → 사용 가능
      * return false → 이미 존재

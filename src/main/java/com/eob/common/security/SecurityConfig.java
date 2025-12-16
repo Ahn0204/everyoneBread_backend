@@ -235,6 +235,8 @@ public class SecurityConfig {
                                                                 "/shop/register/step",
                                                                 "/shop/register/step/**",
                                                                 "/shop/login", // 판매자 로그인 페이지
+                                                                "/shop/check-id",
+                                                                "/shop/check-email",
                                                                 "/shop/check-name",
                                                                 "/css/**", "/js/**", "/image/**", "/fonts/**",
                                                                 "/lib/**")

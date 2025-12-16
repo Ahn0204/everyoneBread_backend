@@ -331,6 +331,8 @@
             <!-- 로그인 창 위에 header-->
             <div class="login-title">
                 <h1>라이더 전용 로그인</h1>
+                <span sec:authorize="isAnonymous()">[익명]</span>
+                <span sec:authorize="isAuthenticated()">[로그인]</span>
             </div>
             <!-- 로그인 card -->
             <div class="login-card">
