@@ -1,4 +1,4 @@
-package com.eob.admin.repository;
+package com.eob.admin.model.repository;
 
 import java.util.ArrayList;
 import java.util.Optional;

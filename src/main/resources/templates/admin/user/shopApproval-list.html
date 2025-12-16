@@ -8,67 +8,221 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/comm/admin-layout}">
     <head>
         <th:block layout:fragment="head">
-            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+            <link rel="stylesheet" th:href="@{/css/admin/comm/list-comm.css}" />
+            <style>
+                /*항목 너비 설정하는 레이아웃css*/
+                .div-cols {
+                    /*항목을 담는 div에 지정*/
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    padding: 20px 10px 10px 20px;
+                }
+                .div-col-1 {
+                    flex: 0.7;
+                } /* 번호 */
+                .div-col-2 {
+                    flex: 1;
+                } /* 상태 */
+                .div-col-3 {
+                    flex: 1.2;
+                } /* 아이디 */
+                .div-col-4 {
+                    flex: 1;
+                } /* 이름 */
+                .div-col-5 {
+                    flex: 1.5;
+                } /* 신청일시 */
+                .div-col-6 {
+                    flex: 1.5;
+                } /* 승인일시 */
+                .div-col-7 {
+                    flex: 1.5;
+                } /* 상점명 */
+                .div-col-8 {
+                    flex: 0.2;
+                } /* 펼치기 버튼 칸 */
+            </style>
         </th:block>
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
         <div layout:fragment="content">
-            <h3>입점승인 내역</h3>
-            <!--입점승인 신청내역 출력-->
-            <div calss="m-2" width="80%" max-width="1000px" min-width="700px">
-                <div class="d-flex flex-row border-bottom border-3 border-dark fw-b">
-                    <div class="p-2 flex-fill fw-bold">번호</div>
-                    <div class="p-2 flex-fill fw-bold">상태</div>
-                    <div class="p-2 flex-fill fw-bold">아이디</div>
-                    <div class="p-2 flex-fill fw-bold">이름</div>
-                    <div class="p-2 flex-fill fw-bold">상점명</div>
-                    <div class="p-2 flex-fill fw-bold">신청일시</div>
-                    <div class="p-2 flex-fill fw-bold">승인일시</div>
-                </div>
-                <!--상점 내역이 없을 때-->
-                <div class="d-flex" th:if="${noShop}">
-                    <div class="p-2 flex-fill" th:text="${noShop}"></div>
-                </div>
-                <!--상점 내역이 있을 때-->
-                <div th:unless="${noShop}">
-                    <!--미검토 APPLY_REVIEW 리스트-->
-                    <div class="d-flex flex-row border-bottom" th:each="shop : ${reviewList}">
-                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+            <div class="listAndList-header m-2">
+                <div class="list-header"><h3>입점 승인 내역</h3></div>
+                <div calss="list" style="max-width: 1000px; min-width: 800px">
+                    <div class="div-cols border-bottom border-3 border-dark fw-b text-center">
+                        <div class="div-col-1 fw-bold">번호</div>
+                        <div class="div-col-2 fw-bold">상태</div>
+                        <div class="div-col-3 fw-bold">아이디</div>
+                        <div class="div-col-4 fw-bold">이름</div>
+                        <div class="div-col-7 fw-bold">상점명</div>
+                        <div class="div-col-5 fw-bold">신청일시</div>
+                        <div class="div-col-6 fw-bold">승인일시</div>
+                        <div class="div-col-8"></div>
                     </div>
-                    <!--보완요청 APPLY_REJECT 리스트-->
-                    <div class="d-flex flex-row border-bottom" th:each="shop : ${rejectedList}">
-                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+                    <!--입점 신청 내역이 없을 때-->
+                    <div th:if="${noShop}">
+                        <div class="p-2 flex-fill" th:text="${noShop}"></div>
                     </div>
-                    <!--승인완료 APPLY_APPROVED 리스트-->
-                    <div class="d-flex flex-row border-bottom" th:each="shop : ${approvedList}">
-                        <div class="p-2 flex-fill" th:text="${shop.shopNo}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.status}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberId}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.member.memberName}"></div>
-                        <div class="p-2 flex-fill" th:text="${shop.shopName}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd hh:mm')}"></div>
-                        <div class="p-2 flex-fill" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd hh:mm')}"></div>
+                    <!--입점 신청 내역이 있을 때-->
+                    <div th:unless="${noShop}">
+                        <!--아코디언 속성이 적용된 리스트-->
+                        <div class="accordion" id="shopApproval-List">
+                            <!--미검토 PENDING, UNDER_REVIEW 리스트-->
+                            <!--항목 1개 : 목록에서 보이는 헤더 + 클릭 시 나타나는 바디 구성-->
+                            <div class="accordion-item" th:each="shop, loop : ${pendingList}">
+                                <!--내역마다 반복되는 출력부 fragment, 글번호 시작값 전달-->
+                                <div th:replace="~{/admin/user/shopApproval-common(start=${pendingStart})}"></div>
+                            </div>
+                            <!--보완요청 REVISION_REQUIRED 리스트-->
+                            <div class="accordion-item" th:each="shop,loop : ${rejectedList}">
+                                <div th:replace="~{/admin/user/shopApproval-common(start=${rejectedStart})}"></div>
+                            </div>
+                            <!--승인완료 APPROVED 리스트-->
+                            <div class="accordion-item" th:each="shop,loop : ${approvedList}">
+                                <div th:replace="~{/admin/user/shopApproval-common(start=${approvedStart})}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--면허증 사진 모달-->
+                    <!--모달 출력 시 뒷배경-->
+                    <div class="dimmed" aria-hidden="true" id="dimmed" style="display: none"></div>
+                    <!--사진 출력 모달-->
+                    <div class="modal-layer" id="modal-photo" style="display: none">
+                        <div class="modal">
+                            <div class="modal-top justyfy-content-between">
+                                <!--입력받은 정보-->
+                                <div id="license-info"></div>
+                                <!--닫기버튼-->
+                                <div class="closeBtn">&times;</div>
+                            </div>
+                            <!--사진-->
+                            <div class="modal-content">
+                                <img id="license-img" alt="면허증" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--페이지 블럭-->
+                    <div th:unless="${noShop}">
+                        <ul class="pagination justify-content-center p-2">
+                            <!--이전 버튼-->
+                            <li class="page-item" th:classappend="${!shopP.hasPrevious} ? 'disabled' ">
+                                <a class="page-link" th:text="이전" th:href="@{|?page=${shopP.number-1}|}"></a>
+                            </li>
+                            <!--페이지 숫자 버튼-->
+                            <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,shopP.totalPages-1)}" th:classappend="${pageNum == shopP.number} ? 'active'">
+                                <a class="page-link" th:href="@{|?page=${pageNum}|}" th:text="${pageNum}+1"></a>
+                            </li>
+                            <!--다음 버튼-->
+                            <li class="page-item" th:classappend="${!shopP.hasNext} ? 'disabled'">
+                                <a class="page-link" th:href="@{|?page=${shopP.number+1}|}" th:text="다음"></a>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
-        <script layout:fragment="script">
-            console.log('fragment 됨');
+        <script layout:fragment="script" th:inline="javascript">
+            //사진 보기
+            $('.show-license').on('click', function () {
+                const fileName = $(this).data('file');
+                const licenseNo = $(this).data('license');
+                const licenseCreatedAt = $(this).data('date');
+                if (fileName) {
+                    //상점 정보 가져오기
+                    $('#license-info').html(`<span>[` + licenseNo + ']&nbsp;' + licenseCreatedAt + `</span>`);
+                    //사진 가져오기
+                    $('#license-img').attr('src', '/upload/shop/licenseFile/' + fileName);
+                    //배경, 모달 보이기
+                    $('#dimmed, #modal-photo').show();
+                } else {
+                    //fileName이 없다면
+                    showToast('등록된 사진이 없습니다.', 'error');
+                }
+            });
+            //모달 - 닫기 버튼, dimmed 클릭
+            $('.closeBtn, #dimmed').on('click', function () {
+                //기존값 초기화
+                $('#license-img').removeAttr('src');
+                //배경, 모달 숨김
+                $('#dimmed, #modal-photo').hide();
+            });
+
+            //보완요청
+            $('.revision').on('click', function () {
+                //보완 버튼의.가장 가까운 조상'form'의.클래스shopNo 요소의.값;
+                const objectNo = $(this).closest('form').find('.shopNo').val();
+                const rejectReason = $(this).closest('form').find('.reject-reason').val();
+                if (rejectReason) {
+                    //보완 사유 선택됨
+                    const reasonText = $(this).closest('form').find('.reject-reason option:selected').text();
+                    showConfirmAlert(
+                        //자바스크립트 - ``(백틱) 내부에서 ${} 사용 가능
+                        `아래 사유로 보완을 요청합니다.\n[${reasonText}]`,
+                        //예
+                        () => {
+                            $.ajax({
+                                url: '/admin/user/shop/revision',
+                                type: 'POST',
+                                data: { objectNo: objectNo, rejectReason: rejectReason },
+                                success: function (success) {
+                                    if (success == true) {
+                                        showToast('보완이 요청되었습니다.', 'success');
+                                    } else {
+                                        showToast('다시 시도해주세요.', 'error');
+                                    }
+                                },
+                                error: function (error) {
+                                    showToast('다시 시도해주세요.', 'error');
+                                },
+                            });
+                        },
+                        //아니오
+                        () => {
+                            showToast('보완 요청이 취소되었습니다.', 'warning');
+                        }
+                    );
+                } else {
+                    //보완 사유 선택 안됨
+                    showToast('보완 사유를 선택해주세요.', 'warning');
+                }
+            });
+
+            //승인
+            $('.approval').on('click', function () {
+                //보완 버튼의.가장 가까운 조상'form'의.클래스shopNo 요소의.값;
+                const objectNo = $(this).closest('form').find('.shopNo').val();
+                showConfirmAlert(
+                    '입점이 승인됩니다.',
+                    //예
+                    () => {
+                        $.ajax({
+                            url: '/admin/user/shop/approval',
+                            type: 'POST',
+                            data: { objectNo: objectNo },
+                            success: function (success) {
+                                if (success == true) {
+                                    showToast('가입이 승인되었습니다.', 'success');
+                                } else {
+                                    showToast('다시 시도해주세요.', 'error');
+                                }
+                            },
+                            error: function (error) {
+                                showToast('다시 시도해주세요.', 'error');
+                            },
+                        });
+                    },
+                    //아니오
+                    () => {
+                        showToast('승인이 취소되었습니다.', 'warning');
+                    }
+                );
+            });
         </script>
     </body>
 </html>

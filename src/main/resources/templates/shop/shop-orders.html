@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/common/shop-layout}">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>주문 관리 - 모두의빵 판매자센터</title>
+
+    <style>
+        /* ===== 기존 스타일 유지 ===== */
+        .orders-container { width: 100%; padding: 25px; box-sizing: border-box; }
+        .page-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        .top-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .date-input { padding: 7px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 7px 14px; border: 1px solid #000; background: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; }
+        .btn:hover { background: #000; color: #fff; }
+
+        .status-tabs { display: flex; margin-bottom: 20px; }
+        .status-tab { flex: 1; padding: 10px; text-align: center; border: 1px solid #ddd; background: #f9f9f9; text-decoration: none; color: #000; }
+        .status-tab.active { background: #000; color: #fff; font-weight: 600; }
+
+        .order-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; background: #fff; }
+        .order-row { display: flex; justify-content: space-between; align-items: center; }
+        .order-left { display: flex; gap: 15px; }
+        .order-img { width: 60px; height: 60px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #777; }
+        .order-info { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+        .order-date { color: #777; }
+        .order-actions { display: flex; gap: 10px; align-items: center; }
+
+        .pagination { text-align: center; margin-top: 30px; }
+        .pagination a { margin: 0 4px; text-decoration: none; color: #000; }
+        .pagination a.current { font-weight: bold; text-decoration: underline; }
+
+        /* ===== 추가: 거절 모달 ===== */
+        .modal {
+            display: none; /* 기본 숨김 */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            width: 400px;
+            border-radius: 6px;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 10px;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 100px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .text-reject {
+            color: red;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+
+    <div class="orders-container">
+
+        <div class="page-title">주문 관리</div>
+
+        <!-- 기간 필터 (더미 유지) -->
+        <form class="top-controls">
+            <input type="date" class="date-input">
+            <span>~</span>
+            <input type="date" class="date-input">
+            <button type="button" class="btn">조회</button>
+        </form>
+
+        <!-- 상태 탭 (더미 유지) -->
+        <div class="status-tabs">
+            <!-- 전체 -->
+            <a th:href="@{/shop/orders}"
+            class="status-tab"
+            th:classappend="${status == null} ? 'active'">
+                전체
+            </a>
+
+            <!-- 대기 -->
+            <a th:href="@{/shop/orders(status=WAIT)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).WAIT} ? 'active'">
+                대기
+            </a>
+
+            <!-- 준비 -->
+            <a th:href="@{/shop/orders(status=PREPARE)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).PREPARE} ? 'active'">
+                준비
+            </a>
+
+            <!-- 배송중 -->
+            <a th:href="@{/shop/orders(status=DELIVERING)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).DELIVERING} ? 'active'">
+                배송중
+            </a>
+
+            <!-- 완료 -->
+            <a th:href="@{/shop/orders(status=COMPLETE)}"
+            class="status-tab"
+            th:classappend="${status == T(com.eob.order.model.data.OrderStatus).COMPLETE} ? 'active'">
+                완료
+            </a>
+        </div>
+
+        <!-- ===== 대기 주문 (버튼 있음) ===== -->
+        <!-- 대기 더미 -->
+        <div class="order-card">
+            <div class="order-row">
+                <div class="order-left">
+                    <div class="order-img">상품</div>
+                    <div class="order-info">
+                        <div class="order-date">2025-12-15</div>
+                        <div>소금빵 세트 / 2개</div>
+                        <div>총 금액 : 8,000원</div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <button class="btn">수락</button>
+                    <!-- 거절 버튼 → 모달 오픈 -->
+                    <button class="btn" th:onclick="|openRejectModal(${order.orderNo})">거절</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 준비 주문 ===== -->
+        <div class="order-card">
+            <div class="order-row">
+                <div class="order-left">
+                    <div class="order-img">상품</div>
+                    <div class="order-info">
+                        <div class="order-date">2025-12-14</div>
+                        <div>앙버터 / 1개</div>
+                        <div>총 금액 : 5,500원</div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <span>상품 준비 중</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 배송중 ===== -->
+        <div class="order-card">
+            <div class="order-row">
+                <div class="order-left">
+                    <div class="order-img">상품</div>
+                    <div class="order-info">
+                        <div class="order-date">2025-12-13</div>
+                        <div>크루아상 / 3개</div>
+                        <div>총 금액 : 12,000원</div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <span>배송 중</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== 완료 ===== -->
+        <div class="order-card">
+            <div class="order-row">
+                <div class="order-left">
+                    <div class="order-img">상품</div>
+                    <div class="order-info">
+                        <div class="order-date">2025-12-12</div>
+                        <div>식빵 / 1개</div>
+                        <div>총 금액 : 3,000원</div>
+                    </div>
+                </div>
+                <div class="order-actions">
+                    <span>배송 완료</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이징 (더미) -->
+        <div class="pagination">
+            <a href="#">◀</a>
+            <a href="#" class="current">1</a>
+            <a href="#">2</a>
+            <a href="#">▶</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ===== 거절 모달 ===== -->
+<div class="modal" id="rejectModal">
+    <div class="modal-content">
+        <h3>주문 거절</h3>
+
+        <!-- 실제 서버 연동 시 action만 바꾸면 됨 -->
+        <form method="post" id="rejectForm">
+            <input type="hidden" name="orderNo" id="rejectOrderNo">
+            <textarea name="reason" placeholder="거절 사유를 입력해주세요." required></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="btn" onclick="closeRejectModal()">취소</button>
+                <button type="submit" class="btn">거절</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 거절 모달 열기
+    function openRejectModal(orderNo) {
+        const modal = document.getElementById('rejectModal');
+        const form = document.getElementById('rejectForm');
+
+        // orderNo를 URL에 꽂아줌
+        form.action = `/shop/orders/${orderNo}/reject`;
+
+        modal.style.display = 'flex';
+    }
+
+    // 거절 모달 닫기
+    function closeRejectModal() {
+        document.getElementById('rejectModal').style.display = 'none';
+    }
+</script>
+</body>
+</html>
