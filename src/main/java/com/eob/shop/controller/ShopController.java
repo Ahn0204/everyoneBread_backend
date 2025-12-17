@@ -119,7 +119,7 @@ public class ShopController {
     public String registerStep(
             ShopEntity shop,
             HttpSession session,
-            @RequestParam("bizFile") MultipartFile bizFile) throws Exception {
+            @RequestParam(value = "bizFile", required = false) MultipartFile bizFile) throws Exception {
 
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
@@ -141,7 +141,7 @@ public class ShopController {
             if (!folder.exists()) {
                 folder.mkdirs();
             }
-            bizFile.transferTo(new File(savePath));
+            bizFile.transferTo(new File(fileName + savePath));
         }
 
         // ShopEntity 값 설정
