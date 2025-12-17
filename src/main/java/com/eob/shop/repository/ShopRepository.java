@@ -48,4 +48,5 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
      */
     @Query("select s from ShopEntity s where s.status='CLOSE_REVIEW'")
     Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
+
 }

@@ -3,6 +3,8 @@ package com.eob.shop.model.data;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import org.locationtech.jts.geom.Point;
+
 import com.eob.member.model.data.MemberEntity;
 
 import jakarta.persistence.Column;
@@ -153,10 +155,15 @@ public class ShopEntity {
     private String bizImg;
 
     @PrePersist
-    public void PrePersist(){
+    public void PrePersist() {
 
         // 생성일 자동 저장
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 
+    /**
+     * 상점 위치 (좌표형식으로 저장됨)
+     */
+    // @Type(type = "org.hibernate.spatial.GeometryType")
+    private Point location;
 }
