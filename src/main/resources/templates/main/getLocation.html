@@ -2,17 +2,9 @@
     <div class="d-flex align-items-center">
         <i class="bi bi-geo-alt user_location fs-1 fw-bold me-2" title="내 위치 저장"></i>
         <div class="selectLocation me-2">
-            <select name="sido" id="sido">
-                <option value="" selected hidden>시/도</option>
-                <div th:each="sido : ${sidoList}">
-                    <option th:value="${sido}" th:text="${sido}" th:selected="${session.location != null and session.location.sido == sido}"></option>
-                </div>
-            </select>
-            <select name="sigungu" id="sigungu">
-                <option value="" selected hidden>시/군/구</option>
-            </select>
+            <input type="text" class="address getLocation" />
         </div>
-        <i class="bi bi-arrow-clockwise btn btn-warning deleteLocation btn-md" title="위치 초기화"></i>
+        <button class="">검색</button>
     </div>
 
     <script th:src="@{/js/main/location.js}"></script>
@@ -20,35 +12,27 @@
         //페이지 로드 후 세션 스토리지에 위치 정보가 저장되어있다면
         $(document).ready(function () {
             if (sessionStorage.getItem('location') != null) {
-                //세션스토리지에 값이 있음
+                //세션스토리지에 값이 있다
                 const location = JSON.parse(sessionStorage.getItem('location'));
-                sidoSigunguList(location.sido, location.sigungu);
+                console.log('저장된 주소' + location);
+                //location가져와서 input에 입력 후 검색시키기
+                getShopList(location);
                 //위치 정보 사용중 표시
                 $('.user_location').removeClass('bi-geo-alt').addClass('bi-geo-alt-fill');
             } else {
                 //세션스토리지에 값이 없음
                 console.log('저장된 위치정보 없음');
-                //목록 불러오기
-                sidoSigunguList('서울', '관악구');
-                console.log('기본위치 설정 완료');
+                //기본위치 설정
+                getShopList('서울 관악구 남부순환로 1820 에그엘로우 6층 6B');
+                showToast('위치를 설정해주세요.', 'info');
             }
         });
 
-        //시도 클릭시 시군구 목록 가져오기
-        $('#sido').on('change', function () {
-            //시군구 기존 값 비우기
-            $('#sigungu').empty().append(new Option('시/군/구', ''));
-            getSigungu();
-        });
-
-        //시군구 변경 시 세션스토리지에 저장, 출력 변경
-        $('#sigungu').on('change', function () {
-            const sido = $('#sido').val();
-            const sigungu = $('#sigungu').val();
-            sessionStorage.setItem('location', JSON.stringify({ sido, sigungu }));
-            //선택된 지역구에 맞게 목록 이름, 목록 변경
-            changeList();
-        });
+        //위치 기반으로 상점(상품) 검색하기
+        function getShopList(location) {
+            //주소input에 주소 입력
+            $('.address').val(location);
+        }
 
         //사용자의 위치를 페이지에 반영 () (async, await 처리)
         $('.user_location').on('click', function () {
@@ -59,27 +43,23 @@
                     try {
                         //위치좌표 가져와서 주소로 변환
                         const { lat, lng } = await getUserPosition();
-                        let { sido, sigungu } = await getAddress(lat, lng);
-                        //상품 구매 불가한 위치일 경우
-                        if ($("#sido option[value='" + sido + "']").length === 0 || $("#sigungu option[value='" + sigungu + "']").length === 0) {
-                            showToast('사용자의 위치에서 조회되는 상품이 없습니다.', 'error');
-                            sidoSigunguList('서울', '관악구');
-                            $('.user_location').removeClass('bi-geo-alt-fill').addClass('bi-geo-alt');
-                        }
-                        //상품 구매가 가능한 위치일 경우
+                        let { addr } = await getAddress(lat, lng);
                         //해당 주소를 세션에 저장
-                        sessionStorage.setItem('location', JSON.stringify({ sido, sigungu }));
+                        sessionStorage.setItem('location', JSON.stringify({ addr }));
                         //위치 반영
-                        $('#sido').val(sido).prop('selected', true);
-                        $('#sigungu').val(sigungu).prop('selected', true);
                         $('.user_location').removeClass('bi-geo-alt').addClass('bi-geo-alt-fill');
-
+                        getShopList(addr);
                         showToast('위치 정보가 반영되었습니다', 'success');
-                        changeList();
+                        // } else{
+                        //조회되는 상점이 없을 때
+                        //     showToast('사용자의 위치에서 조회되는 상품이 없습니다.', 'error');
+                        //     sidoSigunguList('서울', '관악구');
+                        //     $('.user_location').removeClass('bi-geo-alt-fill').addClass('bi-geo-alt');
+                        // }
                     } catch (error) {
                         console.log(error);
                         showToast('위치 정보를 사용할 수 없어 기본값으로 지정됩니다.', 'error');
-                        sidoSigunguList('서울', '관악구');
+                        getShopList('서울 관악구 남부순환로 1820 에그엘로우 6층 6B');
                     }
                 },
                 () => {
@@ -106,37 +86,5 @@
                 }
             );
         });
-
-        //지역 목록 불러오고 설정한 값으로 초기화
-        function sidoSigunguList(sido, sigungu) {
-            let sidoList = /*[[${sidoList}]]*/ 'null';
-            console.log('목록 불러옴' + sidoList);
-            //기존 목록 비우기
-            $('#sido').empty();
-            $('#sigungu').empty();
-            //시도 목록 추가
-            sidoList.forEach(function (s) {
-                $('#sido').append(new Option(s, s));
-            });
-            $('#sido').val(sido);
-            //시군구 목록 불러오기
-            $.ajax({
-                url: '/sigungu',
-                method: 'get',
-                data: { sido: $('#sido').val() },
-                success: function (sigunguList) {
-                    //성공 응답의 시군구 리스트 반복해서 꺼내기
-                    sigunguList.forEach(function (sigungu) {
-                        $('#sigungu').append(new Option(sigungu, sigungu));
-                    });
-                    $('#sigungu').val(sigungu);
-                    //설정한 값의 제목&목록 반영
-                    changeList();
-                },
-                error: function () {
-                    showToast('다시 시도해주세요.', 'error');
-                },
-            });
-        }
     </script>
 </div>

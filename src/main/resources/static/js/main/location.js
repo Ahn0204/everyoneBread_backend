@@ -1,4 +1,7 @@
 //위치 정보 사용
+//카카오맵 sdk 로드 우선
+//getUserPosition()으로 사용자 기기의 위치 좌표 획득
+//getAddress()로 위치좌표를 카카오맵api를 통해 주소로 변환
 
 //현재 사용자의 위치 좌표를 가져오는 함수 (promise 생성)
 function getUserPosition() {
@@ -30,8 +33,6 @@ function getUserPosition() {
 //현재 좌표를 주소로 변환하는 함수 (promise 생성)
 function getAddress(lat, lng) {
     return new Promise((resolve, reject) => {
-        //const sido = null;
-        //const sigungu = null;
         //주소-좌표 변환 객체 생성
         let geocoder = new kakao.maps.services.Geocoder();
         //coord={전체주소, 시도, 시군구}
@@ -42,10 +43,9 @@ function getAddress(lat, lng) {
             if (status === kakao.maps.services.Status.OK) {
                 //전체주소 addr 변환
                 const addr = result[0].road_address || result[0].address;
-                //addr에서 sido, sigungu, bname 얻기
+                //addr 얻기
                 resolve({
-                    sido: addr.region_1depth_name,
-                    sigungu: addr.region_2depth_name,
+                    addr: addr,
                 });
             } else {
                 reject('주소 변환 실패');
@@ -54,25 +54,25 @@ function getAddress(lat, lng) {
     });
 }
 
-//시군구 목록 가져오는 함수 -
-function getSigungu() {
-    //시군구 목록 요청
-    $.ajax({
-        url: '/sigungu',
-        method: 'get',
-        data: { sido: $('#sido').val() },
-        success: function (sigunguList) {
-            //성공 응답의 시군구 리스트 반복해서 꺼내기
-            sigunguList.forEach(function (sigungu) {
-                $('#sigungu').append(new Option(sigungu, sigungu));
-            });
-        },
-        error: function () {
-            showToast('다시 시도해주세요.', 'error');
-            //알림이 사라진 후(2초 후) 자동 새로고침 되도록 설정
-            setTimeout(function () {
-                location.reload();
-            }, 2000);
-        },
-    });
-}
+// //시군구 목록 가져오는 함수 -
+// function getSigungu() {
+//     //시군구 목록 요청
+//     $.ajax({
+//         url: '/sigungu',
+//         method: 'get',
+//         data: { sido: $('#sido').val() },
+//         success: function (sigunguList) {
+//             //성공 응답의 시군구 리스트 반복해서 꺼내기
+//             sigunguList.forEach(function (sigungu) {
+//                 $('#sigungu').append(new Option(sigungu, sigungu));
+//             });
+//         },
+//         error: function () {
+//             showToast('다시 시도해주세요.', 'error');
+//             //알림이 사라진 후(2초 후) 자동 새로고침 되도록 설정
+//             setTimeout(function () {
+//                 location.reload();
+//             }, 2000);
+//         },
+//     });
+// }
