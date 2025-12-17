@@ -238,6 +238,7 @@ public class SecurityConfig {
                                                                 "/shop/check-id",
                                                                 "/shop/check-email",
                                                                 "/shop/check-name",
+                                                                "/shop/orders/dashboard", // 주문 대시보드 AJAX
                                                                 "/css/**", "/js/**", "/image/**", "/fonts/**",
                                                                 "/lib/**")
                                                 .permitAll()

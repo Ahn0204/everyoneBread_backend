@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 판매자 주문 관리 컨트롤러
@@ -93,4 +96,44 @@ public class ShopOrderController {
         orderService.rejectOrder(orderNo, reason);
         return "redirect:/shop/orders" + (status != null ? "?status=" + status.name() : "");
     }
+
+    /**
+     * 주문관리 대시보드 숫자 (AJAX)
+     * URL: GET /shop/orders/dashboard
+     */
+    @GetMapping("/dashboard")
+    @ResponseBody
+    public Map<String, Long> orderDashboard(@AuthenticationPrincipal CustomSecurityDetail principal) {
+        // 1. 현재 로그인한 회원의 상점 정보 조회
+        MemberEntity member = principal.getMember();
+        // 2. 상점 번호로 오늘 주문 수, 상태별 주문 수 조회
+        ShopEntity shop = shopService.findByMemberNo(member.getMemberNo());
+        // 3. 결과 맵으로 반환
+        Long shopNo = shop.getShopNo();
+        
+        // 4. 결과 맵 생성
+        Map<String, Long> result = new HashMap<>();
+        result.put("today", orderService.countTodayOrders(shopNo));                             // 오늘 주문 수
+        result.put("wait", orderService.countByStatus(shopNo, OrderStatus.WAIT));               // 대기 주문 수
+        result.put("delivering", orderService.countByStatus(shopNo, OrderStatus.DELIVERING));   // 배송중 주문 수
+        result.put("complete", orderService.countByStatus(shopNo, OrderStatus.COMPLETE));       // 완료 주문 수
+
+        return result;
+    }
+
+    /**
+     * 주문 상세 페이지
+     * URL: GET /shop/orders/{orderNo}
+     */
+    @GetMapping("/{orderNo}")
+    public String orderDetail(
+            @PathVariable Long orderNo,
+            Model model
+    ) {
+        OrderHistoryEntity order = orderService.findById(orderNo);
+        model.addAttribute("order", order);
+        return "shop/shop-order-detail";
+    }
+
+
 }

@@ -10,6 +10,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -52,8 +53,8 @@ public class OrderHistoryEntity {
     /**
      * 상품 상세 내역
      */
-    @OneToMany(mappedBy = "orderNo") // mappedBy에는 클래스명이 아니라, 자식 엔티티의 필드명을 써야 합니다.
-    // @JoinColumn(name = "order_detail_no", nullable = false)
+    @OneToMany(mappedBy = "orderNo", fetch = FetchType.LAZY) // mappedBy에는 클래스명이 아니라, 자식 엔티티의 필드명을 써야 합니다.
+    @JoinColumn(name = "order_detail_no", nullable = false)
     private List<OrderDetailEntity> orderDetail;
 
     /**
