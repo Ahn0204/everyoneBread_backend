@@ -8,7 +8,7 @@
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
 
     <!-- 공통 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
@@ -180,7 +180,7 @@
             let shopName = $("input[name='shopName']").val().trim();
 
             if (shopName === "") {
-                Swal.fire("상점명을 입력해주세요.");
+                showErrorAlert("상점명을 입력해주세요.");
                 return;
             }
 
@@ -190,15 +190,15 @@
                 data: { shopName: shopName },
                 success: function (available) {
                     if (available === true) {
-                        Swal.fire("사용 가능한 상점명입니다.");
+                        showSuccessAlert("사용 가능한 상점명입니다.");
                         shopNameOk = true;
                     } else {
-                        Swal.fire("이미 등록된 상점명입니다.");
+                        showErrorAlert("이미 등록된 상점명입니다.");
                         shopNameOk = false;
                     }
                 },
                 error: function() {
-                    Swal.fire("서버 오류가 발생했습니다.");
+                    showErrorAlert("서버 오류가 발생했습니다.");
                 }
             });
         });
@@ -252,7 +252,7 @@
             if (!file) return;
 
             if (!file.type.match("image.*")) {
-                Swal.fire("이미지 파일만 업로드 가능합니다.");
+                showErrorAlert("이미지 파일만 업로드 가능합니다.");
                 $(this).val("");
                 $("#fileNameDisplay").text("");
                 return;
@@ -270,19 +270,19 @@
 
             // ■ 클라이언트 유효성 검사
             if (!shopNameOk) {
-                Swal.fire("상점명 중복확인을 완료해주세요.");
+                showErrorAlert("상점명 중복확인을 완료해주세요.");
                 return false;
             }
 
             let addr = $("input[name='shopAddress']").val().trim();
             if (addr.length < 5) {
-                Swal.fire("사업장 주소를 입력해주세요.");
+                showErrorAlert("사업장 주소를 입력해주세요.");
                 return false;
             }
 
             let biz = $("input[name='bizNo']").val().trim();
             if (biz.length !== 12) {
-                Swal.fire("올바른 사업자 등록번호 형식이 아닙니다.");
+                showErrorAlert("올바른 사업자 등록번호 형식이 아닙니다.");
                 return false;
             }
 
@@ -297,7 +297,7 @@
                 contentType: false,
 
                 success: function() {
-                    Swal.fire({
+                    showSuccessAlert({
                         icon: "success",
                         title: "입점 신청이 완료되었습니다!",
                         confirmButtonText: "확인"
@@ -307,7 +307,7 @@
                 },
 
                 error: function() {
-                    Swal.fire({
+                    showErrorAlert({
                         icon: "error",
                         title: "서버 오류가 발생했습니다.",
                         text: "잠시 후 다시 시도해주세요.",
