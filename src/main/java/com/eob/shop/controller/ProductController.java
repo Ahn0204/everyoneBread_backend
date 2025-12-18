@@ -38,7 +38,7 @@ public class ProductController {
      * - 1~10 페이지 묶음 계산
      */
     @GetMapping("products")
-    public String list(@RequestParam(defaultValue = "0") int page, Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
+    public String list(@RequestParam(defaultValue = "0", name="page") int page, Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
 
         // 1) 로그인 정보 가져오기
         MemberEntity loginMember = principal.getMember();

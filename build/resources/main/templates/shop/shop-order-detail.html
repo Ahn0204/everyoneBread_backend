@@ -1,0 +1,37 @@
+<div>
+    <h2>주문 상세</h2>
+
+    <div>
+        주문번호: <span th:text="${order.orderNo}"></span>
+    </div>
+
+    <div>
+        주문일:
+        <span th:text="${#temporals.format(order.orderTime.orderedAt, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
+
+    <hr>
+
+    <h3>주문 상품</h3>
+
+    <div th:each="detail : ${order.orderDetail}">
+        <div>
+            상품명:
+            <span th:text="${detail.productNo.productName}"></span>
+        </div>
+        <div>
+            수량:
+            <span th:text="${detail.quantity}"></span>
+        </div>
+        <div>
+            가격:
+            <span th:text="${detail.price}"></span>원
+        </div>
+        <hr>
+    </div>
+
+    <div>
+        총 결제 금액:
+        <span th:text="${order.orderPrice}"></span>원
+    </div>
+</div>
