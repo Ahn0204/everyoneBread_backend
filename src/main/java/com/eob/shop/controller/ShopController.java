@@ -132,9 +132,10 @@ public class ShopController {
     public String registerStep(
             ShopEntity shop,
             HttpSession session,
-            @RequestParam(name = "bizFile", required = false) MultipartFile bizFile,
-            @RequestParam(name = "longitude") String longitude, @RequestParam(name = "latitude") String latitude)
+            @RequestParam(name = "bizFile", required = false) MultipartFile bizFile)
             throws Exception {
+        // @RequestParam(name = "longitude") String longitude, @RequestParam(name =
+        // "latitude") String latitude
 
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
@@ -181,6 +182,8 @@ public class ShopController {
         System.out.println("shopName = " + shop.getShopName());
         System.out.println("shopAddress = " + shop.getShopAddress());
         System.out.println("bizNo = " + shop.getBizNo());
+        System.out.println("latitude = " + shop.getLatitude());
+        System.out.println("longitude = " + shop.getLongitude());
         // System.out.println("location = " + shop.getLocation());
 
         // 저장
