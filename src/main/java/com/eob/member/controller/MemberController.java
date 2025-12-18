@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -52,7 +53,7 @@ public class MemberController {
     @PostMapping("register")
     public String register(
             @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
-            BindingResult bindingResult
+            BindingResult bindingResult, HttpSession session
     ) {
         // Valid에서 걸리면 다시 보여줌
         if (bindingResult.hasErrors()) {
@@ -63,7 +64,7 @@ public class MemberController {
         dto.setMemberRole("USER");
 
         // 일반 회원 가입 처리
-        memberService.registerUser(dto, bindingResult);
+        memberService.registerUser(dto, bindingResult, session);
 
         if (bindingResult.hasErrors()) {
             return "member/member-register";
