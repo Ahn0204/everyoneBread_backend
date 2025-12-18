@@ -1,339 +1,340 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>입점신청</title>
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>입점신청</title>
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
 
-    <!-- 공통 폰트 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+        <!-- 공통 폰트 -->
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
 
+        <!-- Daum 주소 API -->
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
-    <!-- Daum 주소 API -->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <!--카카오맵 API & 라이브러리 SDK-->
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4fd57268b42b0698df77c27d1c4e78c&libraries=services"></script>
+        <!--주소를 좌표로 변환해서 location에 등록-->
+        <script th:src="@{/js/comm/getLngLat.js}"></script>
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: 'Noto Sans KR', sans-serif;
+            }
 
-    <style>
-        * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; }
+            body {
+                margin: 0;
+                padding: 40px 0;
+                background-color: #fff;
+                display: flex;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-        body {
-            margin: 0;
-            padding: 40px 0;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+            .signup-container {
+                width: 100%;
+                max-width: 550px;
+                padding: 40px;
+                border: 2px solid #000;
+                border-radius: 10px;
+                background-color: #fff;
+            }
 
-        .signup-container {
-            width: 100%;
-            max-width: 550px;
-            padding: 40px;
-            border: 2px solid #000;
-            border-radius: 10px;
-            background-color: #fff;
-        }
+            .signup-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .signup-header h1 {
+                font-size: 32px;
+                font-weight: 700;
+                margin-bottom: 20px;
+            }
 
-        .signup-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .signup-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
+            .form-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
 
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+            .form-label {
+                width: 130px;
+                font-weight: 700;
+                font-size: 15px;
+                flex-shrink: 0;
+                color: #333;
+            }
 
-        .form-label {
-            width: 130px;
-            font-weight: 700;
-            font-size: 15px;
-            flex-shrink: 0;
-            color: #333;
-        }
+            .input-text {
+                flex: 1;
+                height: 45px;
+                padding: 0 10px;
+                border: 1px solid #000;
+                border-radius: 4px;
+                font-size: 14px;
+            }
 
-        .input-text {
-            flex: 1;
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-        }
+            .input-with-btn {
+                display: flex;
+                flex: 1;
+                gap: 8px;
+            }
 
-        .input-with-btn {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-        }
+            .btn-small {
+                height: 45px;
+                padding: 0 15px;
+                background-color: #fff;
+                border: 1px solid #000;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: 700;
+            }
+            .btn-small:hover {
+                background-color: #f0f0f0;
+            }
 
-        .btn-small {
-            height: 45px;
-            padding: 0 15px;
-            background-color: #fff;
-            border: 1px solid #000;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 700;
-        }
-        .btn-small:hover { background-color: #f0f0f0; }
+            .action-buttons {
+                margin-top: 40px;
+                display: flex;
+                justify-content: center;
+            }
 
-        .action-buttons {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-        }
+            .btn-submit {
+                width: 200px;
+                height: 50px;
+                background-color: #fff;
+                border: 2px solid #000;
+                font-size: 16px;
+                font-weight: 700;
+                border-radius: 8px;
+                cursor: pointer;
+            }
+            .btn-submit:hover {
+                background-color: #000;
+                color: #fff;
+            }
+            .file-info {
+                font-size: 12px;
+                color: #555;
+                margin-left: 130px;
+                margin-top: -10px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
 
-        .btn-submit {
-            width: 200px;
-            height: 50px;
-            background-color: #fff;
-            border: 2px solid #000;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .btn-submit:hover {
-            background-color: #000;
-            color: #fff;
-        }
-        .file-info {
-            font-size: 12px;
-            color: #555;
-            margin-left: 130px;
-            margin-top: -10px;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
+    <body>
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>입점신청</h1>
+                <hr />
+            </div>
 
-<body>
+            <form method="post" action="/shop/register/step" enctype="multipart/form-data">
+                <!-- 상점명 -->
+                <div class="form-row">
+                    <label class="form-label">상점명</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="shopName" class="input-text" required />
+                        <button type="button" class="btn-small" id="shopNameChkBtn">중복확인</button>
+                    </div>
+                </div>
 
-    <div class="signup-container">
-        <div class="signup-header">
-            <h1>입점신청</h1>
-            <hr>
+                <!-- 사업장 주소 -->
+                <div class="form-row">
+                    <label class="form-label">사업장 주소</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="shopAddress" id="shopAddress" class="input-text" placeholder="주소 검색" required readonly />
+                        <!--경도, 위도-->
+                        <input type="hidden" name="longitude" id="logitude" value="" />
+                        <input type="hidden" name="latitude" id="latitude" value="" />
+                        <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                    </div>
+                </div>
+
+                <!-- 사업자 등록번호 -->
+                <div class="form-row">
+                    <label class="form-label">사업자 등록번호</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="bizNo" class="input-text" required />
+                        <!-- 숨겨진 파일 업로드 input -->
+                        <input type="file" id="bizFile" name="bizFile" accept="image/*" style="display: none" />
+
+                        <button type="button" class="btn-small" id="bizFileBtn">사진첨부</button>
+                    </div>
+                </div>
+
+                <!-- 선택된 파일명 출력 -->
+                <div class="file-info" id="fileInfo"><span id="fileNameDisplay"></span></div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn-submit">가입</button>
+                </div>
+            </form>
         </div>
 
-        <form method="post" action="/shop/register/step" enctype="multipart/form-data">
-
-            <!-- 상점명 -->
-            <div class="form-row">
-                <label class="form-label">상점명</label>
-                <div class="input-with-btn">
-                    <input type="text" name="shopName" class="input-text" required>
-                    <button type="button" class="btn-small" id="shopNameChkBtn">중복확인</button>
-                </div>
-            </div>
-
-            <!-- 사업장 주소 -->
-            <div class="form-row">
-                <label class="form-label">사업장 주소</label>
-                <div class="input-with-btn">
-                    <input type="text" name="shopAddress" id="shopAddress" class="input-text" placeholder="주소 검색" required readonly>
-                    <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
-                </div>
-            </div>
-
-            <!-- 사업자 등록번호 -->
-            <div class="form-row">
-                <label class="form-label">사업자 등록번호</label>
-                <div class="input-with-btn">
-                    <input type="text" name="bizNo" class="input-text" required>
-                    <!-- 숨겨진 파일 업로드 input -->
-                    <input type="file" id="bizFile" name="bizFile" accept="image/*" style="display:none;">
-
-                    <button type="button" class="btn-small" id="bizFileBtn">사진첨부</button>
-                </div>
-            </div>
-
-            <!-- 선택된 파일명 출력 -->
-            <div class="file-info" id="fileInfo"><span id="fileNameDisplay"></span></div>
-
-            <div class="action-buttons">
-                <button type="submit" class="btn-submit">가입</button>
-            </div>
-
-        </form>
-    </div>
-
-    <script>
-        /* ------------------------------
+        <script>
+            /* ------------------------------
         1) 상점명 중복확인
         ------------------------------ */
-        let shopNameOk = false;
+            let shopNameOk = false;
 
-        $("#shopNameChkBtn").click(function () {
+            $('#shopNameChkBtn').click(function () {
+                let shopName = $("input[name='shopName']").val().trim();
 
-            let shopName = $("input[name='shopName']").val().trim();
-
-            if (shopName === "") {
-                Swal.fire("상점명을 입력해주세요.");
-                return;
-            }
-
-            $.ajax({
-                url: "/shop/check-name",
-                type: "GET",
-                data: { shopName: shopName },
-                success: function (available) {
-                    if (available === true) {
-                        Swal.fire("사용 가능한 상점명입니다.");
-                        shopNameOk = true;
-                    } else {
-                        Swal.fire("이미 등록된 상점명입니다.");
-                        shopNameOk = false;
-                    }
-                },
-                error: function() {
-                    Swal.fire("서버 오류가 발생했습니다.");
+                if (shopName === '') {
+                    Swal.fire('상점명을 입력해주세요.');
+                    return;
                 }
+
+                $.ajax({
+                    url: '/shop/check-name',
+                    type: 'GET',
+                    data: { shopName: shopName },
+                    success: function (available) {
+                        if (available === true) {
+                            Swal.fire('사용 가능한 상점명입니다.');
+                            shopNameOk = true;
+                        } else {
+                            Swal.fire('이미 등록된 상점명입니다.');
+                            shopNameOk = false;
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('서버 오류가 발생했습니다.');
+                    },
+                });
             });
-        });
 
-        $("input[name='shopName']").on("input", function () {
-            shopNameOk = false;
-        });
+            $("input[name='shopName']").on('input', function () {
+                shopNameOk = false;
+            });
 
-
-        /* ------------------------------
+            /* ------------------------------
         2) 사업자 등록번호 자동 하이픈
         ------------------------------ */
-        $("input[name='bizNo']").on("input", function() {
+            $("input[name='bizNo']").on('input', function () {
+                let v = $(this)
+                    .val()
+                    .replace(/[^0-9]/g, '');
+                if (v.length > 10) v = v.substring(0, 10);
 
-            let v = $(this).val().replace(/[^0-9]/g, "");
-            if (v.length > 10) v = v.substring(0, 10);
+                let res = '';
 
-            let res = "";
+                if (v.length < 4) res = v;
+                else if (v.length < 6) res = v.substring(0, 3) + '-' + v.substring(3);
+                else res = v.substring(0, 3) + '-' + v.substring(3, 5) + '-' + v.substring(5);
 
-            if (v.length < 4) res = v;
-            else if (v.length < 6) res = v.substring(0,3) + "-" + v.substring(3);
-            else res = v.substring(0,3) + "-" + v.substring(3,5) + "-" + v.substring(5);
-
-            $(this).val(res);
-        });
-
-
-        /* ------------------------------
-        3) 카카오 주소 API
-        ------------------------------ */
-        function execDaumPostcode() {
-            new daum.Postcode({
-                oncomplete: function(data) {
-                    let addr = (data.userSelectedType === "R") ? data.roadAddress : data.jibunAddress;
-                    document.getElementById("shopAddress").value = addr;
-                }
-            }).open();
-        }
-
-
-        /* ------------------------------
-        4) 파일 첨부
-        ------------------------------ */
-        $("#bizFileBtn").click(function () {
-            $("#bizFile").click();
-        });
-
-        $("#bizFile").on("change", function () {
-
-            let file = this.files[0];
-            if (!file) return;
-
-            if (!file.type.match("image.*")) {
-                Swal.fire("이미지 파일만 업로드 가능합니다.");
-                $(this).val("");
-                $("#fileNameDisplay").text("");
-                return;
-            }
-
-            $("#fileNameDisplay").text("선택된 파일: " + file.name);
-        });
-
-
-        /* ------------------------------
-        5) 최종 submit  AJAX 처리
-        ------------------------------ */
-        $("form").submit(function(e) {
-            e.preventDefault();  // 폼 기본 제출 막기
-
-            // ■ 클라이언트 유효성 검사
-            if (!shopNameOk) {
-                Swal.fire("상점명 중복확인을 완료해주세요.");
-                return false;
-            }
-
-            let addr = $("input[name='shopAddress']").val().trim();
-            if (addr.length < 5) {
-                Swal.fire("사업장 주소를 입력해주세요.");
-                return false;
-            }
-
-            let biz = $("input[name='bizNo']").val().trim();
-            if (biz.length !== 12) {
-                Swal.fire("올바른 사업자 등록번호 형식이 아닙니다.");
-                return false;
-            }
-
-            // 파일 포함 FormData
-            let formData = new FormData(this);
-
-            $.ajax({
-                url: "/shop/register/step",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-
-                success: function() {
-                    Swal.fire({
-                        icon: "success",
-                        title: "입점 신청이 완료되었습니다!",
-                        confirmButtonText: "확인"
-                    }).then(() => {
-                        window.location.href = "/shop/login";
-                    });
-                },
-
-                error: function() {
-                    Swal.fire({
-                        icon: "error",
-                        title: "서버 오류가 발생했습니다.",
-                        text: "잠시 후 다시 시도해주세요.",
-                        confirmButtonText: "확인"
-                    }).then(() => {
-
-                        // form 내부 입력값 전체 초기화
-                        $("form")[0].reset();
-
-                        // 파일명 표시 영역도 초기화
-                        $("#fileNameDisplay").text("");
-
-                        // 중복확인 상태 초기화
-                        shopNameOk = false;
-
-                        // 페이지 다시 로드하여 완전 초기화
-                        window.location.href = "/shop/register/step";
-                    });
-                }
-
+                $(this).val(res);
             });
 
-            return false;
-        });
+            /* ------------------------------
+        3) 카카오 주소 API
+        ------------------------------ */
+            function execDaumPostcode() {
+                new daum.Postcode({
+                    oncomplete: function (data) {
+                        let addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                        document.getElementById('shopAddress').value = addr;
+                        //입력받은 주소 좌표로 변환, longitude, latitude에 저장
+                        getLngLat(addr);
+                    },
+                }).open();
+            }
 
-    </script>
+            /* ------------------------------
+        4) 파일 첨부
+        ------------------------------ */
+            $('#bizFileBtn').click(function () {
+                $('#bizFile').click();
+            });
 
-</body>
+            $('#bizFile').on('change', function () {
+                let file = this.files[0];
+                if (!file) return;
+
+                if (!file.type.match('image.*')) {
+                    Swal.fire('이미지 파일만 업로드 가능합니다.');
+                    $(this).val('');
+                    $('#fileNameDisplay').text('');
+                    return;
+                }
+
+                $('#fileNameDisplay').text('선택된 파일: ' + file.name);
+            });
+
+            /* ------------------------------
+        5) 최종 submit  AJAX 처리
+        ------------------------------ */
+            $('form').submit(function (e) {
+                e.preventDefault(); // 폼 기본 제출 막기
+
+                // ■ 클라이언트 유효성 검사
+                if (!shopNameOk) {
+                    Swal.fire('상점명 중복확인을 완료해주세요.');
+                    return false;
+                }
+
+                let addr = $("input[name='shopAddress']").val().trim();
+                if (addr.length < 5) {
+                    Swal.fire('사업장 주소를 입력해주세요.');
+                    return false;
+                }
+
+                let biz = $("input[name='bizNo']").val().trim();
+                if (biz.length !== 12) {
+                    Swal.fire('올바른 사업자 등록번호 형식이 아닙니다.');
+                    return false;
+                }
+
+                // 파일 포함 FormData
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: '/shop/register/step',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+
+                    success: function () {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '입점 신청이 완료되었습니다!',
+                            confirmButtonText: '확인',
+                        }).then(() => {
+                            window.location.href = '/shop/login';
+                        });
+                    },
+
+                    error: function () {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '서버 오류가 발생했습니다.',
+                            text: '잠시 후 다시 시도해주세요.',
+                            confirmButtonText: '확인',
+                        }).then(() => {
+                            // form 내부 입력값 전체 초기화
+                            $('form')[0].reset();
+
+                            // 파일명 표시 영역도 초기화
+                            $('#fileNameDisplay').text('');
+
+                            // 중복확인 상태 초기화
+                            shopNameOk = false;
+
+                            // 페이지 다시 로드하여 완전 초기화
+                            window.location.href = '/shop/register/step';
+                        });
+                    },
+                });
+
+                return false;
+            });
+        </script>
+    </body>
 </html>

@@ -3,6 +3,8 @@ package com.eob.shop.model.data;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.locationtech.jts.geom.Point;
 
 import com.eob.member.model.data.MemberEntity;
@@ -164,6 +166,19 @@ public class ShopEntity {
     /**
      * 상점 위치 (좌표형식으로 저장됨)
      */
-    // @Type(type = "org.hibernate.spatial.GeometryType")
-    private Point location;
+    // @JdbcTypeCode(SqlTypes.STRUCT) // DDL생성(ALTER문) 차단 + 타입 지정
+    // @Column(name = "LOCATION", nullable = false, columnDefinition =
+    // "MDSYS.SDO_GEOMETRY") // hibernate가 이 컬럼을 수정하지 않도록
+    // // 컬럼 명시
+    // private Point location;
+
+    /**
+     * 상점 위치 - 경도
+     */
+    private float longitude;
+
+    /**
+     * 상점 위치 - 위도
+     */
+    private float latitude;
 }

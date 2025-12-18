@@ -3,17 +3,28 @@ package com.eob.shop.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.eob.member.model.dto.RegisterRequest;
 import com.eob.common.security.CustomSecurityDetail;
+import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
+import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
+import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
@@ -27,9 +38,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/shop/*")
 public class ShopController {
 
-    private final MemberService memberService; 
-    private final ShopService shopService;     
+    private final MemberService memberService;
+    private final ShopService shopService;
     private final ProductService productService;
+    // location저장용 - Point객체 생성 객체
+    private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * 판매자 로그인 페이지
@@ -40,7 +53,7 @@ public class ShopController {
      */
     @GetMapping("login")
     public String shopLogin() {
-        return "shop/shop-login";   // 로그인 HTML 이동
+        return "shop/shop-login"; // 로그인 HTML 이동
     }
 
     /**
@@ -119,7 +132,9 @@ public class ShopController {
     public String registerStep(
             ShopEntity shop,
             HttpSession session,
-            @RequestParam(value = "bizFile", required = false) MultipartFile bizFile) throws Exception {
+            @RequestParam(name = "bizFile", required = false) MultipartFile bizFile,
+            @RequestParam(name = "longitude") String longitude, @RequestParam(name = "latitude") String latitude)
+            throws Exception {
 
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
@@ -129,7 +144,7 @@ public class ShopController {
 
         // 회원 저장 (MemberEntity 생성)
         MemberEntity member = memberService.createShopMember(temp);
-        System.out.println("저장된 MemberNo ="+member.getMemberNo());
+        System.out.println("저장된 MemberNo =" + member.getMemberNo());
 
         // 파일 업로드 처리
         String fileName = null;
@@ -144,13 +159,21 @@ public class ShopController {
             bizFile.transferTo(new File(fileName + savePath));
         }
 
+        // member status값 지정
+        member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
+
         // ShopEntity 값 설정
-        shop.setMember(member);                       // FK 연결
-        shop.setSellerName(member.getMemberName());   // 대표자명
+        shop.setMember(member); // FK 연결
+        shop.setSellerName(member.getMemberName()); // 대표자명
         shop.setCreatedAt(LocalDateTime.now());
         shop.setBizImg(fileName);
 
-        // shop.setStatus(ShopApprovalStatus.PENDING); // 승인대기 상태
+        shop.setStatus(ShopApprovalStatus.APPLY_REVIEW); // 입점검토 상태
+        // location저장
+        // Point location = geometryFactory
+        // .createPoint(new Coordinate(Float.parseFloat(longitude),
+        // Float.parseFloat(latitude)));
+        // shop.setLocation(location);
 
         // 저장 전 필드 확인
         System.out.println("Shop 저장 전 확인");
@@ -158,6 +181,7 @@ public class ShopController {
         System.out.println("shopName = " + shop.getShopName());
         System.out.println("shopAddress = " + shop.getShopAddress());
         System.out.println("bizNo = " + shop.getBizNo());
+        // System.out.println("location = " + shop.getLocation());
 
         // 저장
         shopService.saveShop(shop);
@@ -172,7 +196,7 @@ public class ShopController {
 
     /**
      * 판매자 회원가입 - 아이디 중복 확인
-     * true  : 사용 가능
+     * true : 사용 가능
      * false : 이미 존재
      */
     @GetMapping("check-id")
@@ -215,7 +239,7 @@ public class ShopController {
             @AuthenticationPrincipal CustomSecurityDetail principal,
             Model model) {
 
-        MemberEntity member = principal.getMember();     // 로그인한 회원 정보
+        MemberEntity member = principal.getMember(); // 로그인한 회원 정보
         ShopEntity shop = shopService.findByMemberNo(member.getMemberNo());
 
         model.addAttribute("shop", shop);

@@ -1,583 +1,566 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
-    <!-- 카카오 주소 API -->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <title>판매자 회원가입</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
+        <!-- 카카오 주소 API -->
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <title>판매자 회원가입</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: 'Noto Sans KR', sans-serif;
+            }
 
-        body {
-            margin: 0;
-            padding: 40px 0;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+            body {
+                margin: 0;
+                padding: 40px 0;
+                background-color: #fff;
+                display: flex;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-        .signup-container {
-            width: 100%;
-            max-width: 550px;
-            padding: 40px;
-            border: 2px solid #000;
-            border-radius: 10px;
-            background-color: #fff;
-        }
+            .signup-container {
+                width: 100%;
+                max-width: 550px;
+                padding: 40px;
+                border: 2px solid #000;
+                border-radius: 10px;
+                background-color: #fff;
+            }
 
-        .signup-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .signup-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 0 20px 0;
-        }
+            .signup-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .signup-header h1 {
+                font-size: 32px;
+                font-weight: 700;
+                margin: 0 0 20px 0;
+            }
 
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+            .form-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
 
-        .form-label {
-            width: 120px;
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-            flex-shrink: 0;
-        }
+            .form-label {
+                width: 120px;
+                font-weight: 700;
+                font-size: 15px;
+                color: #333;
+                flex-shrink: 0;
+            }
 
-        .input-text {
-            flex: 1;
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .input-text:focus {
-            background-color: #f9f9f9;
-            border-width: 2px;
-        }
+            .input-text {
+                flex: 1;
+                height: 45px;
+                padding: 0 10px;
+                border: 1px solid #000;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            .input-text:focus {
+                background-color: #f9f9f9;
+                border-width: 2px;
+            }
 
-        .input-with-btn {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-        }
+            .input-with-btn {
+                display: flex;
+                flex: 1;
+                gap: 8px;
+            }
 
-        .btn-small {
-            height: 45px;
-            padding: 0 15px;
-            background-color: #fff;
-            border: 1px solid #000;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
-        .btn-small:hover { background-color: #f0f0f0; }
+            .btn-small {
+                height: 45px;
+                padding: 0 15px;
+                background-color: #fff;
+                border: 1px solid #000;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: bold;
+            }
+            .btn-small:hover {
+                background-color: #f0f0f0;
+            }
 
-        .jumin-area {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-            align-items: center;
-        }
+            .jumin-area {
+                display: flex;
+                flex: 1;
+                gap: 8px;
+                align-items: center;
+            }
 
-        .input-jumin {
-            width: 100%;
-            height: 45px;
-            text-align: center;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
+            .input-jumin {
+                width: 100%;
+                height: 45px;
+                text-align: center;
+                border: 1px solid #000;
+                border-radius: 4px;
+            }
 
-        .action-buttons {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
+            .action-buttons {
+                margin-top: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
 
-        .btn-large {
-            width: 200px;
-            height: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+            .btn-large {
+                width: 200px;
+                height: 50px;
+                font-size: 16px;
+                font-weight: 700;
+                border-radius: 8px;
+                cursor: pointer;
+            }
 
-        .btn-next {
-            background-color: #000;
-            border: 2px solid #000;
-            color: #fff;
-        }
-        .btn-next:hover { opacity: 0.8; }
+            .btn-next {
+                background-color: #000;
+                border: 2px solid #000;
+                color: #fff;
+            }
+            .btn-next:hover {
+                opacity: 0.8;
+            }
 
-        .auth-code-row { padding-left: 120px; }
+            .auth-code-row {
+                padding-left: 120px;
+            }
+        </style>
+    </head>
 
-    </style>
-</head>
+    <body>
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>판매자 회원가입</h1>
+                <hr />
+            </div>
 
-<body>
-    <div class="signup-container">
-        <div class="signup-header">
-            <h1>판매자 회원가입</h1>
-            <hr>
-        </div>
+            <!-- 판매자 단계 1: 기본 회원 정보 -->
+            <form method="post" th:object="${registerRequest}" action="/shop/register/start">
+                <!-- 역할 고정 -->
+                <input type="hidden" name="memberRole" value="SHOP" />
 
-        <!-- 판매자 단계 1: 기본 회원 정보 -->
-        <form method="post" th:object="${registerRequest}" action="/shop/register/start">
-
-            <!-- 역할 고정 -->
-            <input type="hidden" name="memberRole" value="SHOP">
-
-            <div class="form-row">
-                <label class="form-label">아이디</label>
-                <div class="input-with-btn">
-                    <input type="text" th:field="*{memberId}" class="input-text" required>
-                    <button type="button" class="btn-small" id="id-chk-btn">중복확인</button>
+                <div class="form-row">
+                    <label class="form-label">아이디</label>
+                    <div class="input-with-btn">
+                        <input type="text" th:field="*{memberId}" class="input-text" required />
+                        <button type="button" class="btn-small" id="id-chk-btn">중복확인</button>
+                    </div>
                 </div>
-            </div>
-            <div class="error" th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></div>
+                <div class="error" th:if="${#fields.hasErrors('memberId')}" th:errors="*{memberId}"></div>
 
-            <div class="form-row">
-                <label class="form-label">비밀번호</label>
-                <input type="password" name="memberPw" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">비밀번호 확인</label>
-                <input type="password" name="memberPwConfirm" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">이름</label>
-                <input type="text" name="memberName" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">주민등록번호</label>
-                <div class="jumin-area">
-                    <input type="text" name="jumin1" class="input-jumin" maxlength="6">
-                    <span>-</span>
-                    <input type="password" name="jumin2" class="input-jumin" maxlength="1">
+                <div class="form-row">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" name="memberPw" class="input-text" required />
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">이메일</label>
-                <div class="input-with-btn">
-                    <input type="email" name="memberEmail" class="input-text" required>
-                    <button type="button" class="btn-small" id="email-chk-btn">중복확인</button>
+                <div class="form-row">
+                    <label class="form-label">비밀번호 확인</label>
+                    <input type="password" name="memberPwConfirm" class="input-text" required />
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">휴대폰</label>
-                <div class="input-with-btn">
-                    <input type="text" name="memberPhone" class="input-text" required>
-                    <!-- <button type="button" class="btn-small" id="phone-chk-btn">인증</button> -->
+                <div class="form-row">
+                    <label class="form-label">이름</label>
+                    <input type="text" name="memberName" class="input-text" required />
                 </div>
-            </div>
 
-            <!-- <div class="form-row auth-code-row">
+                <div class="form-row">
+                    <label class="form-label">주민등록번호</label>
+                    <div class="jumin-area">
+                        <input type="text" name="jumin1" class="input-jumin" maxlength="6" />
+                        <span>-</span>
+                        <input type="password" name="jumin2" class="input-jumin" maxlength="1" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">이메일</label>
+                    <div class="input-with-btn">
+                        <input type="email" name="memberEmail" class="input-text" required />
+                        <button type="button" class="btn-small" id="email-chk-btn">중복확인</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">휴대폰</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="memberPhone" class="input-text" required />
+                        <!-- <button type="button" class="btn-small" id="phone-chk-btn">인증</button> -->
+                    </div>
+                </div>
+
+                <!-- <div class="form-row auth-code-row">
                 <div class="input-with-btn">
                     <input type="text" name="authCode" class="input-text" placeholder="인증번호 입력" required>
                     <button type="button" class="btn-small" id="auth-code-btn">확인</button>
                 </div>
             </div> -->
 
-            <div class="form-row">
-                <label class="form-label">주소</label>
-                <div class="input-with-btn">
-                    <input type="text" name="memberAddress" id="memberAddress" class="input-text" placeholder="주소 검색" readonly required>
-                    <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                <div class="form-row">
+                    <label class="form-label">주소</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="memberAddress" id="memberAddress" class="input-text" placeholder="주소 검색" readonly required />
+                        <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">상세주소</label>
-                <input type="text" name="memberAddressDetail" class="input-text">
-            </div>
+                <div class="form-row">
+                    <label class="form-label">상세주소</label>
+                    <input type="text" name="memberAddressDetail" class="input-text" />
+                </div>
 
-            <div class="action-buttons">
-                <button type="submit" class="btn-large btn-next">다음 (입점신청)</button>
-            </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn-large btn-next">다음 (입점신청)</button>
+                </div>
+            </form>
+        </div>
 
-        </form>
-    </div>
+        <script>
+            $(document).ready(function () {
+                let idCheck = false;
+                let emailCheck = false;
+                let phoneAuthSent = false;
+                let phoneAuthOk = false;
 
-<script>
-$(document).ready(function () {
+                /* ---------------- 아이디 중복확인 ---------------- */
+                $('#id-chk-btn').click(function () {
+                    let memberId = $("input[name='memberId']").val().trim();
 
-    let idCheck = false;
-    let emailCheck = false;
-    let phoneAuthSent = false;
-    let phoneAuthOk = false;
+                    if (memberId === '') {
+                        Swal.fire('아이디를 입력해주세요.');
+                        return;
+                    }
 
-    /* ---------------- 아이디 중복확인 ---------------- */
-    $("#id-chk-btn").click(function () {
+                    let idReg = /^[a-zA-Z][a-zA-Z0-9]{4,19}$/;
+                    if (!idReg.test(memberId)) {
+                        Swal.fire('아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.');
+                        return;
+                    }
 
-        let memberId = $("input[name='memberId']").val().trim();
+                    let repeatReg = /(.)\1\1/;
+                    if (repeatReg.test(memberId)) {
+                        Swal.fire('같은 문자를 3번 이상 반복할 수 없습니다.');
+                        return;
+                    }
 
-        if (memberId === "") {
-            Swal.fire("아이디를 입력해주세요.");
-            return;
-        }
+                    $.ajax({
+                        url: '/shop/check-id',
+                        type: 'GET',
+                        data: { memberId: memberId },
 
-        let idReg = /^[a-zA-Z][a-zA-Z0-9]{4,19}$/;
-        if (!idReg.test(memberId)) {
-            Swal.fire("아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.");
-            return;
-        }
+                        success: function (result) {
+                            if (result === true) {
+                                Swal.fire('사용 가능한 아이디입니다.');
+                                idCheck = true;
+                            } else {
+                                Swal.fire('이미 사용 중인 아이디입니다.');
+                                idCheck = false;
+                            }
+                        },
 
-        let repeatReg = /(.)\1\1/;
-        if (repeatReg.test(memberId)) {
-            Swal.fire("같은 문자를 3번 이상 반복할 수 없습니다.");
-            return;
-        }
+                        error: function (xhr) {
+                            let msg = '알 수 없는 오류가 발생했습니다.';
 
-        $.ajax({
-            url: "/shop/check-id",
-            type: "GET",
-            data: { memberId: memberId },
+                            if (xhr.status === 401 || xhr.status === 403) {
+                                msg = '권한 문제로 요청이 차단되었습니다. (로그인/시큐리티)';
+                            } else if (xhr.status === 302) {
+                                msg = '로그인 페이지로 리다이렉트되었습니다.';
+                            } else if (xhr.status === 404) {
+                                msg = '중복확인 API를 찾을 수 없습니다.';
+                            } else if (xhr.status === 500) {
+                                msg = '서버 내부 오류입니다.';
+                            }
 
-            success: function (result) {
-                if (result === true) {
-                    Swal.fire("사용 가능한 아이디입니다.");
-                    idCheck = true;
-                } else {
-                    Swal.fire("이미 사용 중인 아이디입니다.");
-                    idCheck = false;
-                }
-            },
+                            Swal.fire({
+                                icon: 'error',
+                                title: '아이디 중복확인 실패',
+                                text: msg,
+                            });
 
-            error: function (xhr) {
-                let msg = "알 수 없는 오류가 발생했습니다.";
-
-                if (xhr.status === 401 || xhr.status === 403) {
-                    msg = "권한 문제로 요청이 차단되었습니다. (로그인/시큐리티)";
-                } else if (xhr.status === 302) {
-                    msg = "로그인 페이지로 리다이렉트되었습니다.";
-                } else if (xhr.status === 404) {
-                    msg = "중복확인 API를 찾을 수 없습니다.";
-                } else if (xhr.status === 500) {
-                    msg = "서버 내부 오류입니다.";
-                }
-
-                Swal.fire({
-                    icon: "error",
-                    title: "아이디 중복확인 실패",
-                    text: msg
+                            console.error('ID CHECK ERROR', xhr.status, xhr.responseText);
+                            idCheck = false;
+                        },
+                    });
                 });
 
-                console.error("ID CHECK ERROR", xhr.status, xhr.responseText);
-                idCheck = false;
-            }
-        });
-    });
+                $("input[name='memberId']").on('input', function () {
+                    idCheck = false;
+                });
 
-    $("input[name='memberId']").on("input", function () {
-        idCheck = false;
-    });
+                /* ---------------- 비밀번호 검사 ---------------- */
+                $("input[name='memberPw'], input[name='memberPwConfirm']").on('input', function () {
+                    let pw = $("input[name='memberPw']").val();
+                    let pw2 = $("input[name='memberPwConfirm']").val();
+                    let id = $("input[name='memberId']").val();
+                    let name = $("input[name='memberName']").val();
 
+                    let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+                    let sameReg = /(.)\1\1/;
 
-    /* ---------------- 비밀번호 검사 ---------------- */
-    $("input[name='memberPw'], input[name='memberPwConfirm']").on("input", function () {
+                    if (pw.includes(id) && id.length > 0) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (pw.includes(name) && name.length > 0) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (!pwReg.test(pw)) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (sameReg.test(pw)) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else {
+                        $("input[name='memberPw']").css('border', '1px solid #000');
+                    }
 
-        let pw = $("input[name='memberPw']").val();
-        let pw2 = $("input[name='memberPwConfirm']").val();
-        let id = $("input[name='memberId']").val();
-        let name = $("input[name='memberName']").val();
+                    if (pw !== pw2) {
+                        $("input[name='memberPwConfirm']").css('border', '2px solid red');
+                    } else {
+                        $("input[name='memberPwConfirm']").css('border', '1px solid #000');
+                    }
+                });
 
-        let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
-        let sameReg = /(.)\1\1/;
+                $("input[name='memberName']").on('input', function () {
+                    $("input[name='memberPw']").css('border', '1px solid #000');
+                    $("input[name='memberPwConfirm']").css('border', '1px solid #000');
+                });
 
-        if (pw.includes(id) && id.length > 0) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        } 
-        else if (pw.includes(name) && name.length > 0) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        }
-        else if (!pwReg.test(pw)) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        } 
-        else if (sameReg.test(pw)) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        }
-        else {
-            $("input[name='memberPw']").css("border", "1px solid #000");
-        }
+                // $("input[name='memberName']").on("input", function () {
+                //     let v = $(this).val().replace(/[^가-힣]/g, "");
+                //     $(this).val(v);
+                // });
 
-        if (pw !== pw2) {
-            $("input[name='memberPwConfirm']").css("border", "2px solid red");
-        } else {
-            $("input[name='memberPwConfirm']").css("border", "1px solid #000");
-        }
-    });
+                /* ---------------- 이메일 중복확인 ---------------- */
+                $('#email-chk-btn').click(function () {
+                    let email = $("input[name='memberEmail']").val().trim();
 
-    $("input[name='memberName']").on("input", function () {
-        $("input[name='memberPw']").css("border", "1px solid #000");
-        $("input[name='memberPwConfirm']").css("border", "1px solid #000");
-    });
+                    if (email === '') {
+                        Swal.fire('이메일을 입력해주세요.');
+                        return;
+                    }
 
-    // $("input[name='memberName']").on("input", function () {
-    //     let v = $(this).val().replace(/[^가-힣]/g, "");
-    //     $(this).val(v);
-    // });
+                    let emailReg = /^[a-zA-Z0-9._%+-]{2,20}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailReg.test(email)) {
+                        Swal.fire('올바른 이메일 형식이 아닙니다.');
+                        return;
+                    }
 
+                    $.ajax({
+                        url: '/shop/check-email',
+                        type: 'GET',
+                        data: { memberEmail: email },
+                        success: function (result) {
+                            if (result === true) {
+                                Swal.fire('사용 가능한 이메일입니다.');
+                                emailCheck = true;
+                            } else {
+                                Swal.fire('이미 사용 중인 이메일입니다.');
+                                emailCheck = false;
+                            }
+                        },
+                    });
+                });
 
-    /* ---------------- 이메일 중복확인 ---------------- */
-    $("#email-chk-btn").click(function () {
-
-        let email = $("input[name='memberEmail']").val().trim();
-
-        if (email === "") {
-            Swal.fire("이메일을 입력해주세요.");
-            return;
-        }
-
-        let emailReg = /^[a-zA-Z0-9._%+-]{2,20}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailReg.test(email)) {
-            Swal.fire("올바른 이메일 형식이 아닙니다.");
-            return;
-        }
-
-        $.ajax({
-            url: "/shop/check-email",
-            type: "GET",
-            data: { memberEmail: email },
-            success: function (result) {
-                if (result === true) {
-                    Swal.fire("사용 가능한 이메일입니다.");
-                    emailCheck = true;
-                } else {
-                    Swal.fire("이미 사용 중인 이메일입니다.");
+                $("input[name='memberEmail']").on('input', function () {
                     emailCheck = false;
-                }
+                    $(this).val($(this).val().toLowerCase());
+                });
+
+                /* ---------------- 전화번호 자동 하이픈 ---------------- */
+                $("input[name='memberPhone']").on('input', function () {
+                    let value = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, '');
+
+                    if (value.length > 11) {
+                        value = value.substring(0, 11);
+                    }
+
+                    let result = '';
+
+                    if (value.length < 4) {
+                        result = value;
+                    } else if (value.length < 8) {
+                        result = value.substring(0, 3) + '-' + value.substring(3);
+                    } else {
+                        result = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+                    }
+
+                    $(this).val(result);
+                });
+
+                /* ---------------- 인증번호 발송 ---------------- */
+                // $("#phone-chk-btn").click(function () {
+
+                //     let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
+
+                //     let phoneReg = /^(010|011|016|017|018|019)[0-9]{7,8}$/;
+
+                //     if (!phoneReg.test(phone)) {
+                //         showErrorAlert("휴대폰 번호 형식을 확인해주세요.");
+                //         return;
+                //     }
+
+                //     $.ajax({
+                //         url: "/member/send-auth-code",
+                //         type: "POST",
+                //         contentType: "application/json",
+                //         data: JSON.stringify({ phone: phone }),
+                //         success: function (res) {
+                //             if (!res.success) {
+                //                 showErrorAlert("인증번호 발송에 실패했습니다.");
+                //                 phoneAuthSent = false;
+                //                 return;
+                //             }
+                //             showSuccessAlert("인증번호가 발송되었습니다.");
+                //             phoneAuthSent = true;
+                //             console.log("인증번호(테스트) :", res.authCode);
+                //         }
+                //     });
+                // });
+
+                /* ---------------- 인증번호 확인 ---------------- */
+                // $("#auth-code-btn").click(function () {
+
+                //     if (!phoneAuthSent) {
+                //         showErrorAlert("먼저 인증번호를 발송해주세요.");
+                //         return;
+                //     }
+
+                //     let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
+                //     let inputCode = $("input[name='authCode']").val().trim();
+
+                //     $.ajax({
+                //         url: "/member/verify-auth-code",
+                //         type: "POST",
+                //         contentType: "application/json",
+                //         data: JSON.stringify({ phone: phone, authCode: inputCode }),
+                //         success: function (res) {
+                //             if (res.success) {
+                //                 showSuccessAlert("휴대폰 인증이 완료되었습니다.");
+                //                 phoneAuthOk = true;
+                //             } else {
+                //                 showErrorAlert("인증번호가 일치하지 않습니다.");
+                //                 phoneAuthOk = false;
+                //             }
+                //         }
+                //     });
+                // });
+
+                /* ---------------- 주민번호 입력 제한 ---------------- */
+                $("input[name='jumin1']").on('input', function () {
+                    let v = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, '');
+
+                    if (v.length > 6) v = v.substring(0, 6);
+                    $(this).val(v);
+
+                    if (v.length === 6) {
+                        $("input[name='jumin2']").focus();
+                    }
+                });
+
+                $("input[name='jumin2']").on('input', function () {
+                    let v = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, '');
+                    if (v.length > 1) v = v.substring(0, 1);
+                    $(this).val(v);
+                });
+
+                /* ---------------- submit 직전 검증 ---------------- */
+                $('form').submit(function () {
+                    let id = $("input[name='memberId']").val().trim();
+                    let pw = $("input[name='memberPw']").val();
+
+                    $("input[name='memberPhone']").val($("input[name='memberPhone']").val().replace(/-/g, ''));
+
+                    let pw2 = $("input[name='memberPwConfirm']").val();
+                    let name = $("input[name='memberName']").val().trim();
+                    let j1 = $("input[name='jumin1']").val().trim();
+                    let j2 = $("input[name='jumin2']").val().trim();
+                    let email = $("input[name='memberEmail']").val().trim();
+                    let phone = $("input[name='memberPhone']").val().trim();
+                    let address = $("input[name='memberAddress']").val().trim();
+
+                    if (!idCheck) {
+                        Swal.fire('아이디 중복확인을 완료해주세요.');
+                        return false;
+                    }
+
+                    if (/^\d+$/.test(id)) {
+                        Swal.fire('아이디는 숫자만으로 구성할 수 없습니다.');
+                        return false;
+                    }
+
+                    // let nameReg = /^[가-힣]{2,20}$/;
+                    // if (!nameReg.test(name)) {
+                    //     showErrorAlert("이름은 한글 2~20자만 가능합니다.");
+                    //     return false;
+                    // }
+
+                    let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+                    if (!pwReg.test(pw)) {
+                        Swal.fire('비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.');
+                        return false;
+                    }
+
+                    if (pw !== pw2) {
+                        Swal.fire('비밀번호가 일치하지 않습니다.');
+                        return false;
+                    }
+
+                    if (!emailCheck) {
+                        Swal.fire('이메일 중복확인을 완료해주세요.');
+                        return false;
+                    }
+
+                    // if (!phoneAuthOk) {
+                    //     showErrorAlert("휴대폰 인증을 완료해주세요.");
+                    //     return false;
+                    // }
+
+                    if (address.length < 5) {
+                        Swal.fire('주소를 정확히 입력해주세요.');
+                        return false;
+                    }
+
+                    return true;
+                });
+            });
+
+            // 주소 검색 API
+            function execDaumPostcode() {
+                // 카카오 주소 API 호출
+                new daum.Postcode({
+                    oncomplete: function (data) {
+                        // 주소 선택 시 처리 로직
+                        let addr = '';
+
+                        // 사용자가 선택한 주소 타입에 따라 주소 설정
+                        if (data.userSelectedType === 'R') {
+                            // 도로명 주소
+                            addr = data.roadAddress;
+                        } else {
+                            // 지번 주소
+                            addr = data.jibunAddress;
+                        }
+
+                        document.getElementById('memberAddress').value = addr;
+                        document.getElementsByName('memberAddressDetail')[0].focus();
+                    },
+                }).open();
             }
-        });
-
-    });
-
-    $("input[name='memberEmail']").on("input", function () {
-        emailCheck = false;
-        $(this).val($(this).val().toLowerCase());
-    });
-
-
-    /* ---------------- 전화번호 자동 하이픈 ---------------- */
-    $("input[name='memberPhone']").on("input", function () {
-
-        let value = $(this).val().replace(/[^0-9]/g, "");
-
-        if (value.length > 11) {
-            value = value.substring(0, 11);
-        }
-
-        let result = "";
-
-        if (value.length < 4) {
-            result = value;
-        } else if (value.length < 8) {
-            result = value.substring(0, 3) + "-" + value.substring(3);
-        } else {
-            result =
-                value.substring(0, 3) + "-" +
-                value.substring(3, 7) + "-" +
-                value.substring(7, 11);
-        }
-
-        $(this).val(result);
-    });
-
-
-    /* ---------------- 인증번호 발송 ---------------- */
-    // $("#phone-chk-btn").click(function () {
-
-    //     let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
-
-    //     let phoneReg = /^(010|011|016|017|018|019)[0-9]{7,8}$/;
-
-    //     if (!phoneReg.test(phone)) {
-    //         showErrorAlert("휴대폰 번호 형식을 확인해주세요.");
-    //         return;
-    //     }
-
-    //     $.ajax({
-    //         url: "/member/send-auth-code",
-    //         type: "POST",
-    //         contentType: "application/json",
-    //         data: JSON.stringify({ phone: phone }),
-    //         success: function (res) {
-    //             if (!res.success) {
-    //                 showErrorAlert("인증번호 발송에 실패했습니다.");
-    //                 phoneAuthSent = false;
-    //                 return;
-    //             }
-    //             showSuccessAlert("인증번호가 발송되었습니다.");
-    //             phoneAuthSent = true;
-    //             console.log("인증번호(테스트) :", res.authCode);
-    //         }
-    //     });
-    // });
-
-
-    /* ---------------- 인증번호 확인 ---------------- */
-    // $("#auth-code-btn").click(function () {
-
-    //     if (!phoneAuthSent) {
-    //         showErrorAlert("먼저 인증번호를 발송해주세요.");
-    //         return;
-    //     }
-
-    //     let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
-    //     let inputCode = $("input[name='authCode']").val().trim();
-
-    //     $.ajax({
-    //         url: "/member/verify-auth-code",
-    //         type: "POST",
-    //         contentType: "application/json",
-    //         data: JSON.stringify({ phone: phone, authCode: inputCode }),
-    //         success: function (res) {
-    //             if (res.success) {
-    //                 showSuccessAlert("휴대폰 인증이 완료되었습니다.");
-    //                 phoneAuthOk = true;
-    //             } else {
-    //                 showErrorAlert("인증번호가 일치하지 않습니다.");
-    //                 phoneAuthOk = false;
-    //             }
-    //         }
-    //     });
-    // });
-
-
-    /* ---------------- 주민번호 입력 제한 ---------------- */
-    $("input[name='jumin1']").on("input", function () {
-        let v = $(this).val().replace(/[^0-9]/g, "");
-
-        if (v.length > 6) v = v.substring(0, 6);
-        $(this).val(v);
-
-        if (v.length === 6) {
-            $("input[name='jumin2']").focus();
-        }
-    });
-
-    $("input[name='jumin2']").on("input", function () {
-        let v = $(this).val().replace(/[^0-9]/g, "");
-        if (v.length > 1) v = v.substring(0, 1);
-        $(this).val(v);
-    });
-
-
-    /* ---------------- submit 직전 검증 ---------------- */
-    $("form").submit(function () {
-
-        let id = $("input[name='memberId']").val().trim();
-        let pw = $("input[name='memberPw']").val();
-
-        $("input[name='memberPhone']").val(
-            $("input[name='memberPhone']").val().replace(/-/g, "")
-        );
-
-        let pw2 = $("input[name='memberPwConfirm']").val();
-        let name = $("input[name='memberName']").val().trim();
-        let j1 = $("input[name='jumin1']").val().trim();
-        let j2 = $("input[name='jumin2']").val().trim();
-        let email = $("input[name='memberEmail']").val().trim();
-        let phone = $("input[name='memberPhone']").val().trim();
-        let address = $("input[name='memberAddress']").val().trim();
-
-        if (!idCheck) {
-            Swal.fire("아이디 중복확인을 완료해주세요.");
-            return false;
-        }
-
-        if (/^\d+$/.test(id)) {
-            Swal.fire("아이디는 숫자만으로 구성할 수 없습니다.");
-            return false;
-        }
-
-        // let nameReg = /^[가-힣]{2,20}$/;
-        // if (!nameReg.test(name)) {
-        //     showErrorAlert("이름은 한글 2~20자만 가능합니다.");
-        //     return false;
-        // }
-
-        let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
-        if (!pwReg.test(pw)) {
-            Swal.fire("비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.");
-            return false;
-        }
-
-        if (pw !== pw2) {
-            Swal.fire("비밀번호가 일치하지 않습니다.");
-            return false;
-        }
-
-        if (!emailCheck) {
-            Swal.fire("이메일 중복확인을 완료해주세요.");
-            return false;
-        }
-
-        // if (!phoneAuthOk) {
-        //     showErrorAlert("휴대폰 인증을 완료해주세요.");
-        //     return false;
-        // }
-
-        if (address.length < 5) {
-            Swal.fire("주소를 정확히 입력해주세요.");
-            return false;
-        }
-
-        return true;
-    });
-    
-});
-
-// 주소 검색 API
-function execDaumPostcode() {
-    // 카카오 주소 API 호출
-    new daum.Postcode({
-        oncomplete: function(data) {
-
-            // 주소 선택 시 처리 로직
-            let addr = "";
-
-            // 사용자가 선택한 주소 타입에 따라 주소 설정
-            if (data.userSelectedType === "R") { 
-                // 도로명 주소
-                addr = data.roadAddress;
-            } else { 
-                // 지번 주소
-                addr = data.jibunAddress;
-            }
-
-            document.getElementById("memberAddress").value = addr;
-            document.getElementsByName("memberAddressDetail")[0].focus();
-        }
-    }).open();
-}
-
-</script>
-</body>
+        </script>
+    </body>
 </html>
