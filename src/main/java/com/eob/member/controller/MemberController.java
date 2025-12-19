@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
     private final MemberService memberService;
+    private final SmsService smsService;
 
     /*
         로그인 페이지
@@ -53,10 +55,16 @@ public class MemberController {
     @PostMapping("register")
     public String register(
             @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
-            BindingResult bindingResult, HttpSession session
-    ) {
-        // Valid에서 걸리면 다시 보여줌
+            BindingResult bindingResult, HttpSession session) {
+
+        // 기본 유효성 검사
         if (bindingResult.hasErrors()) {
+            return "member/member-register";
+        }
+
+        // SMS 인증 체크
+        if(!smsService.isVerified(session)){
+            bindingResult.reject("sms.notVerified","휴대폰 인증을 완료해주세요.");
             return "member/member-register";
         }
 
@@ -69,6 +77,9 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             return "member/member-register";
         }
+
+        // 인증 상태 초기화
+        session.removeAttribute("SMS_VERIFIED");
 
         return "redirect:/member/login";
     }

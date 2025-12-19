@@ -100,8 +100,7 @@ dependencies {
 
 	// coolsms-java-sdk
 	// CoolSMS 문자 발송 API를 Java에서 쉽게 사용할 수 있도록 도와주는 SDK
-	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
-	implementation 'com.google.code.gson:gson:2.10.1'
+	implementation 'net.nurigo:sdk:4.3.0'
 
 }
 

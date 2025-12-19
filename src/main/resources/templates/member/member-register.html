@@ -673,10 +673,10 @@ $(document).ready(function () {
 
         /* 휴대폰 인증 */
         // 나중에 주석 제거
-        // if (!phoneAuthOk) {
-        //     showErrorAlert("휴대폰 인증을 완료해주세요.");
-        //     return false;
-        // }
+         if (!phoneAuthOk) {
+            showErrorAlert("휴대폰 인증을 완료해주세요.");
+            return false;
+         }
 
         // 010만 허용
         if (!/^010/.test(phone)) {
