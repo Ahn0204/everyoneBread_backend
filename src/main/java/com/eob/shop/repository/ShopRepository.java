@@ -49,4 +49,21 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
     @Query("select s from ShopEntity s where s.status='CLOSE_REVIEW'")
     Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
 
+    /**
+     * 상품 카테고리에 해당하는 상점 조회 - 페이징 객체 리턴
+     * ->추후 위치 조건까지 추가 예정
+     * (예솔 추가)
+     */
+    @Query("""
+            select distinct s
+            from ShopEntity s
+            join ProductEntity p on p.shop = s
+            where s.status = 'APPLY_APPROVED'
+            and p.catName = :category
+            """)
+    // 아래가 틀린 이유: G와의 대화 참고
+    // @Query("select s from ShopEntity s, ProductEntity p where
+    // s.status='APPLY_APPROVED' and in(select distinct shopNo from p where
+    // catName=:category)")
+    Page<ShopEntity> findByProductCatName(@Param("category") String category, Pageable pageable);
 }

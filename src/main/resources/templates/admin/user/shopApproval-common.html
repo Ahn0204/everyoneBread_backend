@@ -7,6 +7,7 @@
         <div class="div-col-2" th:text="${shop.status.description}"></div>
         <div class="div-col-3" th:text="${shop.member.memberId}"></div>
         <div class="div-col-4" th:text="${shop.member.memberName}"></div>
+        <div class="div-col-7" th:text="${shop.shopName}"></div>
         <div class="div-col-5" th:text="${#temporals.format(shop.createdAt, 'YY-MM-dd HH:mm')}"></div>
         <div class="div-col-6" th:text="${#temporals.format(shop.approvedDate, 'YY-MM-dd HH:mm')}"></div>
     </button>

@@ -1,0 +1,29 @@
+<div class="cartList">
+    <div class="cartListBox d-flex flex-column gap-2">
+        <!--상점명-->
+        <div class="shopNameBox">
+            <h4 class="shopName" th:text="${shop.shopName}"></h4>
+        </div>
+        <!--상품 목록-->
+        <div class="cart-product"></div>
+        <!--주문 금액-->
+        <div class="cart-totalPrice">0원</div>
+        <!--주문 버튼-->
+        <div class="cart-order">
+            <button class="orderBtn btn btn-primary">주문</button>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" th:inline="javascript">
+    //$(document).ready()대신 사용
+    $(function () {
+        const cartList = sessionStorage.getItem('cartList');
+        if (cartList) {
+            //장바구니에 담은 값이 있다면
+            cartList.forEach((element) => {
+                $('.cart-product').append(element);
+            });
+        }
+    });
+</script>

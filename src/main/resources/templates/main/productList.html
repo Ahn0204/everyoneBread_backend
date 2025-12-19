@@ -1,0 +1,84 @@
+<!--
+******************************************
+*  Created On : 2025. 12. 19.
+*  File : productList.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
+    <head>
+        <th:block layout:fragment="head">
+            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+        </th:block>
+    </head>
+    <body>
+        <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
+        <div layout:fragment="content">
+            <!--상품 리스트-->
+            <div class="d-flex row">
+                <div class="listBox">
+                    <!--상품 리스트 상부 - 상점 정보-->
+                    <div class="shopInfo" th:object="${shop}">
+                        <div class="shopName" th:text="${shop.shopName}"></div>
+                    </div>
+                    <!--상품 리스트 하부 - 상품 리스트-->
+                    <div class="productList">
+                        <div class="product" th:each="product:${productList}">
+                            <!--상품 사진 url 경로 몰라서 주석 처리-->
+                            <!-- <div><img th:src="@{|/${product.imgUrl}|}" alt="" /></div> -->
+                            <div class="productName" th:text="${product.productName}"></div>
+                            <div class="productPrice" th:text="${product.price}"></div>
+                            <div class="productSummary" th:text="${product.summary}"></div>
+                            <!--수량, 담기 버튼-->
+                            <div class="beforeCart">
+                                <input type="number" class="quantity" value="1" />
+                                <button class="cartBtn btn btn-secondary" th:data-productno="${product.productNo}">담기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--장바구니/주문표-->
+                <div th:replace="~{main/cartList}" class="cartList"></div>
+            </div>
+        </div>
+
+        <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
+        <script layout:fragment="script">
+            const shopNo = $(this).data('shopno');
+            const this = $(this);
+            //장바구니 담기 버튼
+            $('.cartBtn').on('click', function () {
+                //sessionStorage에 저장된 shopNo 확인
+                if(!sessionStorage.getItem(shopNo)){
+                    //shopNo이 일치하지 않는다면
+                    showConfirmAlert(
+                    '다른 가게 주문이 담겨있습니다. 변경하시겠습니까?',
+                    ()=>{ //예
+                        insertCart($(this));
+                    },
+                    ()=>{
+                        //아니오
+                        showToast('같은 가게 주문만 담을 수 있습니다.','error');
+                    }
+                    );
+                } else {
+                    //shopNo이 일치한다면
+                    insertCart();
+                }
+
+                const product = $(this).closest('.product');
+                const productName = product.find('.productName').text();
+                const productPrice = product.find('.productPrice').text();
+                const quantity = $(this).siblings('.quantity').val();
+                const data = { productNo: $(this).data('productno'), productName, productPrice, quantity };
+                // console.log(data);
+                let arrData = []; //리스트 객체 생성
+                arrData.push(data); //리스트에 상품 추가
+                sessionStorage.setItem('':arrData);
+                console.log(arrData);
+
+                // sessionStorage.setItem('user', JSON.stringify({ : , quantity: }));
+            });
+        </script>
+    </body>
+</html>
