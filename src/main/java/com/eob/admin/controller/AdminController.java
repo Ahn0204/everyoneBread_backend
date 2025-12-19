@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.service.AdminService;
+import com.eob.member.model.data.MemberEntity;
+import com.eob.member.repository.MemberRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.repository.RiderRepository;
@@ -44,6 +46,7 @@ public class AdminController {
     public final ShopRepository shopRepository;
     public final RiderService riderService;
     public final RiderRepository riderRepository;
+    public final MemberRepository memberRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -293,7 +296,8 @@ public class AdminController {
 
     // 관리자 계정 내역(추가) 페이지
     @GetMapping("/user/admin-list")
-    public String getAdminList(Model model) { // 그냥 insertAdminForm만 뷰로 전달해도, 뷰에서 th:object로 사용가능
+    public String getAdminList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 그냥 insertAdminForm만 뷰로 전달해도, 뷰에서 th:object로 사용가능
         // redirect 시에는 flashAttribute에 insertAdminForm이 담아져옴(필드 에러 출력에 필요)
 
         // 필드 에러로 redirect되지 않은 새 페이지라면
@@ -301,6 +305,30 @@ public class AdminController {
             // insertAdminForm객체 생성
             model.addAttribute("insertAdminForm", new InsertAdminForm());
         }
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 라이더 내역 - 페이징 객체로 리턴
+        Page<MemberEntity> adminP = memberRepository.findByMemberRoleAdmin(pageable);
+
+        // 라이더 내역이 존재 하지 않을 때
+        if (adminP.getTotalElements() == 0) { // adminP 요소의 총 갯수가 0이면
+            model.addAttribute("noAdmin", "조회된 내역이 없습니다.");
+        } else {
+            // 관리자 내역이 존재한다면, adminList 생성
+            List<MemberEntity> adminList = adminP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("adminList", adminList);
+
+            // 글번호 시작값 계산
+            int start = adminList.size();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("adminP", adminP);
 
         return "admin/user/admin-list";
     }

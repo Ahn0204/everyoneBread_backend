@@ -102,6 +102,9 @@ dependencies {
 	// CoolSMS 문자 발송 API를 Java에서 쉽게 사용할 수 있도록 도와주는 SDK
 	implementation 'net.nurigo:sdk:4.3.0'
 
+	// OracleDB에서 공간데이터(위치 좌표값 등)를 활용할 수 있게 함
+    implementation 'org.hibernate.orm:hibernate-spatial:6.6.4.Final'
+
 }
 
 // JUnit Platform을 사용하여 테스트 실행
