@@ -61,10 +61,10 @@ public class AlertController {
     // 알림 삭제 처리
     @PostMapping("/deleteAlert")
     @ResponseBody
-    public String deleteAlert(@AuthenticationPrincipal CustomSecurityDetail principal,
+    public boolean deleteAlert(@AuthenticationPrincipal CustomSecurityDetail principal,
             @RequestParam("alertNo") Long alertNo) {
-
-        return "";
+        boolean result = this.alertService.deleteAlert(principal, alertNo);
+        return result;
     }
 
     // 알림 쓰기
@@ -76,6 +76,15 @@ public class AlertController {
         this.alertService.sendAlert(principal.getMember(), toMemberNo, type, typeCode);
 
         return "";
+    }
+
+    // 알림 갯수 카운트
+    @PostMapping("/ajaxCount")
+    @ResponseBody
+    public int ajaxAlertCount(@AuthenticationPrincipal CustomSecurityDetail principal) {
+        int result = 0;
+        result = this.alertService.ajaxAlertCount(principal.getMember());
+        return result;
     }
 
 }

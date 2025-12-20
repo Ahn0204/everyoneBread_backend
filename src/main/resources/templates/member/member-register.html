@@ -1,465 +1,450 @@
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
-    <!--예솔: csrf토근 헤더 추가-->
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-    <!-- 카카오 주소 API -->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <title>모두의빵</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+        <!--예솔: csrf토근 헤더 추가-->
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <!-- 카카오 주소 API -->
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <title>모두의빵</title>
 
-    <style>
-        /* 1. 기본 초기화 및 폰트 */
-        * {
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
+        <style>
+            /* 1. 기본 초기화 및 폰트 */
+            * {
+                box-sizing: border-box;
+                font-family: 'Noto Sans KR', sans-serif;
+            }
 
-        body {
-            margin: 0;
-            padding: 40px 0;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
+            body {
+                margin: 0;
+                padding: 40px 0;
+                background-color: #fff;
+                display: flex;
+                justify-content: center;
+                min-height: 100vh;
+            }
 
-        /* 2. 전체 컨테이너 (박스 형태) */
-        .signup-container {
-            width: 100%;
-            max-width: 550px; /* 로그인보다 조금 더 넓게 */
-            padding: 40px;
-            border: 2px solid #000; /* 외곽 테두리 (와이어프레임 느낌) */
-            border-radius: 10px;
-            background-color: #fff;
-        }
+            /* 2. 전체 컨테이너 (박스 형태) */
+            .signup-container {
+                width: 100%;
+                max-width: 550px; /* 로그인보다 조금 더 넓게 */
+                padding: 40px;
+                border: 2px solid #000; /* 외곽 테두리 (와이어프레임 느낌) */
+                border-radius: 10px;
+                background-color: #fff;
+            }
 
-        /* 3. 헤더 스타일 */
-        .signup-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .signup-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 0 20px 0;
-        }
-        .signup-header hr {
-            border: 0;
-            height: 2px;
-        }
+            /* 3. 헤더 스타일 */
+            .signup-header {
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            .signup-header h1 {
+                font-size: 32px;
+                font-weight: 700;
+                margin: 0 0 20px 0;
+            }
+            .signup-header hr {
+                border: 0;
+                height: 2px;
+            }
 
-        /* 4. 입력 폼 행(Row) 스타일 */
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+            /* 4. 입력 폼 행(Row) 스타일 */
+            .form-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
 
-        /* 왼쪽 라벨 (아이디, 비밀번호 등) */
-        .form-label {
-            width: 120px; /* 고정 너비로 정렬 */
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-            flex-shrink: 0; /* 줄어들지 않음 */
-        }
+            /* 왼쪽 라벨 (아이디, 비밀번호 등) */
+            .form-label {
+                width: 120px; /* 고정 너비로 정렬 */
+                font-weight: 700;
+                font-size: 15px;
+                color: #333;
+                flex-shrink: 0; /* 줄어들지 않음 */
+            }
 
-        /* 입력창 공통 스타일 */
-        .input-text {
-            flex: 1; /* 남은 공간 채움 */
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-        }
-        .input-text:focus {
-            background-color: #f9f9f9;
-            border-width: 2px;
-        }
+            /* 입력창 공통 스타일 */
+            .input-text {
+                flex: 1; /* 남은 공간 채움 */
+                height: 45px;
+                padding: 0 10px;
+                border: 1px solid #000;
+                border-radius: 4px;
+                font-size: 14px;
+                outline: none;
+            }
+            .input-text:focus {
+                background-color: #f9f9f9;
+                border-width: 2px;
+            }
 
-        /* 5. 특수 입력 영역 (주민번호, 버튼 포함) */
-        
-        /* 버튼이 옆에 붙는 경우 */
-        .input-with-btn {
-            display: flex;
-            flex: 1;
-            gap: 8px; /* 입력창과 버튼 사이 간격 */
-        }
+            /* 5. 특수 입력 영역 (주민번호, 버튼 포함) */
 
-        /* 중복확인, 인증 버튼 등 작은 버튼 */
-        .btn-small {
-            height: 45px;
-            padding: 0 15px;
-            background-color: #fff;
-            border: 1px solid #000;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-            white-space: nowrap; /* 줄바꿈 방지 */
-            transition: all 0.2s;
-        }
-        .btn-small:hover {
-            background-color: #f0f0f0;
-        }
+            /* 버튼이 옆에 붙는 경우 */
+            .input-with-btn {
+                display: flex;
+                flex: 1;
+                gap: 8px; /* 입력창과 버튼 사이 간격 */
+            }
 
-        /* 주민번호 영역 */
-        .jumin-area {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            gap: 8px;
-        }
-        .input-jumin {
-            width: 100%;
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            text-align: center;
-        }
+            /* 중복확인, 인증 버튼 등 작은 버튼 */
+            .btn-small {
+                height: 45px;
+                padding: 0 15px;
+                background-color: #fff;
+                border: 1px solid #000;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 13px;
+                font-weight: bold;
+                white-space: nowrap; /* 줄바꿈 방지 */
+                transition: all 0.2s;
+            }
+            .btn-small:hover {
+                background-color: #f0f0f0;
+            }
 
-        /* 6. 하단 버튼 영역 (가입, 다음) */
-        .action-buttons {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
+            /* 주민번호 영역 */
+            .jumin-area {
+                display: flex;
+                flex: 1;
+                align-items: center;
+                gap: 8px;
+            }
+            .input-jumin {
+                width: 100%;
+                height: 45px;
+                padding: 0 10px;
+                border: 1px solid #000;
+                border-radius: 4px;
+                text-align: center;
+            }
 
-        .btn-large {
-            width: 200px;
-            height: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+            /* 6. 하단 버튼 영역 (가입, 다음) */
+            .action-buttons {
+                margin-top: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
 
-        /* 가입 버튼 (메인) */
-        .btn-submit {
-            background-color: #fff;
-            border: 2px solid #000;
-            color: #000;
-        }
-        .btn-submit:hover {
-            background-color: #000;
-            color: #fff;
-        }
+            .btn-large {
+                width: 200px;
+                height: 50px;
+                font-size: 16px;
+                font-weight: 700;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
 
-        /* 다음 버튼 (판매자용) */
-        .btn-next {
-            background-color: #000;
-            border: 2px solid #000;
-            color: #fff;
-        }
-        .btn-next:hover {
-            opacity: 0.8;
-        }
+            /* 가입 버튼 (메인) */
+            .btn-submit {
+                background-color: #fff;
+                border: 2px solid #000;
+                color: #000;
+            }
+            .btn-submit:hover {
+                background-color: #000;
+                color: #fff;
+            }
 
-        /* 인증번호 입력 행 (라벨 없음) */
-        .auth-code-row {
-            padding-left: 120px; /* 라벨 너비만큼 들여쓰기 */
-        }
+            /* 다음 버튼 (판매자용) */
+            .btn-next {
+                background-color: #000;
+                border: 2px solid #000;
+                color: #fff;
+            }
+            .btn-next:hover {
+                opacity: 0.8;
+            }
 
-    </style>
-</head>
-<!--  -->
-<body>
-    <div class="signup-container">
-        <div class="signup-header">
-            <h1>회원가입</h1>
-            <hr>
-        </div>
+            /* 인증번호 입력 행 (라벨 없음) */
+            .auth-code-row {
+                padding-left: 120px; /* 라벨 너비만큼 들여쓰기 */
+            }
+        </style>
+    </head>
+    <!--  -->
+    <body>
+        <div class="signup-container">
+            <div class="signup-header">
+                <h1>회원가입</h1>
+                <hr />
+            </div>
 
-        <form method="post" action="/member/register">
-            <!--예솔: csrf토큰 추가-->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-            <input type="hidden" name="memberRole" value="USER">
-            
-            <div class="form-row">
-                <label class="form-label">아이디</label>
-                <div class="input-with-btn">
-                    <input type="text" name="memberId" class="input-text" required>
-                    <button type="button" class="btn-small" id="id-chk-btn">중복확인</button>
+            <form method="post" action="/member/register">
+                <!--예솔: csrf토큰 추가-->
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <input type="hidden" name="memberRole" value="USER" />
+
+                <div class="form-row">
+                    <label class="form-label">아이디</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="memberId" class="input-text" required />
+                        <button type="button" class="btn-small" id="id-chk-btn">중복확인</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">비밀번호</label>
-                <input type="password" name="memberPw" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">비밀번호 확인</label>
-                <input type="password" name="memberPwConfirm" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">이름</label>
-                <input type="text" name="memberName" class="input-text" required>
-            </div>
-
-            <div class="form-row">
-                <label class="form-label">주민등록번호</label>
-                <div class="jumin-area">
-                    <input type="text" name="jumin1" class="input-jumin" maxlength="6">
-                    <span>-</span>
-                    <input type="password" name="jumin2" class="input-jumin" maxlength="1">
+                <div class="form-row">
+                    <label class="form-label">비밀번호</label>
+                    <input type="password" name="memberPw" class="input-text" required />
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">이메일</label>
-                <div class="input-with-btn">
-                    <input type="email" name="memberEmail" class="input-text" required>
-                    <button type="button" class="btn-small" id="email-chk-btn">중복확인</button>
+                <div class="form-row">
+                    <label class="form-label">비밀번호 확인</label>
+                    <input type="password" name="memberPwConfirm" class="input-text" required />
                 </div>
-            </div>
 
-            <div class="form-row">
-                <label class="form-label">휴대폰</label>
-                <div class="input-with-btn">
-                    <input type="text" name="memberPhone" class="input-text" required>
-                    <!-- <button type="button" class="btn-small" id="phone-chk-btn">인증</button> -->
+                <div class="form-row">
+                    <label class="form-label">이름</label>
+                    <input type="text" name="memberName" class="input-text" required />
                 </div>
-            </div>
 
-            <!-- <div class="form-row auth-code-row">
+                <div class="form-row">
+                    <label class="form-label">주민등록번호</label>
+                    <div class="jumin-area">
+                        <input type="text" name="jumin1" class="input-jumin" maxlength="6" />
+                        <span>-</span>
+                        <input type="password" name="jumin2" class="input-jumin" maxlength="1" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">이메일</label>
+                    <div class="input-with-btn">
+                        <input type="email" name="memberEmail" class="input-text" required />
+                        <button type="button" class="btn-small" id="email-chk-btn">중복확인</button>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label class="form-label">휴대폰</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="memberPhone" class="input-text" required />
+                        <!-- <button type="button" class="btn-small" id="phone-chk-btn">인증</button> -->
+                    </div>
+                </div>
+
+                <!-- <div class="form-row auth-code-row">
                 <div class="input-with-btn">
                     <input type="text" name="authCode" class="input-text" placeholder="인증번호 입력" required>
                     <button type="button" class="btn-small" id="auth-code-btn">확인</button>
                 </div>
             </div> -->
 
-            <!-- 기본 주소 + 검색 버튼 -->
-            <div class="form-row">
-                <label class="form-label">주소</label>
-                <div class="input-with-btn">
-                    <input type="text" name="memberAddress" id="memberAddress" class="input-text" placeholder="주소 검색을 눌러주세요" readonly required>
-                    <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                <!-- 기본 주소 + 검색 버튼 -->
+                <div class="form-row">
+                    <label class="form-label">주소</label>
+                    <div class="input-with-btn">
+                        <input type="text" name="memberAddress" id="memberAddress" class="input-text" placeholder="주소 검색을 눌러주세요" readonly required />
+                        <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- 상세주소 입력 -->
-            <div class="form-row">
-                <label class="form-label">상세주소</label>
-                <input type="text" name="memberAddressDetail" class="input-text" placeholder="상세주소 입력 (선택)">
-            </div>
+                <!-- 상세주소 입력 -->
+                <div class="form-row">
+                    <label class="form-label">상세주소</label>
+                    <input type="text" name="memberAddressDetail" class="input-text" placeholder="상세주소 입력 (선택)" />
+                </div>
 
-            <div class="action-buttons">
-                <button type="submit" class="btn-large btn-submit">가입</button>
-                <!-- <button type="button" class="btn-large btn-next" onclick="location.href='/seller/register'">다음 (판매자)</button> -->
-            </div>
-
-        </form>
-    </div>
-<script>
-$(document).ready(function () {
-
-    /*
+                <div class="action-buttons">
+                    <button type="submit" class="btn-large btn-submit">가입</button>
+                    <!-- <button type="button" class="btn-large btn-next" onclick="location.href='/seller/register'">다음 (판매자)</button> -->
+                </div>
+            </form>
+        </div>
+        <script>
+            $(document).ready(function () {
+                /*
         전역 변수 – 상태 체크
     */
-    let idCheck = false;            // 아이디 중복확인 여부
-    let emailCheck = false;         // 이메일 중복확인 여부
-//    let phoneAuthSent = false;      // 인증번호 발송 여부
-//    let phoneAuthOk = false;        // 인증 성공 여부
+                let idCheck = false; // 아이디 중복확인 여부
+                let emailCheck = false; // 이메일 중복확인 여부
+                //    let phoneAuthSent = false;      // 인증번호 발송 여부
+                //    let phoneAuthOk = false;        // 인증 성공 여부
 
-    /*
+                /*
         아이디 중복확인
         - 영문으로 시작
         - 영문/숫자 조합 5~20자
         - 중복확인 AJAX 요청
     */
-    $("#id-chk-btn").click(function () {
+                $('#id-chk-btn').click(function () {
+                    let memberId = $("input[name='memberId']").val().trim();
 
-        let memberId = $("input[name='memberId']").val().trim();
+                    // 기본 빈칸 체크
+                    if (memberId === '') {
+                        Swal.fire('아이디를 입력해주세요.');
+                        return;
+                    }
 
-        // 기본 빈칸 체크
-        if (memberId === "") {
-            Swal.fire("아이디를 입력해주세요.");
-            return;
-        }
+                    // 영문으로 시작 + 영문/숫자만 가능 + 5~20자
+                    let idReg = /^[a-zA-Z][a-zA-Z0-9]{4,19}$/;
+                    if (!idReg.test(memberId)) {
+                        Swal.fire('아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.');
+                        return;
+                    }
 
-        // 영문으로 시작 + 영문/숫자만 가능 + 5~20자
-        let idReg = /^[a-zA-Z][a-zA-Z0-9]{4,19}$/;
-        if (!idReg.test(memberId)) {
-            Swal.fire("아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.");
-            return;
-        }
+                    // 연속 문자를 금지 (aaa, 111, abc)
+                    let repeatReg = /(.)\1\1/; // 같은 문자 3연속
+                    if (repeatReg.test(memberId)) {
+                        Swal.fire('같은 문자를 3번 이상 반복할 수 없습니다.');
+                        return;
+                    }
 
-        // 연속 문자를 금지 (aaa, 111, abc)
-        let repeatReg = /(.)\1\1/; // 같은 문자 3연속
-        if (repeatReg.test(memberId)) {
-            Swal.fire("같은 문자를 3번 이상 반복할 수 없습니다.");
-            return;
-        }
+                    // AJAX 중복확인 요청 (URL은 실제 컨트롤러에 맞게 변경)
+                    $.ajax({
+                        url: '/member/check-id',
+                        type: 'GET',
+                        data: { memberId: memberId },
+                        success: function (result) {
+                            if (result === true) {
+                                Swal.fire('사용 가능한 아이디입니다.');
+                                idCheck = true;
+                            } else {
+                                Swal.fire('이미 사용 중인 아이디입니다.');
+                                idCheck = false;
+                            }
+                        },
+                    });
+                });
 
-        // AJAX 중복확인 요청 (URL은 실제 컨트롤러에 맞게 변경)
-        $.ajax({
-            url: "/member/check-id",
-            type: "GET",
-            data: { memberId: memberId },
-            success: function (result) {
-                if (result === true) {
-                    Swal.fire("사용 가능한 아이디입니다.");
-                    idCheck = true;
-                } else {
-                    Swal.fire("이미 사용 중인 아이디입니다.");
+                // 아이디 입력 변경 → 중복확인 다시 해야 함
+                $("input[name='memberId']").on('input', function () {
                     idCheck = false;
-                }
-            }
-        });
-    });
+                });
 
-    // 아이디 입력 변경 → 중복확인 다시 해야 함
-    $("input[name='memberId']").on("input", function () {
-        idCheck = false;
-    });
-
-
-    /*
+                /*
         비밀번호 실시간 유효성 검사
         - 영문 + 숫자 + 특수문자 포함
         - 8~20자
         - 동일 문자 반복 금지
         - 아이디/이름 포함 금지
     */
-    $("input[name='memberPw'], input[name='memberPwConfirm']").on("input", function () {
+                $("input[name='memberPw'], input[name='memberPwConfirm']").on('input', function () {
+                    let pw = $("input[name='memberPw']").val();
+                    let pw2 = $("input[name='memberPwConfirm']").val();
+                    let id = $("input[name='memberId']").val();
+                    let name = $("input[name='memberName']").val();
 
-        let pw = $("input[name='memberPw']").val();
-        let pw2 = $("input[name='memberPwConfirm']").val();
-        let id = $("input[name='memberId']").val();
-        let name = $("input[name='memberName']").val();
+                    // 비밀번호 기본 조건 정규식
+                    let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
 
-        // 비밀번호 기본 조건 정규식
-        let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+                    // 동일 문자 3회 이상 금지
+                    let sameReg = /(.)\1\1/;
 
-        // 동일 문자 3회 이상 금지
-        let sameReg = /(.)\1\1/;
+                    // 비밀번호 포함 금지 요소
+                    if (pw.includes(id) && id.length > 0) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (pw.includes(name) && name.length > 0) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (!pwReg.test(pw)) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else if (sameReg.test(pw)) {
+                        $("input[name='memberPw']").css('border', '2px solid red');
+                    } else {
+                        $("input[name='memberPw']").css('border', '1px solid #000');
+                    }
 
-        // 비밀번호 포함 금지 요소
-        if (pw.includes(id) && id.length > 0) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        } 
-        else if (pw.includes(name) && name.length > 0) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        }
-        else if (!pwReg.test(pw)) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        } 
-        else if (sameReg.test(pw)) {
-            $("input[name='memberPw']").css("border", "2px solid red");
-        }
-        else {
-            $("input[name='memberPw']").css("border", "1px solid #000");
-        }
+                    // 비밀번호 확인 일치 여부
+                    if (pw !== pw2) {
+                        $("input[name='memberPwConfirm']").css('border', '2px solid red');
+                    } else {
+                        $("input[name='memberPwConfirm']").css('border', '1px solid #000');
+                    }
+                });
 
-        // 비밀번호 확인 일치 여부
-        if (pw !== pw2) {
-            $("input[name='memberPwConfirm']").css("border", "2px solid red");
-        } else {
-            $("input[name='memberPwConfirm']").css("border", "1px solid #000");
-        }
-    });
+                // 이름 변경 시 비밀번호 경고 border 초기화
+                $("input[name='memberName']").on('input', function () {
+                    $("input[name='memberPw']").css('border', '1px solid #000');
+                    $("input[name='memberPwConfirm']").css('border', '1px solid #000');
+                });
 
-    // 이름 변경 시 비밀번호 경고 border 초기화
-    $("input[name='memberName']").on("input", function () {
-        $("input[name='memberPw']").css("border", "1px solid #000");
-        $("input[name='memberPwConfirm']").css("border", "1px solid #000");
-    });
-
-    /*
+                /*
         이메일 중복확인
         - 기본 정규식 검사
         - 중복확인 AJAX 요청
     */
-    $("#email-chk-btn").click(function () {
+                $('#email-chk-btn').click(function () {
+                    let email = $("input[name='memberEmail']").val().trim();
 
-        let email = $("input[name='memberEmail']").val().trim();
+                    if (email === '') {
+                        Swal.fire('이메일을 입력해주세요.');
+                        return;
+                    }
 
-        if (email === "") {
-            Swal.fire("이메일을 입력해주세요.");
-            return;
-        }
+                    // 이메일 정규식 (기본적인 RFC 형태)
+                    let emailReg = /^[a-zA-Z0-9._%+-]{2,20}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailReg.test(email)) {
+                        Swal.fire('올바른 이메일 형식이 아닙니다.');
+                        return;
+                    }
 
-        // 이메일 정규식 (기본적인 RFC 형태)
-        let emailReg = /^[a-zA-Z0-9._%+-]{2,20}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailReg.test(email)) {
-            Swal.fire("올바른 이메일 형식이 아닙니다.");
-            return;
-        }
+                    $.ajax({
+                        url: '/member/check-email',
+                        type: 'GET',
+                        data: { memberEmail: email },
+                        success: function (result) {
+                            if (result === true) {
+                                Swal.fire('사용 가능한 이메일입니다.');
+                                emailCheck = true;
+                            } else {
+                                Swal.fire('이미 사용 중인 이메일입니다.');
+                                emailCheck = false;
+                            }
+                        },
+                    });
+                });
 
-        $.ajax({
-            url: "/member/check-email",
-            type: "GET",
-            data: { memberEmail: email },
-            success: function (result) {
-                if (result === true) {
-                    Swal.fire("사용 가능한 이메일입니다.");
-                    emailCheck = true;
-                } else {
-                    Swal.fire("이미 사용 중인 이메일입니다.");
+                // 이메일 입력 변경 → 중복확인 다시 해야 함
+                $("input[name='memberEmail']").on('input', function () {
                     emailCheck = false;
-                }
-            }
-        });
+                    // 이메일 자동 소문자 변환
+                    $(this).val($(this).val().toLowerCase());
+                });
 
-    });
-
-    // 이메일 입력 변경 → 중복확인 다시 해야 함
-    $("input[name='memberEmail']").on("input", function () {
-        emailCheck = false;
-        // 이메일 자동 소문자 변환
-        $(this).val($(this).val().toLowerCase());
-    });
-
-    /*
+                /*
         휴대폰 번호 자동 하이픈 삽입 (010-1234-5678)
     */
-    $("input[name='memberPhone']").on("input", function () {
+                $("input[name='memberPhone']").on('input', function () {
+                    let value = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, ''); //숫자만
 
-        let value = $(this).val().replace(/[^0-9]/g, ""); //숫자만
+                    // 최대 11자리 제한
+                    if (value.length > 11) {
+                        value = value.substring(0, 11);
+                    }
 
-        // 최대 11자리 제한
-        if (value.length > 11) {
-            value = value.substring(0, 11);
-        }
+                    let result = '';
 
-        let result = "";
+                    if (value.length < 4) {
+                        result = value;
+                    } else if (value.length < 8) {
+                        result = value.substring(0, 3) + '-' + value.substring(3);
+                    } else {
+                        result = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+                    }
 
-        if (value.length < 4) {
-            result = value;
-        } else if (value.length < 8) {
-            result = value.substring(0, 3) + "-" + value.substring(3);
-        } else {
-            result =
-                value.substring(0, 3) + "-" +
-                value.substring(3, 7) + "-" +
-                value.substring(7, 11);
-        }
+                    $(this).val(result);
+                });
 
-        $(this).val(result);
-    });
-
-    /*
+                /*
         휴대폰 인증번호 발송
     */
-/*    $("#phone-chk-btn").click(function () {
+                /*    $("#phone-chk-btn").click(function () {
 
         let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
 
@@ -490,10 +475,10 @@ $(document).ready(function () {
         });
     });
 */
-    /*
+                /*
         인증번호 확인
     */
-/*    $("#auth-code-btn").click(function () {
+                /*    $("#auth-code-btn").click(function () {
 
         if (!phoneAuthSent) {
             Swal.fire("먼저 인증번호를 발송해주세요.");
@@ -520,192 +505,187 @@ $(document).ready(function () {
         });
     });
 */
-    /*
+                /*
         주민등록번호 입력 제한
         - 앞6자리 YYMMDD → 숫자만
         - 뒤1자리 → 숫자만
         - 초과 입력 방지
         */
-    $("input[name='jumin1']").on("input", function () {
-        let v = $(this).val().replace(/[^0-9]/g, "");
+                $("input[name='jumin1']").on('input', function () {
+                    let v = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, '');
 
-        // 최대 6자리 제한
-        if (v.length > 6) v = v.substring(0, 6);
-        $(this).val(v);
+                    // 최대 6자리 제한
+                    if (v.length > 6) v = v.substring(0, 6);
+                    $(this).val(v);
 
-        // 6자리 입력되면 자동으로 뒷자리로 포커스 이동
-        if (v.length === 6) {
-            $("input[name='jumin2']").focus();
-        }
-    });
+                    // 6자리 입력되면 자동으로 뒷자리로 포커스 이동
+                    if (v.length === 6) {
+                        $("input[name='jumin2']").focus();
+                    }
+                });
 
-    $("input[name='jumin2']").on("input", function () {
-        let v = $(this).val().replace(/[^0-9]/g, "");
-        if (v.length > 1) v = v.substring(0, 1);
-        $(this).val(v);
-    });
+                $("input[name='jumin2']").on('input', function () {
+                    let v = $(this)
+                        .val()
+                        .replace(/[^0-9]/g, '');
+                    if (v.length > 1) v = v.substring(0, 1);
+                    $(this).val(v);
+                });
 
-    /*
+                /*
         전체 유효성 검사 후 submit 허용
     */
-    $("form").submit(function () {
+                $('form').submit(function () {
+                    let id = $("input[name='memberId']").val().trim();
+                    let pw = $("input[name='memberPw']").val();
+                    // 전화번호 하이픈 제거 (01012345678 형태로 만들기)
+                    $("input[name='memberPhone']").val($("input[name='memberPhone']").val().replace(/-/g, ''));
+                    let pw2 = $("input[name='memberPwConfirm']").val();
+                    let name = $("input[name='memberName']").val().trim();
+                    let j1 = $("input[name='jumin1']").val().trim();
+                    let j2 = $("input[name='jumin2']").val().trim();
+                    let email = $("input[name='memberEmail']").val().trim();
+                    let phone = $("input[name='memberPhone']").val().trim();
+                    let address = $("input[name='memberAddress']").val().trim();
 
-        let id = $("input[name='memberId']").val().trim();
-        let pw = $("input[name='memberPw']").val();
-        // 전화번호 하이픈 제거 (01012345678 형태로 만들기)
-        $("input[name='memberPhone']").val(
-            $("input[name='memberPhone']").val().replace(/-/g, "")
-        );
-        let pw2 = $("input[name='memberPwConfirm']").val();
-        let name = $("input[name='memberName']").val().trim();
-        let j1 = $("input[name='jumin1']").val().trim();
-        let j2 = $("input[name='jumin2']").val().trim();
-        let email = $("input[name='memberEmail']").val().trim();
-        let phone = $("input[name='memberPhone']").val().trim();
-        let address = $("input[name='memberAddress']").val().trim();
+                    /* 아이디 */
+                    if (!idCheck) {
+                        Swal.fire('아이디 중복확인을 완료해주세요.');
+                        return false;
+                    }
 
-        /* 아이디 */
-        if (!idCheck) {
-            Swal.fire("아이디 중복확인을 완료해주세요.");
-            return false;
-        }
+                    // 아이디 앞뒤 공백 금지
+                    if (/^\s+|\s+$/g.test(id)) {
+                        Swal.fire('아이디 앞뒤에 공백을 포함할 수 없습니다.');
+                        return false;
+                    }
 
-        // 아이디 앞뒤 공백 금지
-        if (/^\s+|\s+$/g.test(id)) {
-            Swal.fire("아이디 앞뒤에 공백을 포함할 수 없습니다.");
-            return false;
-        }
+                    // 숫자만으로 구성 금지
+                    if (/^\d+$/.test(id)) {
+                        Swal.fire('아이디는 숫자만으로 구성할 수 없습니다.');
+                        return false;
+                    }
 
-        // 숫자만으로 구성 금지
-        if (/^\d+$/.test(id)) {
-            Swal.fire("아이디는 숫자만으로 구성할 수 없습니다.");
-            return false;
-        }
+                    /* 이름 - 한글만 허용 */
+                    let nameReg = /^[가-힣]{2,20}$/;
+                    if (!nameReg.test(name)) {
+                        Swal.fire('이름은 한글 2~20자만 가능합니다.');
+                        return false;
+                    }
 
-        /* 이름 - 한글만 허용 */
-        let nameReg = /^[가-힣]{2,20}$/;
-        if (!nameReg.test(name)) {
-            Swal.fire("이름은 한글 2~20자만 가능합니다.");
-            return false;
-        }
+                    /* 비밀번호 */
+                    let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+                    if (!pwReg.test(pw)) {
+                        Swal.fire('비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.');
+                        return false;
+                    }
 
-        /* 비밀번호 */
-        let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
-        if (!pwReg.test(pw)) {
-            Swal.fire("비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.");
-            return false;
-        }
+                    // 공백 포함 금지
+                    if (/\s/.test(pw)) {
+                        Swal.fire('비밀번호에는 공백을 포함할 수 없습니다.');
+                        return false;
+                    }
 
-        // 공백 포함 금지
-        if (/\s/.test(pw)) {
-            Swal.fire("비밀번호에는 공백을 포함할 수 없습니다.");
-            return false;
-        }
+                    if (pw !== pw2) {
+                        Swal.fire('비밀번호가 일치하지 않습니다.');
+                        return false;
+                    }
 
-        if (pw !== pw2) {
-            Swal.fire("비밀번호가 일치하지 않습니다.");
-            return false;
-        }
+                    /* 주민등록번호 */
+                    if (j1.length !== 6 || j2.length !== 1) {
+                        Swal.fire('주민등록번호를 정확히 입력해주세요.');
+                        return false;
+                    }
+                    // 주민등록번호 앞자리 날짜 유효성 검사 (YYMMDD)
+                    let year = parseInt(j1.substring(0, 2));
+                    let month = parseInt(j1.substring(2, 4));
+                    let day = parseInt(j1.substring(4, 6));
 
-        /* 주민등록번호 */
-        if (j1.length !== 6 || j2.length !== 1) {
-            Swal.fire("주민등록번호를 정확히 입력해주세요.");
-            return false;
-        }
-        // 주민등록번호 앞자리 날짜 유효성 검사 (YYMMDD)
-        let year = parseInt(j1.substring(0, 2));
-        let month = parseInt(j1.substring(2, 4));
-        let day = parseInt(j1.substring(4, 6));
+                    if (month < 1 || month > 12 || day < 1 || day > 31) {
+                        Swal.fire('주민등록번호 앞자리를 다시 확인해주세요.');
+                        return false;
+                    }
 
-        if (month < 1 || month > 12 || day < 1 || day > 31) {
-            Swal.fire("주민등록번호 앞자리를 다시 확인해주세요.");
-            return false;
-        }
+                    // 실제 존재하는 날짜인지 검사
+                    let fullYear = 2000 + year; // 20xx 기준
+                    let dateObj = new Date(fullYear, month - 1, day);
 
-        // 실제 존재하는 날짜인지 검사
-        let fullYear = 2000 + year;  // 20xx 기준
-        let dateObj = new Date(fullYear, month - 1, day);
+                    if (dateObj.getFullYear() !== fullYear || dateObj.getMonth() + 1 !== month || dateObj.getDate() !== day) {
+                        Swal.fire('주민등록번호 앞자리 날짜가 실제 존재하지 않습니다.');
+                        return false;
+                    }
 
-        if (
-            dateObj.getFullYear() !== fullYear ||
-            dateObj.getMonth() + 1 !== month ||
-            dateObj.getDate() !== day
-        ) {
-            Swal.fire("주민등록번호 앞자리 날짜가 실제 존재하지 않습니다.");
-            return false;
-        }
+                    // 주민등록번호 뒷자리는 1~4로 시작해야 함
+                    if (!/^[1-4]$/.test(j2)) {
+                        Swal.fire('주민등록번호 뒷자리는 1~4로 시작해야 합니다.');
+                        return false;
+                    }
 
-        // 주민등록번호 뒷자리는 1~4로 시작해야 함
-        if (!/^[1-4]$/.test(j2)) {
-            Swal.fire("주민등록번호 뒷자리는 1~4로 시작해야 합니다.");
-            return false;
-        }
+                    /* 이메일 */
+                    if (!emailCheck) {
+                        Swal.fire('이메일 중복확인을 완료해주세요.');
+                        return false;
+                    }
 
-        /* 이메일 */
-        if (!emailCheck) {
-            Swal.fire("이메일 중복확인을 완료해주세요.");
-            return false;
-        }
+                    // 특수문자 연속 금지
+                    if (email.includes('..') || email.includes('__') || email.includes('--')) {
+                        Swal.fire('이메일에 특수문자를 연속으로 사용할 수 없습니다.');
+                        return false;
+                    }
 
-        // 특수문자 연속 금지
-        if (email.includes("..") || email.includes("__") || email.includes("--")) {
-            Swal.fire("이메일에 특수문자를 연속으로 사용할 수 없습니다.");
-            return false;
-        }
+                    /* 휴대폰 인증 */
+                    // if (!phoneAuthOk) {
+                    //     Swal.fire("휴대폰 인증을 완료해주세요.");
+                    //     return false;
+                    // }
 
-        /* 휴대폰 인증 */
-        // if (!phoneAuthOk) {
-        //     Swal.fire("휴대폰 인증을 완료해주세요.");
-        //     return false;
-        // }
+                    // 010만 허용
+                    if (!/^010/.test(phone)) {
+                        Swal.fire('휴대폰 번호는 010으로 시작해야 합니다.');
+                        return false;
+                    }
 
-        // 010만 허용
-        if (!/^010/.test(phone)) {
-            Swal.fire("휴대폰 번호는 010으로 시작해야 합니다.");
-            return false;
-        }
+                    /* 주소 */
+                    if (address.length < 5) {
+                        Swal.fire('주소를 정확히 입력해주세요.');
+                        return false;
+                    }
 
-        /* 주소 */
-        if (address.length < 5) {
-            Swal.fire("주소를 정확히 입력해주세요.");
-            return false;
-        }
-
-        return true;
-    });
-    
-});
-    // 주소 API
-    function execDaumPostcode() {
-        new daum.Postcode({
-            oncomplete: function(data) {
-
-                let addr = "";
-
-                if (data.userSelectedType === "R") { 
-                    addr = data.roadAddress;      // 도로명 주소
-                } else { 
-                    addr = data.jibunAddress;     // 지번 주소
-                }
-
-                // 주소 입력창에 값 채우기
-                document.getElementById("memberAddress").value = addr;
-
-                // 상세주소 입력창으로 이동
-                document.getElementsByName("memberAddressDetail")[0].focus();
-            }
-        }).open();
-
-        //예솔 추가
-            //ajax사용시 csrf헤더 생성
-            $(function () {
-                const token = $('meta[name="_csrf"]').attr('content');
-                const header = $('meta[name="_csrf_header"]').attr('content');
-                $(document).ajaxSend(function (e, xhr) {
-                    if (token && header) xhr.setRequestHeader(header, token);
+                    return true;
                 });
-            });        
-    }
-</script>
-</body>
+            });
+            // 주소 API
+            function execDaumPostcode() {
+                new daum.Postcode({
+                    oncomplete: function (data) {
+                        let addr = '';
+
+                        if (data.userSelectedType === 'R') {
+                            addr = data.roadAddress; // 도로명 주소
+                        } else {
+                            addr = data.jibunAddress; // 지번 주소
+                        }
+
+                        // 주소 입력창에 값 채우기
+                        document.getElementById('memberAddress').value = addr;
+
+                        // 상세주소 입력창으로 이동
+                        document.getElementsByName('memberAddressDetail')[0].focus();
+                    },
+                }).open();
+
+                //예솔 추가
+                //ajax사용시 csrf헤더 생성
+                $(function () {
+                    const token = $('meta[name="_csrf"]').attr('content');
+                    const header = $('meta[name="_csrf_header"]').attr('content');
+                    $(document).ajaxSend(function (e, xhr) {
+                        if (token && header) xhr.setRequestHeader(header, token);
+                    });
+                });
+            }
+        </script>
+    </body>
 </html>

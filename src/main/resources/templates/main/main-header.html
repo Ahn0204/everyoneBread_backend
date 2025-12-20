@@ -41,7 +41,7 @@
             font-size: 15px;
         }
         .alert-text a {
-            color: black;
+            color: #545455;
             text-decoration: none;
         }
 
@@ -67,6 +67,7 @@
         /* 읽지 않은 알림 강조 */
         .alert-item.unread .alert-link {
             font-weight: 600;
+            color: black;
         }
 
         .alert-tab {
@@ -84,9 +85,105 @@
         }
         .alert-link {
             font-weight: 400;
-            color: #212529;
+            color: #545455;
             text-decoration: none;
         }
+        .alert-time {
+            font-size: 14px;
+        }
+        /* 
+        #alarm-btn {
+            position: relative;
+            padding: 10px 18px;
+            background: #6c7075;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .badge-new {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+
+            width: 20px;
+            height: 20px;
+
+            background: #e55b5b;
+            color: #fff;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+        } */
+        #alertBtn {
+            position: relative;
+            padding: 10px 18px;
+            background: #6c7075;
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        .alert-badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+
+            background: #e55b5b;
+            color: #fff;
+
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 999px; /* 원 → 캡슐 자동 전환 */
+            white-space: nowrap;
+        }
+
+        /* .badge-new {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
+
+            background: #ff3b3b;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+
+            border-radius: 999px; 
+        }
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .badge-new {
+            animation: blink 1.2s infinite;
+        } */
     </style>
     <nav class="navbar bg-body-tertiary" style="min-width: 800px">
         <div class="container-fluid d-flex">
@@ -126,7 +223,9 @@
                     <div class="alert-wrapper">
                         <button class="btn btn-secondary util-alert pb-2" id="alertBtn">
                             알림함
-                            <span class="badge bg-danger ms-1" id="alertCount" style="display: none">0</span>
+                            <span class="alert-badge-count" style="display: none"></span>
+                            <!-- <span class="badge-new">N</span> -->
+                            <!-- <span class="badge bg-danger ms-1" id="alertCount" style="display: none">0</span> -->
                         </button>
 
                         <!-- 🔔 알림 패널 -->
@@ -139,10 +238,6 @@
                                 <div class="alert-tabs d-flex border-bottom">
                                     <button class="alert-tab active" data-tab="all">전체</button>
                                     <button class="alert-tab" data-tab="unread">읽지않음</button>
-                                </div>
-                                <div class="d-flex justify-content-end">
-                                    <span style="font-size: 13px">전체 읽기</span>
-                                    <span style="font-size: 13px">전체 삭제</span>
                                 </div>
                             </div>
                             <ul class="list-unstyled m-0" id="alertList">
@@ -177,10 +272,7 @@
                                         <span class="alert-text"><a href="#">주문이 접수되었습니다.</a></span>
 
                                         <!-- 오른쪽: 액션 -->
-                                        <div class="alert-actions">
-                                            <button type="button" class="alert-btn read">읽음</button>
-                                            <button type="button" class="alert-btn delete">삭제</button>
-                                        </div>
+                                        <div class="alert-actions"></div>
                                     </div>
                                 </li>
                             </ul>
@@ -195,6 +287,8 @@
                         let hasMore = true; // 더 불러올 데이터가 있는가?
 
                         $(function () {
+                            // 읽지 않은 알림 카운트
+                            getAlertCount();
                             // 알림 버튼 클릭 → 토글
                             $('#alertBtn').on('click', function (e) {
                                 e.stopPropagation();
@@ -217,6 +311,7 @@
                                 e.stopPropagation();
                             });
                         });
+
                         // 탭 클릭시
                         $('.alert-tab').on('click', function () {
                             $('.alert-tab').removeClass('active');
@@ -268,17 +363,21 @@
                                         .text(alert.content)
                                 );
 
-                            // 오른쪽: 액션 버튼
-                            const actions = $('<div>').addClass('alert-actions');
-                            // ✅ 읽지 않은 알림만 읽음 버튼 생성
-                            if (alert.readYn === 'N') {
-                                const readBtn = $('<button>').attr('type', 'button').addClass('alert-btn read').text('읽음');
-                                actions.append(readBtn);
-                            }
-                            const deleteBtn = $('<button>').attr('type', 'button').addClass('alert-btn delete').text('삭제');
+                            const time = $('<span>').addClass('alert-time');
+                            time.text(alert.createdAt);
 
-                            actions.append(deleteBtn);
-                            row.append(text, actions);
+                            // // 오른쪽: 액션 버튼
+                            // const actions = $('<div>').addClass('alert-actions');
+                            // // ✅ 읽지 않은 알림만 읽음 버튼 생성
+                            // if (alert.readYn === 'N') {
+                            //     const readBtn = $('<button>').attr('type', 'button').addClass('alert-btn read').text('읽음');
+                            //     actions.append(readBtn);
+                            // }
+                            // const deleteBtn = $('<button>').attr('type', 'button').addClass('alert-btn delete').text('삭제');
+
+                            // actions.append(deleteBtn);
+                            // row.append(text, actions);
+                            row.append(text, time);
                             li.append(row);
 
                             return li;
@@ -302,9 +401,27 @@
 
                         // 삭제 버튼
                         $('#alertPanel').on('click', '.alert-btn.delete', function () {
-                            const thisIndex = $('.alert-btn.delete').index(this);
-
-                            console.log(thisIndex + '번째 삭제처리');
+                            const alertItem = $(this).closest('.alert-item');
+                            const alertNo = $(this).closest('.alert-item').data('alert-no');
+                            $.ajax({
+                                url: '/alert/deleteAlert',
+                                type: 'POST',
+                                data: { alertNo },
+                                success: function (response) {
+                                    if (response) {
+                                        alertItem.remove();
+                                        showToast('알림이 삭제되었습니다.', 'success');
+                                    } else {
+                                        showToast('알림을 삭제하지 못했습니다', 'error');
+                                    }
+                                },
+                                error: function (xhr, status, msg) {
+                                    console.error('삭제 오류');
+                                    console.error(xhr);
+                                    console.error(status);
+                                    console.error(msg);
+                                },
+                            });
                         });
 
                         function readAlert(alertNo, callback) {
@@ -371,7 +488,7 @@
                             const linkUrl = $(this).attr('href');
                             const alertItem = $(this).closest('.alert-item');
                             const alertNo = alertItem.data('alert-no');
-
+                            const badge = $('.alert-badge-count');
                             // 이미 읽은 알림이면 바로 이동
                             if (!alertItem.hasClass('unread')) {
                                 location.href = linkUrl;
@@ -382,10 +499,58 @@
                             readAlert(alertNo, function (result) {
                                 if (result === true) {
                                     alertItem.removeClass('unread');
+                                    const beforeCount = badge.attr('data-badge-count');
+                                    const afterCount = beforeCount - 1;
+                                    badge.attr('data-badge-count', afterCount);
+                                    if (afterCount == 0) {
+                                        badge.text(afterCount);
+                                        badge.hide();
+                                        return;
+                                    }
+                                    if (afterCount < 100) {
+                                        badge.text(afterCount);
+                                        return;
+                                    }
                                 }
-                                location.href = linkUrl; // ⭐ 처리 후 이동
+                                // location.href = linkUrl; // ⭐ 처리 후 이동
                             });
                         });
+
+                        // 읽지 않은 알림 갯수 가져오기
+                        function getAlertCount() {
+                            const $badge = $('.alert-badge-count');
+                            $.ajax({
+                                url: '/alert/ajaxCount',
+                                type: 'POST',
+                                beforeSend: function (xhr) {
+                                    const token = $("meta[name='_csrf']").attr('content');
+                                    const header = $("meta[name='_csrf_header']").attr('content');
+                                    xhr.setRequestHeader(header, token);
+                                },
+                                success: function (response) {
+                                    console.log('alert Count : ' + response);
+                                    $badge.attr('data-badge-count', response);
+
+                                    if (response == 0) {
+                                        $badge.hide();
+                                        return;
+                                    }
+                                    if (response <= 99) {
+                                        $badge.text(response).show();
+                                        return;
+                                    }
+                                    if (response >= 100) {
+                                        $badge.text('99+').show();
+                                        return;
+                                    }
+                                },
+                                error: function (xhr, status, msg) {
+                                    console.error(xhr);
+                                    console.error(status);
+                                    console.error(msg);
+                                },
+                            });
+                        }
                     </script>
                     <button class="btn btn-secondary util-alert pb-2" th:onclick="|location.href='@{/member/myPage}'|">마이페이지</button>
                 </div>

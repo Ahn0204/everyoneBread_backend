@@ -96,6 +96,26 @@ public class AlertService {
         return true;
     }
 
+    // 알림 삭제
+    @Transactional
+    public boolean deleteAlert(CustomSecurityDetail principal, Long alertNo) {
+        Optional<AlertEntity> _alert = this.alertRepository.findById(alertNo);
+        if (!_alert.isPresent()) {
+            return false;
+        }
+        System.out.println(_alert.get().getToMember().getMemberNo());
+        System.out.println(principal.getMember().getMemberNo());
+        // 알림의 수신자와 로그인한 회원이 같지 않을경우
+        if (!_alert.get().getToMember().getMemberNo().equals(principal.getMember().getMemberNo())) {
+            return false;
+        }
+
+        AlertEntity alert = _alert.get();
+
+        this.alertRepository.delete(alert);
+        return true;
+    }
+
     @Transactional
     public void sendAlert(MemberEntity fromMember, Long toMemberNo, String type, String typeCode) {
         AlertEntity alert = new AlertEntity();
@@ -189,6 +209,12 @@ public class AlertService {
 
         this.alertRepository.save(alert);
 
+    }
+
+    public int ajaxAlertCount(MemberEntity member) {
+        int result = 0;
+        result = this.alertRepository.countByToMemberAndReadYn(member, "N");
+        return result;
     }
 
 }

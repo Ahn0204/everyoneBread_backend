@@ -19,4 +19,7 @@ public interface AlertRepository extends JpaRepository<AlertEntity, Long> {
     List<AlertEntity> findTop10ByToMember_MemberNoAndAlertNoLessThanAndReadYnOrderByAlertNoDesc(Long memberNo,
             Long lastAlertNo, String string);
 
+    // 읽지 않은 알림 카운트
+    int countByToMemberAndReadYn(MemberEntity toMember, String readYn);
+
 }

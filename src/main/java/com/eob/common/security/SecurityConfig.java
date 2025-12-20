@@ -407,6 +407,7 @@ public class SecurityConfig {
                                                                 // "/member/verify-auth-code", // 문자 인증코드 확인 AJAX
                                                                 "/customerCenter", // 고객센터
                                                                 "/customerCenter/**",
+                                                                "/alert/**", // 알림함
                                                                 "/css/**",
                                                                 "/js/**",
                                                                 "/image/**",
