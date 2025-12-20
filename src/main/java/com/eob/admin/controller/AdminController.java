@@ -156,9 +156,9 @@ public class AdminController {
             model.addAttribute("rejectedStart", rejectedStart);
             model.addAttribute("approvedStart", approvedStart);
 
+            // 페이징 정보 전달
+            model.addAttribute("shopP", shopP);
         }
-        // 페이징 정보 전달
-        model.addAttribute("shopP", shopP);
         return "admin/user/shopApproval-list";
     }
 
