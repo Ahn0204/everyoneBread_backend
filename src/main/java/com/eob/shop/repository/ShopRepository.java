@@ -66,4 +66,12 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
     // s.status='APPLY_APPROVED' and in(select distinct shopNo from p where
     // catName=:category)")
     Page<ShopEntity> findByProductCatName(@Param("category") String category, Pageable pageable);
+
+    /**
+     * 상점조회
+     * 
+     * @param shopNo
+     *               return ShopEntity
+     */
+    ShopEntity findByShopNo(long shopNo);
 }

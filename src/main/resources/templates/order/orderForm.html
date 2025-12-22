@@ -1,0 +1,164 @@
+<!--
+******************************************
+*  Created On : 2025. 12. 19.
+*  File : productList.html
+*******************************************
+ -->
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
+    <head>
+        <th:block layout:fragment="head">
+            <!-- 포트원 API.js -->
+            <!-- v1 -->
+            <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+            <!-- v2 -->
+            <!--<script type="text/javascript" src="https://cdn.portone.io/v2/browser-sdk.js"></script>-->
+            <!-- 우편번호 서비스 -->
+            <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+            <!--결제 api호출-->
+            <script th:src="@{/js/order/portOne.js}"></script>
+        </th:block>
+    </head>
+    <body>
+        <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
+        <div layout:fragment="content">
+            <!--주문 내역-->
+            <div class="d-flex flex-column orderForm">
+                <div class="orderForm heading">
+                    <h2>주문/결제</h2>
+                </div>
+
+                <div class="orderFormBox">
+                    <form th:object="${orderForm}" th:action="@{/order/order}" method="post" id="orderForm">
+                        <!-- 유효성 검증에 에러 발생 시 에러 출력 -->
+                        <div th:replace="~{comm/formErrors :: formErrorsFragment}"></div>
+                        <div class="orderForm-productList heading">
+                            <div class="row">
+                                <h4>상품 정보</h4>
+                                <span>상품 수정은 주문표에서 가능합니다.</span>
+                            </div>
+                        </div>
+                        <div class="orderForm-productList">
+                            <div class="cart-product"></div>
+                        </div>
+                        <div class="orderForm-buyerInfo heading">
+                            <h4>주문자 정보</h4>
+                        </div>
+                        <div class="orderForm-buyerInfo">
+                            <input type="text" class="buyerName" id="buyerName" name="buyerName" th:value="${#authentication.principal.member.memberName}" readonly />
+                            <input type="text" class="buyerPhone" id="buyerPhone" name="orderPhone" th:value="${#authentication.principal.member.memberPhone}" readonly />
+                            <input type="hidden" class="buyerMemberNo" id="buyerMemberNo" name="buyerMemberNo" th:value="${#authentication.principal.member.memberNo}" />
+                        </div>
+                        <div class="orderForm-orderAdress heading">
+                            <h4>배송 정보</h4>
+                        </div>
+                        <div class="orderForm-orderAdress">
+                            <!--배송변경목록 연결할 때까지 기본값 출력-->
+                            <input type="text" class="addressAlias" id="addressAlias" value="회사" readonly />
+                            <br />
+                            <input type="text" class="orderAddress" id="orderAddress" name="orderAddress" value="서울 관악구 남부순환로 1820 에그엘로우 6층 6B" readonly />
+                            <div class="btn-box">
+                                <button class="address-change">배송지 변경</button>
+                            </div>
+                        </div>
+                        <div class="orderForm-request heading">
+                            <h4>가게 요청 사항</h4>
+                        </div>
+                        <div class="orderForm-request">
+                            <textarea name="orderRequest" id="orderRequest"></textarea>
+                        </div>
+                        <div class="orderForm-riderRequest heading">
+                            <h4>배달 요청 사항</h4>
+                        </div>
+                        <div class="orderForm-riderRequest">
+                            <textarea name="riderRequest" id="riderRequest"></textarea>
+                        </div>
+                        <div class="priceBox">
+                            <div class="deliveryFeeBox justify-content-between">
+                                <!--배송비 산출할 때까지 기본값 출력-->
+                                <div class="deliveryFee heading">배송비</div>
+                                <span class="deliveryFee" name="deliveryFee" id="deliveryFee">3000</span>
+                            </div>
+                            <div class="orderPriceBox" justify-content-between>
+                                <div class="orderForm-orderPrice heading">결제 금액</div>
+                                <span class="orderPrice" id="orderPrice" name="orderPrice"></span>
+                                <div class="orderPrice-btn">
+                                    <button type="button" class="order" id="order">결제</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
+        <script layout:fragment="script">
+            $(function () {
+                //주문 내역의 shopNo
+                showCart();
+            });
+
+            //cart 내역출력
+            function showCart() {
+                const shopNo = sessionStorage.getItem('shopNo');
+                const cart = JSON.parse(sessionStorage.getItem('cart'));
+                //총 결제 금액에 배송비 추가
+                let orderPrice = Number($('#deliveryFee').text());
+                if (cart) {
+                    //장바구니에 값이 있다면
+                    $('.cart-product').empty(); //이전 목록 삭제
+                    //상품 내역 출력
+                    cart.forEach((item) => {
+                        $('.cart-product').append(`
+                <div class="cart-item">
+                    <div class="cart-name">${item.productName}</div>
+                    <div class="cart-qty">
+                        수량: ${item.quantity}
+                        <input type="hidden" name="quantity" value="${item.quantity}">
+                    </div>
+                    <div class="cart-price">${item.productPrice * item.quantity}원</div>
+                </div>
+            `);
+                        //총 결제 금액에 상품가격 더하기
+                        orderPrice += item.productPrice * item.quantity;
+                    });
+                    //            <input type="hidden" name="quantities[${item.productNo}]" value="${item.quantity}">
+                    // <input type="hidden" name="productNos" value="${item.productNo}">
+                    //총 결제 금액 출력
+                    $('#orderPrice').text(orderPrice);
+                    //상점 번호 출력
+                    if (shopNo) {
+                        $('.cart-product').append(`<input type="hidden" class="shopNo" id="shopNo" name="shopNo" value="` + shopNo + `"/>`);
+                    } else {
+                        showToast('다시 접속해주세요.');
+                    }
+                } else {
+                    //장바구니가 비었다면
+                    $('.cart-product').append('<div class="noCart"> 담긴 상품이 없습니다.</div>');
+                    showToast('상품을 담은 후 주문이 가능합니다.');
+                }
+            }
+
+            //결제 버튼 클릭 시 포트원 API 호출
+            $('#order').on('click', function () {
+                //유효성 검사
+                const name = $('#buyerName').val().trim();
+                const phone = $('#buyerPhone').val().trim();
+                const address = $('#orderAddress').val().trim();
+                //입력값 유효성 검사
+                if (!(name && phone && address)) {
+                    if (!phone || !name) {
+                        showToast('다시 주문해주세요.', 'error');
+                    } else if (!address) {
+                        $('#orderAddress').focus();
+                    }
+                    return;
+                }
+
+                const orderPrice = $('.orderPrice').text(); //총 결제 금액 가져오기
+                checkout(orderPrice); //결제 API를 호출하는 함수 호출 & DB에 기록 insert
+            });
+        </script>
+    </body>
+</html>

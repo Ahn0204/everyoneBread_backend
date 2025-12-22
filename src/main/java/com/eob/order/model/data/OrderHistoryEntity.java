@@ -6,6 +6,7 @@ import java.util.List;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.shop.model.data.ShopEntity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,10 +30,12 @@ public class OrderHistoryEntity {
 
     /**
      * 주문 번호
+     * merchantUid를 사용
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
-    @SequenceGenerator(name = "order_seq", sequenceName = "order_SEQ", allocationSize = 1)
+    // @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "order_seq")
+    // @SequenceGenerator(name = "order_seq", sequenceName = "order_SEQ",
+    // allocationSize = 1)
     @Column(name = "ORDER_NO")
     private Long orderNo;
 
@@ -53,7 +56,8 @@ public class OrderHistoryEntity {
     /**
      * 상품 상세 내역
      */
-    @OneToMany(mappedBy = "orderNo", fetch = FetchType.LAZY) // mappedBy에는 클래스명이 아니라, 자식 엔티티의 필드명을 써야 합니다.
+    @OneToMany(mappedBy = "orderNo", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // mappedBy에는 클래스명이 아니라, 자식 엔티티의
+                                                                                        // 필드명을 써야 합니다.
     // @JoinColumn(name = "order_detail_no", nullable = false)
     private List<OrderDetailEntity> orderDetail;
 
@@ -103,8 +107,9 @@ public class OrderHistoryEntity {
      * 주문 진행 상태
      */
     @Enumerated(EnumType.STRING)
+
     @Column(nullable = true)
-    private OrderStatus status;
+    private OrderStatus status = OrderStatus.WAIT; // 기본값 지정
 
     /**
      * 거절 사유
@@ -122,7 +127,7 @@ public class OrderHistoryEntity {
     /**
      * 주문 시간
      */
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_time_no", nullable = true)
     private OrderTimeEntity orderTime;
     /**
