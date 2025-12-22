@@ -67,6 +67,14 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
             @Param("category") String category, @Param("minLat") double minLat, @Param("maxLat") double maxLat,
             @Param("minLng") double minLng, @Param("maxLng") double maxLng, Pageable pageable);
 
+    @Query("""
+                select distinct s from ShopEntity s
+                join ProductEntity p on p.shop = s
+                where s.status = 'APPLY_APPROVED'
+                and p.catName = :category
+            """)
+    Page<ShopEntity> findByProductCatName(@Param("category") String category, Pageable pageable);
+
     /**
      * 상점조회
      * 

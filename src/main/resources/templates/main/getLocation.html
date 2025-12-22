@@ -24,7 +24,6 @@
             if (sessionStorage.getItem('location') != null || sessionStorage.getItem('location') != undefined) {
                 //세션스토리지에 값이 있다
                 const location = JSON.parse(sessionStorage.getItem('location'));
-                console.log('저장된 주소' + location.addr);
                 //location가져와서 input에 입력 후 검색시키기
                 getShopList(location);
 
