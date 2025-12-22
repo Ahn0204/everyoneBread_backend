@@ -51,4 +51,12 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
          */
         @Query("select m from MemberEntity m where m.memberRole='ADMIN'")
         Page<MemberEntity> findByMemberRoleAdmin(Pageable pageable);
+
+        /**
+         * 회원 조회
+         * 
+         * @param memberNo
+         * @return MemberEntity
+         */
+        MemberEntity findByMemberNo(long memberNo);
 }

@@ -41,5 +41,57 @@ public class OrderTimeEntity {
     @Column(name = "ORDERED_AT")
     private LocalDateTime orderedAt;
 
+    /**
+     * 상점 주문 거절 시간
+     */
+    @Column(name = "REJECTED_AT")
+    private LocalDateTime rejectedAt;
 
+    /**
+     * 상점 배달 요청 시간
+     */
+    @Column(name = "REQUESTED_AT")
+    private LocalDateTime requestedAt;
+
+    /**
+     * 라이더 배정 시간
+     */
+    @Column(name = "ASSIGNED_AT")
+    private LocalDateTime assignedAt;
+
+    /**
+     * 픽업 완료 시간
+     */
+    @Column(name = "PICKUP_AT")
+    private LocalDateTime pickupAt;
+
+    /**
+     * 배송 완료 시간
+     */
+    @Column(name = "COMPLETED_AT")
+    private LocalDateTime completedAt;
+
+    /**
+     * 고객 주문 취소 시간
+     */
+    @Column(name = "CANCELED_AT")
+    private LocalDateTime canceledAt;
+
+    /**
+     * 취소 사유
+     */
+    @Column(name = "CANCEL_REASON")
+    private LocalDateTime cancelReason;
+
+    /**
+     * 픽업 도착 예정 시간
+     */
+    @Column(name = "EST_PICKUP_AT")
+    private LocalDateTime estPickupAt;
+
+    /**
+     * 배달 완료 예정 시간
+     */
+    @Column(name = "EST_DELIVERY_AT")
+    private LocalDateTime estDeliveryAt;
 }

@@ -50,8 +50,8 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
     Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
 
     /**
-     * 상품 카테고리에 해당하는 상점 조회 - 페이징 객체 리턴
-     * ->추후 위치 조건까지 추가 예정
+     * 상품 카테고리&반경 내 해당하는 상점 조회 - 페이징 객체 리턴
+     * 
      * (예솔 추가)
      */
     @Query("""
@@ -60,10 +60,26 @@ public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
             join ProductEntity p on p.shop = s
             where s.status = 'APPLY_APPROVED'
             and p.catName = :category
+            and s.latitude between :minLat and :maxLat
+            and s.longitude between :minLng and :maxLng
             """)
-    // 아래가 틀린 이유: G와의 대화 참고
-    // @Query("select s from ShopEntity s, ProductEntity p where
-    // s.status='APPLY_APPROVED' and in(select distinct shopNo from p where
-    // catName=:category)")
+    Page<ShopEntity> findByProductCatNameAndLocation(
+            @Param("category") String category, @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+            @Param("minLng") double minLng, @Param("maxLng") double maxLng, Pageable pageable);
+
+    @Query("""
+                select distinct s from ShopEntity s
+                join ProductEntity p on p.shop = s
+                where s.status = 'APPLY_APPROVED'
+                and p.catName = :category
+            """)
     Page<ShopEntity> findByProductCatName(@Param("category") String category, Pageable pageable);
+
+    /**
+     * 상점조회
+     * 
+     * @param shopNo
+     *               return ShopEntity
+     */
+    ShopEntity findByShopNo(long shopNo);
 }
