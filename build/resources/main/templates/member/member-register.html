@@ -280,14 +280,14 @@ $(document).ready(function () {
 //    let phoneAuthSent = false;      // 인증번호 발송 여부
     let phoneAuthOk = false;        // 인증 성공 여부
 
-    /*
-        CSRF 토큰 설정 - 개발 단계에서는 미사용 / 운영 시 주석 해제 예정
+    
+    // CSRF 토큰 설정 - 개발 단계에서는 미사용 / 운영 시 주석 해제 예정
     const token = $('meta[name="_csrf"]').attr('content');
     const header = $('meta[name="_csrf_header"]').attr('content');
     $(document).ajaxSend(function (e, xhr) {
         if (token && header) xhr.setRequestHeader(header, token);
     });
-    */
+    
 
 
     /*
@@ -673,10 +673,10 @@ $(document).ready(function () {
 
         /* 휴대폰 인증 */
         // 나중에 주석 제거
-        // if (!phoneAuthOk) {
-        //     showErrorAlert("휴대폰 인증을 완료해주세요.");
-        //     return false;
-        // }
+         if (!phoneAuthOk) {
+            showErrorAlert("휴대폰 인증을 완료해주세요.");
+            return false;
+         }
 
         // 010만 허용
         if (!/^010/.test(phone)) {
@@ -717,13 +717,13 @@ $(document).ready(function () {
 
         //예솔 추가
             //ajax사용시 csrf헤더 생성
-            $(function () {
-                const token = $('meta[name="_csrf"]').attr('content');
-                const header = $('meta[name="_csrf_header"]').attr('content');
-                $(document).ajaxSend(function (e, xhr) {
-                    if (token && header) xhr.setRequestHeader(header, token);
-                });
-            });        
+            // $(function () {
+            //     const token = $('meta[name="_csrf"]').attr('content');
+            //     const header = $('meta[name="_csrf_header"]').attr('content');
+            //     $(document).ajaxSend(function (e, xhr) {
+            //         if (token && header) xhr.setRequestHeader(header, token);
+            //     });
+            // });        
     }
 </script>
 </body>
