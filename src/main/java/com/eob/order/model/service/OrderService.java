@@ -191,6 +191,7 @@ public class OrderService {
         // }
         // OrderHistoryEntity ordered = _ordered.get();
 
+        System.out.println("장바구니 문자열 출력:" + orderForm.getCart());
         // 장바구니 내역에서 주문 상세에 넣을 상품 정보 조회
         ObjectMapper mapper = new ObjectMapper();
         List<CartDTO> cartList;
@@ -201,7 +202,7 @@ public class OrderService {
                 // CartDTO c = (CartDTO) cart;
                 // 주문 상세 내역 엔티티 생성
                 OrderDetailEntity orderDetail = new OrderDetailEntity(); // orderDetail에 상품 정보 set
-                orderDetail.setOrderNo(ordered); // 주문번호
+                orderDetail.setOrderNo(ordered); // 주문 객체 넣기
                 // 상품 객체 가져오기
                 Optional<ProductEntity> _product = productRepository.findById(c.getProductNo());
                 if (_product.isEmpty()) { // 조회되는 상품이 없다면

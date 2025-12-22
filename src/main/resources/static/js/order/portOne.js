@@ -33,12 +33,10 @@ function checkout(orderPrice) {
                 console.log(response);
                 //결제 식별번호
                 let merchantInput = '<input type="hidden" name="merchantUid" value="' + response.merchant_uid + '"/>';
-                //장바구니 객체
+                //장바구니 객체 -> json문자열이라 html태그에 문자열로 결합 안됨
                 const cart = JSON.parse(sessionStorage.getItem('cart'));
-                const cartJson = JSON.stringify(cart);
-                console.log(cartJson);
-                let cartInput = '<input type="hidden" name="cart" value="' + cartJson + '"/>';
-                $('#orderForm').append(cartInput);
+                // let cartInput = '<input type="hidden" name="cart" value="' + cartJson + '"/>';
+                $('#cart').val(JSON.stringify(cart));
                 $('#orderForm').append(merchantInput);
                 $('#orderForm').submit(); // form 제출
             } else {
