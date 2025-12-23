@@ -1,13 +1,17 @@
 package com.eob.member.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import com.eob.common.security.CustomSecurityDetail;
 import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
+import com.eob.member.service.MypageService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -20,6 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final SmsService smsService;
+    private final MypageService mypageService;
 
     /*
         로그인 페이지
@@ -115,7 +120,17 @@ public class MemberController {
      */
     @GetMapping("mypage/orderList")
     public String orderList(Model model){
+        
+        // Security 인증 객체
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // 로그인 사용자 정보
+        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();
+        // 회원 번호
+        Long memberNo = user.getMember().getMemberNo();
+        
         model.addAttribute("menu","orderList");
+        model.addAttribute("orders", mypageService.getMyOrders(memberNo));
+
         return "member/mypage/orderList";
     }
 

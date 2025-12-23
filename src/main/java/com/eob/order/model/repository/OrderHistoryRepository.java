@@ -46,5 +46,15 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistoryEntity
      */
     long countByShop_ShopNoAndStatus(Long shopNo, OrderStatus status);
 
+    /**
+     * [회원]
+     * - 회원 마이페이지 주문 내역 조회
+     * - 회원 기준 주문 전체 조회 (최신순)
+     * @param memberNo 회원 고유 번호
+     * @return 회원의 주문 내역 리스트
+     */
+    @Query("select o from OrderHistoryEntity o where o.member.memberNo = :memberNo order by o.orderTime.orderedAt desc")
+    List<OrderHistoryEntity> findMyOrders(@Param("memberNo") Long memberNo);
+
 
 }
