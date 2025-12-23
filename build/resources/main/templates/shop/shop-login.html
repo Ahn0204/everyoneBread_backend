@@ -148,6 +148,7 @@
 
         <!-- 판매자 로그인 POST 요청 -->
         <form th:action="@{/shop/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <input type="text" class="login-input" name="shopId" placeholder="판매자 아이디를 입력해주세요." required />
             <input type="password" class="login-input" name="shopPw" placeholder="비밀번호를 입력해주세요." required />
 
