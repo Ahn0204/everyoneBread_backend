@@ -149,10 +149,10 @@ public class MemberController {
     /**
      * 마이페이지 - 배송지 관리
      */
-    @GetMapping("mypage/delivery")
+    @GetMapping("mypage/deliveryList")
     public String delivery(Model model) {
-        model.addAttribute("menu", "delivery");
-        return "member/mypage/delivery";
+        model.addAttribute("menu", "deliveryList");
+        return "member/mypage/deliveryList";
     }
 
     /**
