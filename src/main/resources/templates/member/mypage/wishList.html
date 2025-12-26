@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
 
 <head>
     <meta charset="UTF-8">
@@ -65,10 +66,10 @@
     </style>
 </head>
 
-<body layout:decorate="~{/member/mypage/mypage-layout}">
+<body>
 
 <!-- content 영역만 채우기 -->
-<section layout:fragment="content">
+<section layout:fragment="mypage-content">
 
     <h2 class="wish-title">즐겨찾기</h2>
 
