@@ -488,10 +488,9 @@ $(document).ready(function () {
             data: JSON.stringify({ phone: phone }),
             success: function (res) {
                 if (res.success) {
-                    showSuccessAlert(res.message);
-                    $("input[name= 'authCode']").focus();
+                    showSuccessAlert("인증번호가 발송되었습니다.");
                 } else {
-                    showErrorAlert(res.message);
+                    showErrorAlert("인증번호 발송에 실패했습니다.");
                 }
             }, error: function () {
                 showErrorAlert("서버 오류로 인증번호 발송에 실패했습니다.");
@@ -521,7 +520,7 @@ $(document).ready(function () {
             success: function (res) {
                 if (res.success) {
                     phoneAuthOk = true;
-                    showSuccessAlert(res.message);
+                    showSuccessAlert("휴대폰 인증이 완료되었습니다.");
 
                     // 인증 완료 후 입력 잠금
                     $("input[name='memberPhone']").prop("readonly", true);
@@ -531,7 +530,7 @@ $(document).ready(function () {
 
                 } else {
                     phoneAuthOk = false;
-                    showErrorAlert(res.message);
+                    showErrorAlert("인증번호가 일치하지 않습니다.");
                 }
             }, error: function(){
                 showErrorAlert("서버 통신 오류");

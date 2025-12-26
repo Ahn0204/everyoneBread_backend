@@ -486,7 +486,7 @@ public class SecurityConfig {
                                 // 예솔: csrf토큰 기능을 활성화 했습니다.
                                 // .csrf(csrf -> csrf.disable())
                                 .csrf(csrf -> csrf
-                                        .ignoringRequestMatchers("/sms/**", "POST")
+                                        .ignoringRequestMatchers("/sms/**")
                                                 .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                                 .userDetailsService(customDetailService);
                 return http.build();
