@@ -25,8 +25,6 @@ import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequestMapping("/")
@@ -96,20 +94,6 @@ public class mainController {
 
         return "main/shopList";
     }
-
-    /**
-     * 위치 기반 상점 검색
-     * 
-     * @param location 객체
-     * @return Page<ShopEntity>
-     */
-    // @PostMapping("getShopList")
-    // @ResponseBody
-    // public Page<ShopEntity> ajaxGetShopList(@RequestBody Map< entity) {
-    // TODO: process POST request
-
-    // return entity;
-    // }
 
     @GetMapping("shopList/productList/{shopNo}")
     public String getProductList(@PathVariable(name = "shopNo") long shopNo, Model model) {

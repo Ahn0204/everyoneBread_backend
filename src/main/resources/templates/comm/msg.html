@@ -19,13 +19,6 @@
             <div id="icon" th:text="${icon}"></div>
             <div id="loc" th:text="${loc}"></div>
         </div>
-
-        <!--주문 완료 후 이동된 페이지라면-->
-        <script th:if="${removeCart}">
-            //장바구니 삭제
-            sessionStorage.removeItem('cart');
-        </script>
-
         <script>
             const titleVal = $('#title').text();
             console.log(titleVal);

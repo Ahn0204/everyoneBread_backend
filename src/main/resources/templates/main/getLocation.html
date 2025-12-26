@@ -2,138 +2,85 @@
     <div class="d-flex align-items-center">
         <i class="bi bi-geo-alt user_location fs-1 fw-bold me-2" title="내 위치 저장"></i>
         <div class="selectLocation me-2">
-            <input type="text" class="address locationNow" />
+            <input type="text" class="address getLocation" />
         </div>
-        <button class="search">검색</button>
+        <button class="">검색</button>
     </div>
 
-    <!--카카오맵 활용해 위치 좌표얻기-->
     <script th:src="@{/js/main/location.js}"></script>
-    <!--주소를 좌표로 변환해서 location에 등록-->
-    <script th:src="@{/js/comm/getLngLat.js}"></script>
     <script type="text/javascript" th:inline="javascript">
-        //페이지 로드 후
-        $(function () {
-            checkInitLocation();
-        });
-
-        //세션에 저장된 location이 있는지 확인하는 함수
-        function checkInitLocation() {
-            console.log('작동');
-            //세션 스토리지에 위치 정보가 저장되어있다면
-            if (sessionStorage.getItem('location') != null || sessionStorage.getItem('location') != undefined) {
+        //페이지 로드 후 세션 스토리지에 위치 정보가 저장되어있다면
+        $(document).ready(function () {
+            if (sessionStorage.getItem('location') != null) {
                 //세션스토리지에 값이 있다
                 const location = JSON.parse(sessionStorage.getItem('location'));
+                console.log('저장된 주소' + location);
                 //location가져와서 input에 입력 후 검색시키기
                 getShopList(location);
-
                 //위치 정보 사용중 표시
                 $('.user_location').removeClass('bi-geo-alt').addClass('bi-geo-alt-fill');
             } else {
                 //세션스토리지에 값이 없음
-                showConfirmAlert(
-                    '위치 설정이 필요합니다. \n 현재 위치를 설정하겠습니까?',
-                    () => {
-                        getAutoLocation();
-                    },
-                    async () => {
-                        await setDefaultLocation(); //기본위치 설정
-                        showToast('기본 위치가 설정되었습니다.', 'info');
-                    }
-                );
+                console.log('저장된 위치정보 없음');
+                //기본위치 설정
+                getShopList('서울 관악구 남부순환로 1820 에그엘로우 6층 6B');
+                showToast('위치를 설정해주세요.', 'info');
             }
+        });
+
+        //위치 기반으로 상점(상품) 검색하기
+        function getShopList(location) {
+            //주소input에 주소 입력
+            $('.address').val(location);
+            //서버에 location값 전달
         }
 
         //사용자의 위치를 페이지에 반영 () (async, await 처리)
         $('.user_location').on('click', function () {
-            //자동 위치 반영
-            getAutoLocation();
-        });
-
-        //자동으로 위치를 반영하는 함수
-        function getAutoLocation() {
             showConfirmAlert(
-                '현재 위치를 저장합니다.',
+                '현재 위치를 저장하겠습니까?',
                 async () => {
                     //예
                     try {
-                        showToast('위치 정보를 반영중입니다', 'info', 5000);
                         //위치좌표 가져와서 주소로 변환
-                        let radiusKm = 3.0; //검색 반경
-                        const { lat, lng } = await getUserPosition(); //위도, 경도
-                        let { addr } = await getAddress(lat, lng); //주소 문자열
-                        let location = { lat: lat, lng: lng, addr: addr, radiusKm: radiusKm }; //위치 정보를 가진 객체
-                        //(있을지도 모르는) 기존 location삭제
-                        sessionStorage.removeItem('location');
-                        //해당 좌표,주소를 세션에 저장
-                        sessionStorage.setItem('location', JSON.stringify(location));
+                        const { lat, lng } = await getUserPosition();
+                        let { addr } = await getAddress(lat, lng);
+                        //해당 주소를 세션에 저장
+                        sessionStorage.setItem('location', JSON.stringify({ addr }));
                         //위치 반영
                         $('.user_location').removeClass('bi-geo-alt').addClass('bi-geo-alt-fill');
-                        getShopList(location);
+                        getShopList(addr);
                         showToast('위치 정보가 반영되었습니다', 'success');
+                        // } else{
+                        //조회되는 상점이 없을 때
+                        //     showToast('사용자의 위치에서 조회되는 상품이 없습니다.', 'error');
+                        //     sidoSigunguList('서울', '관악구');
+                        //     $('.user_location').removeClass('bi-geo-alt-fill').addClass('bi-geo-alt');
+                        // }
                     } catch (error) {
                         console.log(error);
                         showToast('위치 정보를 사용할 수 없어 기본값으로 지정됩니다.', 'error');
-                        await setDefaultLocation();
+                        getShopList('서울 관악구 남부순환로 1820 에그엘로우 6층 6B');
                     }
                 },
                 () => {
                     /*아니오*/
                 }
             );
-        }
-
-        //기본 위치 설정하기
-        async function setDefaultLocation() {
-            let radiusKm = 3.0; //검색 반경
-            const defalutAddr = '서울 관악구 남부순환로 1820'; //기본 주소
-            const { lat: defLat, lng: defLng } = await getLngLat(defalutAddr); //기본 위치 좌표
-            //lat이라는 key 이름은 그대로 유지, 꺼내서 쓰는 변수명만 defLat / defLng로 바꾸는 것
-            const defaultLocation = { lat: defLat, lng: defLng, addr: defalutAddr, radiusKm: radiusKm };
-            //기본 location 저장
-            sessionStorage.setItem('location', JSON.stringify(defaultLocation));
-            //화면에 출력, 상점 검색
-            getShopList(defaultLocation);
-            showToast('기본 위치가 저장되었습니다.', 'success');
-        }
-
-        //위치 기반으로 상점(상품) 검색하기 -> @param 위치정보가 key:value로 담긴 객체
-        function getShopList(location) {
-            $('.address').val(location.addr);
-            //서버에 location값 전달
-            // $.ajax({
-            //     url: '/getShopList',
-            //     type: 'POST',
-            //     contentType: 'application/json',
-            //     data: { lat: location.lat, lng: location.lng, addr: location.addr, radiusKm: location.radiusKm },
-            //     success: function (shopList) {
-            //         showToast('반경 3km 상점이 검색되었습니다.');
-            //         //주소input에 주소 입력
-            //         $('.address').val(address);
-            //     },
-            //     error: function (error) {
-            //         showConfirmAlert(
-            //             '상점 목록을 가져올 수 없어 페이지가 새로고침 됩니다.',
-            //             () => {
-            //                 location.reload();
-            //             },
-            //             () => {}
-            //         );
-            //     },
-            // });
-        }
+        });
 
         //위치 정보 초기화 (+ 세션 스토리지에 저장된 위치정보 삭제
-        $(document).on('click', '.user_location.bi-geo-alt-fill', function () {
+        $('.deleteLocation').on('click', function () {
             showConfirmAlert(
-                '위치 정보를 초기화합니다.', // 표시할 메시지
-                async () => {
+                '위치 정보를 초기화 합니다.', // 표시할 메시지
+                () => {
                     // 사용자가 '예'를 눌렀을 때 실행
                     sessionStorage.removeItem('location');
+                    //기본값으로 변경(관악구)
+                    sidoSigunguList('서울', '관악구');
+                    console.log('위치 정보 삭제&선택창 초기화');
                     //위치 정보 삭제 표시
                     $('.user_location').removeClass('bi-geo-alt-fill').addClass('bi-geo-alt');
-                    // 기본값 저장
-                    await setDefaultLocation();
                 },
                 () => {
                     /*아니오*/
