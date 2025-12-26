@@ -280,14 +280,14 @@ $(document).ready(function () {
 //    let phoneAuthSent = false;      // 인증번호 발송 여부
     let phoneAuthOk = false;        // 인증 성공 여부
 
-    
-    // CSRF 토큰 설정 - 개발 단계에서는 미사용 / 운영 시 주석 해제 예정
+    /*
+        CSRF 토큰 설정 - 개발 단계에서는 미사용 / 운영 시 주석 해제 예정
     const token = $('meta[name="_csrf"]').attr('content');
     const header = $('meta[name="_csrf_header"]').attr('content');
     $(document).ajaxSend(function (e, xhr) {
         if (token && header) xhr.setRequestHeader(header, token);
     });
-    
+    */
 
 
     /*
@@ -717,13 +717,13 @@ $(document).ready(function () {
 
         //예솔 추가
             //ajax사용시 csrf헤더 생성
-            // $(function () {
-            //     const token = $('meta[name="_csrf"]').attr('content');
-            //     const header = $('meta[name="_csrf_header"]').attr('content');
-            //     $(document).ajaxSend(function (e, xhr) {
-            //         if (token && header) xhr.setRequestHeader(header, token);
-            //     });
-            // });        
+            $(function () {
+                const token = $('meta[name="_csrf"]').attr('content');
+                const header = $('meta[name="_csrf_header"]').attr('content');
+                $(document).ajaxSend(function (e, xhr) {
+                    if (token && header) xhr.setRequestHeader(header, token);
+                });
+            });        
     }
 </script>
 </body>

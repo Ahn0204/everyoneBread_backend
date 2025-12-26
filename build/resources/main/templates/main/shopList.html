@@ -7,49 +7,15 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
     <head>
-        <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
-        <th:block layout:fragment="head"></th:block>
+        <th:block layout:fragment="head">
+            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+        </th:block>
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
         <div layout:fragment="content">
-            <!--위치 설정box-->
-            <form th:action="@{/}" method="post">
-                <div th:replace="~{main/getLocation}"></div>
-            </form>
-            <!--본문 출력-->
-            <div class="list">
-                <!--카테고리 제목-->
-                <div class="list-title">
-                    <h1 th:text="${param.category}"></h1>
-                </div>
-                <!--카테고리 상점 내역-->
-                <div class="list-shop">
-                    <!--상점 내역이 없을 경우-->
-                    <div th:if="${noShopList}">
-                        <h3 th:text="${noShopList}"></h3>
-                    </div>
-                    <!--상점 내역이 있을 경우-->
-                    <div th:if="${shopList}">
-                        <div class="shopCard-box" th:each="shop, loop : ${shopList}">
-                            <!--상점 카드-->
-                            <div class="shopCard">
-                                <a class="shop-link" th:href="@{|/shopList/productList/${shop.shopNo}|}">
-                                    <div class="shopImg-box">
-                                        <!-- <img th:src="" class="shopImg" alt="" /> -->
-                                    </div>
-                                    <div class="shopName" th:text="${shop.shopName}"></div>
-                                    <div class="shopOrderCount"></div>
-                                    <div class="shopReviewCount"></div>
-                                    <div class="shopAvgRating"></div>
-                                    <div class="shopAddress" th:text="${shop.shopAddress}"></div>
-                                    <!-- 주문수 총리뷰 수 평균 별점 주소 (현재 위치와의 직선 거리) -->
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            판매하는 상품의 대분류에 따라 나누기
+            bread/cake/dessert/cafe
         </div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->

@@ -6,20 +6,14 @@
  -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
-    <!-- <head> -->
-    <th:block layout:fragment="head-link"></th:block>
-    <!-- </head> -->
+    <head>
+        <th:block layout:fragment="head">
+            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+        </th:block>
+    </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
-        <div layout:fragment="content">
-            <!--위치 설정 box-->
-            <div class="m-3">
-                <div th:replace="~{main/getLocation}"></div>
-            </div>
-
-            <!--위치에 따른 상점-상품 출력-->
-            <div class="product-list"></div>
-        </div>
+        <div layout:fragment="content">main 페이지 내용내용</div>
 
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script">

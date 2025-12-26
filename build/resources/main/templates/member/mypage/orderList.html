@@ -1,138 +1,122 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-    <head>
-        <meta charset="UTF-8" />
-        <title>주문내역</title>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
-        <!-- 레이아웃 적용 -->
-        <link layout:decorate="~{/member/mypage/mypage-layout}" />
+<head>
+    <meta charset="UTF-8">
+    <title>주문내역</title>
 
-        <style>
-            .order-title {
-                font-size: 22px;
-                font-weight: 700;
-                margin-bottom: 25px;
-            }
+    <!-- 레이아웃 적용 -->
+    <link layout:decorate="~{/member/mypage/mypage-layout}"/>
 
-            .order-item {
-                display: flex;
-                border: 2px solid #000;
-                background: #fff;
-                padding: 20px;
-                border-radius: 12px;
-                margin-bottom: 25px;
-            }
+    <style>
+        .order-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
 
-            .order-img-box {
-                width: 160px;
-                height: 160px;
-                border-radius: 12px;
-                overflow: hidden;
-                border: 1px solid #ddd;
-                margin-right: 20px;
-            }
+        .order-item {
+            display: flex;
+            border: 2px solid #000;
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
 
-            .order-img-box img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
+        .order-img-box {
+            width: 160px;
+            height: 160px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            margin-right: 20px;
+        }
 
-            .order-info {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-            }
+        .order-img-box img { width: 100%; height: 100%; object-fit: cover; }
 
-            .order-top {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 12px;
-            }
-            .order-number {
-                font-weight: 700;
-                font-size: 16px;
-            }
+        .order-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
 
-            .order-status {
-                padding: 6px 12px;
-                border-radius: 8px;
-                background: #79c3ff;
-                color: #fff;
-                font-size: 14px;
-                font-weight: 700;
-            }
+        .order-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
+        .order-number { font-weight: 700; font-size: 16px; }
 
-            .order-shop {
-                font-size: 18px;
-                font-weight: 700;
-                margin-bottom: 8px;
-            }
+        .order-status {
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: #79C3FF;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
 
-            .order-detail {
-                font-size: 14px;
-                color: #444;
-                margin-bottom: 20px;
-            }
+        .order-shop {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
 
-            .order-buttons {
-                display: flex;
-                gap: 10px;
-            }
+        .order-detail { font-size: 14px; color: #444; margin-bottom: 20px; }
 
-            .order-btn {
-                padding: 10px 16px;
-                border: 2px solid #000;
-                border-radius: 8px;
-                background: #fff;
-                font-weight: 700;
-                cursor: pointer;
-                transition: 0.15s;
-            }
+        .order-buttons { display: flex; gap: 10px; }
 
-            .order-btn:hover {
-                background: #000;
-                color: #fff;
-            }
-        </style>
-    </head>
+        .order-btn {
+            padding: 10px 16px;
+            border: 2px solid #000;
+            border-radius: 8px;
+            background: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+        }
 
-    <body layout:decorate="~{/member/mypage/mypage-layout}">
-        <div layout:fragment="content">
-            <h2 class="order-title">주문내역</h2>
+        .order-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+    </style>
+</head>
 
-            <!-- 샘플 1개 -->
-            <div class="order-item">
-                <div class="order-img-box">
-                    <img src="/images/sample/bread.png" alt="상품 사진" />
+<body layout:decorate="~{/member/mypage/mypage-layout}">
+
+<div layout:fragment="content">
+
+    <h2 class="order-title">주문내역</h2>
+
+    <!-- 샘플 1개 -->
+    <div class="order-item">
+
+        <div class="order-img-box">
+            <img src="/images/sample/bread.png" alt="상품 사진">
+        </div>
+
+        <div class="order-info">
+
+            <div>
+                <div class="order-top">
+                    <div class="order-number">주문번호 #2025012345</div>
+                    <div class="order-status">배송 완료</div>
                 </div>
 
-                <div class="order-info">
-                    <div>
-                        <div class="order-top">
-                            <div class="order-number">주문번호 #2025012345</div>
-                            <div class="order-status">배송 완료</div>
-                        </div>
+                <div class="order-shop">성진이 빵집</div>
 
-                        <div class="order-shop">성진이 빵집</div>
-
-                        <div class="order-detail">
-                            소금빵 외 2개
-                            <br />
-                            총 금액 12,500원
-                            <br />
-                            주문일: 2025-12-01 13:20
-                        </div>
-                    </div>
-
-                    <div class="order-buttons">
-                        <button class="order-btn">주문상세</button>
-                        <button class="order-btn">리뷰쓰기</button>
-                        <button class="order-btn">재구매하기</button>
-                    </div>
+                <div class="order-detail">
+                    소금빵 외 2개<br>
+                    총 금액 12,500원<br>
+                    주문일: 2025-12-01 13:20
                 </div>
             </div>
+
+            <div class="order-buttons">
+                <button class="order-btn">주문상세</button>
+                <button class="order-btn">리뷰쓰기</button>
+                <button class="order-btn">재구매하기</button>
+            </div>
         </div>
-    </body>
+    </div>
+
+</div>
+
+</body>
 </html>
