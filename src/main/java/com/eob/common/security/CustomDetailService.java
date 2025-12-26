@@ -73,16 +73,6 @@ public class CustomDetailService implements UserDetailsService {
         // case SHOP:
         // ShopEntity shop = shopRepository.loginShop(member)
         // .orElseThrow(() -> new DisabledException("가게 정보가 없습니다."));
-        // switch (shop.getStatus()) {
-        // case APPLY_REVIEW:
-        // throw new DisabledException("입점 심사 중입니다. 승인 후 로그인 가능합니다.");
-        // case REJECTED:
-        // throw new DisabledException("입점 신청이 반려되었습니다. 관리자에게 문의해주세요.");
-        // case APPROVED:
-        // break;
-        // }
-        // break;
-        // }
         // break;
         // case ADMIN:
         // break;
