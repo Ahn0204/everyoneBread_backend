@@ -175,10 +175,10 @@ public class ShopEntity {
     /**
      * 상점 위치 - 경도
      */
-    private float longitude;
+    private Double longitude;
 
     /**
      * 상점 위치 - 위도
      */
-    private float latitude;
+    private Double latitude;
 }

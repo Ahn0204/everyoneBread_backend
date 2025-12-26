@@ -18,8 +18,12 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
+        <!--카카오맵 API & 라이브러리 SDK-->
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4fd57268b42b0698df77c27d1c4e78c&libraries=services"></script>
+        <!-- Daum 주소 API -->
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <!--자식페이지에서 추가로 삽입될 head내용-->
-        <th:block layout:fragment="head"></th:block>
+        <th:block layout:fragment="head-link"></th:block>
         <style>
             .linkDefault {
                 text-decoration: none;
@@ -35,7 +39,7 @@
         <!--본문-->
         <main class="flex-grow-1 py-4">
             <!--flex~ 본문이 헤더와 푸터 사이의 공간을 채움 footer가 아래에 달라붙어있을 수 잇게 py-4 위쪽 여백-->
-            <div layout:fragment="content" class="container-fluid">
+            <div layout:fragment="content" class="container-fluid center">
                 <!--container-fluid의 쓰임은? container-x1이 더 꽉참 fluid가 양쪽에 여백이 있음-->
             </div>
         </main>
