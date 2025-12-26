@@ -1,178 +1,60 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{member/mypage/mypage-layout}">
-<head>
-    <title>주문내역</title>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{member/mypage/mypage-layout}">
+    <head>
+        <title>주문내역</title>
 
-    <style>
-        .order-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+        <style>
+            .order-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+            .order-item { display: flex; border: 2px solid #000; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
+            .order-img-box { width: 160px; height: 160px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; margin-right: 20px; }
+            .order-img-box img { width: 100%; height: 100%; object-fit: cover; }
+            .order-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+            .order-top { display: flex; justify-content: space-between; margin-bottom: 12px; }
+            .order-number { font-weight: 700; font-size: 16px; }
+            .order-status { padding: 6px 12px; border-radius: 8px; background: #79c3ff; color: #fff; font-size: 14px; font-weight: 700; }
+            .order-shop { font-size: 18px; font-weight: 700;  margin-bottom: 8px; }
+            .order-detail { font-size: 14px; color: #444; margin-bottom: 20px; }
+            .order-buttons { display: flex; gap: 10px; }
+            .order-btn { padding: 10px 16px; border: 2px solid #000; border-radius: 8px; background: #fff; font-weight: 700; cursor: pointer; transition: 0.15s; }
+            .order-btn:hover { background: #000; color: #fff; }
+        </style>
+    </head>
 
-        .order-item {
-            display: flex;
-            border: 2px solid #000;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
+    <body>
+        <div layout:fragment="mypage-content">
+            <h2 class="order-title">주문내역</h2>
 
-        .order-img-box {
-            width: 160px;
-            height: 160px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            margin-right: 20px;
-        }
+            <!-- 샘플 1개 -->
+            <div class="order-item">
+                <div class="order-img-box">
+                    <img src="/images/sample/bread.png" alt="상품 사진" />
+                </div>
 
-        .order-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+                <div class="order-info">
+                    <div>
+                        <div class="order-top">
+                            <div class="order-number">주문번호 #2025012345</div>
+                            <div class="order-status">배송 완료</div>
+                        </div>
 
-        .order-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+                        <div class="order-shop">성진이 빵집</div>
 
-        .order-top {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .order-number {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .order-status {
-            padding: 6px 12px;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        /* 상태별 색상 */
-        .status-WAIT { background: #6c757d; }
-        .status-PREPARE { background: #ff9800; }
-        .status-DELIVERING { background: #2196f3; }
-        .status-COMPLETE { background: #4caf50; }
-        .status-REJECT { background: #f44336; }
-
-        .order-shop {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .order-detail {
-            font-size: 14px;
-            color: #444;
-            margin-bottom: 20px;
-        }
-
-        .order-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .order-btn {
-            padding: 10px 16px;
-            border: 2px solid #000;
-            border-radius: 8px;
-            background: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-
-        .order-btn:hover {
-            background: #000;
-            color: #fff;
-        }
-
-        .empty-order {
-            text-align: center;
-            color: #777;
-            padding: 80px 0;
-        }
-    </style>
-</head>
-
-<body>
-<div layout:fragment="mypage-content">
-
-    <h2 class="order-title">주문내역</h2>
-
-    <!-- 주문이 없을 때 -->
-    <div th:if="${#lists.isEmpty(orders)}" class="empty-order">
-        주문 내역이 없습니다.
-    </div>
-
-    <!-- 주문 목록 -->
-    <div th:each="order : ${orders}" class="order-item">
-
-        <!-- 상품 이미지 -->
-        <div class="order-img-box">
-            <img src="/images/sample/bread.png" alt="상품 사진">
-        </div>
-
-        <div class="order-info">
-            <div>
-                <div class="order-top">
-                    <div class="order-number">
-                        주문번호 #
-                        <span th:text="${order.orderNo}"></span>
+                        <div class="order-detail">
+                            소금빵 외 2개
+                            <br />
+                            총 금액 12,500원
+                            <br />
+                            주문일: 2025-12-01 13:20
+                        </div>
                     </div>
 
-                    <!-- 주문 상태 -->
-                    <div class="order-status"
-                         th:classappend="' status-' + ${order.status.name()}"
-                         th:text="${order.statusLabel}">
+                    <div class="order-buttons">
+                        <button class="order-btn">주문상세</button>
+                        <button class="order-btn">리뷰쓰기</button>
+                        <button class="order-btn">재구매하기</button>
                     </div>
                 </div>
-
-                <!-- 상점명 -->
-                <div class="order-shop"
-                     th:text="${order.shopName}">
-                </div>
-
-                <!-- 주문 정보 -->
-                <div class="order-detail">
-                    총 금액 :
-                    <span th:text="${#numbers.formatInteger(order.orderPrice, 3, 'COMMA')}"></span>원
-                    <br>
-                    주문일 :
-                    <span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></span>
-                </div>
-            </div>
-
-            <!-- 버튼 -->
-            <div class="order-buttons">
-                <button class="order-btn"
-                        th:attr="data-order-no=${order.orderNo}">
-                    주문상세
-                </button>
-
-                <button class="order-btn"
-                        th:if="${order.canWriteReview}">
-                    리뷰쓰기
-                </button>
-
-                <button class="order-btn"
-                        th:if="${order.canReorder}">
-                    재구매하기
-                </button>
             </div>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>
