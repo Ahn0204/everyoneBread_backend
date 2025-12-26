@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{member/mypage/mypage-layout}">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 
 <head>
     <meta charset="UTF-8">
@@ -100,9 +99,9 @@
     </style>
 </head>
 
-<body>
+<body layout:decorate="~{/member/mypage/mypage-layout}">
 
-<section layout:fragment="mypage-content">
+<section layout:fragment="content">
 
     <h2 class="qna-title">문의내역</h2>
 
