@@ -103,7 +103,7 @@ dependencies {
 	implementation 'net.nurigo:sdk:4.3.0'
 
 	// OracleDB에서 공간데이터(위치 좌표값 등)를 활용할 수 있게 함
-    implementation 'org.hibernate.orm:hibernate-spatial:6.6.4.Final'
+    // implementation 'org.hibernate.orm:hibernate-spatial:6.6.4.Final'
 
 }
 

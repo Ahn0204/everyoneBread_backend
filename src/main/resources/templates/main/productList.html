@@ -129,6 +129,8 @@
                 //주문 내역의 shopNo
                 const shopNo = sessionStorage.getItem('shopNo');
                 const cart = JSON.parse(sessionStorage.getItem('cart'));
+                let totalPrice = Number($('.deliveryFee').text()); //shop과 주문 위치 사이의 거리 기반 배송비...
+                console.log(totalPrice);
                 if (cart) {
                     //장바구니에 값이 있다면
                     $('.cart-product').empty(); //이전 목록 삭제
@@ -140,7 +142,10 @@
                 <div class="cart-price">${item.productPrice * item.quantity}원</div>
                 </div>
                 `);
+                        totalPrice += item.productPrice * item.quantity;
                     });
+                    //총 금액 출력
+                    $('.cart-totalPrice').text(totalPrice + '원');
                     //주문 버튼 보이기
                     $('.orderBtn').removeAttr('disabled');
                 } else {

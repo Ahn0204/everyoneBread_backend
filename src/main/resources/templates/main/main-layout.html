@@ -46,11 +46,9 @@
 
         <!--사용자편의버튼-->
         <table class="user-btn wrapper position-fixed bottom-0 end-0 m-3 text-center" style="border-radius: 10px; border: 1px solid cornflowerblue; background-color: rgb(218, 218, 218)">
-            <tr th:if="${session.cart!=null}">
+            <tr class="goCart-btn" style="display: none">
                 <!--주문표-->
-                <td>
-                    <a th:href="@{|${session.cart.url}|}" class="linkDefault p-2">주문표</a>
-                </td>
+                <td id="goCart-btn"></td>
             </tr>
             <tr>
                 <!--고객센터-->
@@ -94,6 +92,14 @@
                 $(document).ajaxSend(function (e, xhr) {
                     if (token && header) xhr.setRequestHeader(header, token);
                 });
+                //sessionStorage에 장바구니가 있는지 상점no 확인
+                const shopNo = sessionStorage.getItem('shopNo');
+                if (shopNo) {
+                    //장바구니가 있음
+                    $('.goCart-btn').show(); //출력시키기
+                    $('#goCart-btn').append(`<a href="/shopList/productList/${shopNo}" class="linkDefault p-2">주문표</a>`);
+                } else {
+                }
             });
         </script>
         <!--헤더 script-->

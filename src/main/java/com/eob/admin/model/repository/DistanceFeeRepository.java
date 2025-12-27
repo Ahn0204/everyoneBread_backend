@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.eob.admin.model.data.CategoryEntity;
+import com.eob.admin.model.data.DistanceFeeEntity;
 
-public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+public interface DistanceFeeRepository extends JpaRepository<DistanceFeeEntity, Long> {
+    // 조건에 맞는 categoryEntity객체를 리턴함..?
 
     /**
      * 대분류 카테고리 조회(depth=0)

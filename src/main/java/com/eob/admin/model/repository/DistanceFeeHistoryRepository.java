@@ -7,9 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.eob.admin.model.data.CategoryEntity;
+import com.eob.admin.model.data.DistanceFeeHistoryEntity;
 
-public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {
+public interface DistanceFeeHistoryRepository extends JpaRepository<DistanceFeeHistoryEntity, Long> {
 
     /**
      * 대분류 카테고리 조회(depth=0)

@@ -2,6 +2,7 @@ package com.eob.main.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,8 +28,6 @@ import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequestMapping("/")
@@ -72,45 +73,67 @@ public class mainController {
 
     }
 
-    // 상점 목록
+    /**
+     * 상점 목록 페이지
+     * 
+     */
     @GetMapping("shopList")
     public String getShopList(@RequestParam(name = "category") String category,
             @RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
-        // pageable객체 생성
-        // -> 일단 등록일자 최신순
-        Pageable pageable = PageRequest.of(page, 8, Sort.by("createdAt").descending());
+        // // pageable객체 생성
+        // // -> 일단 등록일자 최신순
+        // Pageable pageable = PageRequest.of(page, 8,
+        // Sort.by("createdAt").descending());
 
-        // 상품에 카테고리 테이블 연결 시 삭제
-        category = "BREAD";
-        // 상점내역 조회, 페이징 객체로 리턴
-        Page<ShopEntity> shopList = mainService.getShopList(category, pageable);
+        // // 상품에 카테고리 테이블 연결 시 삭제
+        // category = "BREAD";
+        // // 상점내역 조회, 페이징 객체로 리턴
+        // Page<ShopEntity> shopList = mainService.getShopList(category, data,
+        // pageable);
 
-        if (shopList.getTotalElements() == 0) {
-            // 지역, category에 해당하는 상점이 없을 경우
-            model.addAttribute("noShopList", "주문 가능한 상점이 없습니다.");
-        } else {
-            // 지역, category에 해당하는 상점이 있을 경우
-            model.addAttribute("shopList", shopList);
-        }
+        // if (shopList.getTotalElements() == 0) {
+        // // 지역, category에 해당하는 상점이 없을 경우
+        // model.addAttribute("noShopList", "주문 가능한 상점이 없습니다.");
+        // } else {
+        // // 지역, category에 해당하는 상점이 있을 경우
+        // model.addAttribute("shopList", shopList);
+        // }
 
         return "main/shopList";
     }
 
     /**
-     * 위치 기반 상점 검색
-     * 
-     * @param location 객체
-     * @return Page<ShopEntity>
+     * 위치 기반 상점 검색 ajax응답
      */
-    // @PostMapping("getShopList")
+    @PostMapping("getShopList")
     // @ResponseBody
-    // public Page<ShopEntity> ajaxGetShopList(@RequestBody Map< entity) {
-    // TODO: process POST request
+    // public Page<ShopEntity> ajaxGetShopList(@RequestBody Map<String, Object>
+    // data,
+    public String ajaxGetShopList(@RequestBody Map<String, Object> data,
+            @RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
-    // return entity;
-    // }
+        // 반경 내 상점목록 조회
+        // pageable객체 생성-> distance 오름차순
+        Pageable pageable = PageRequest.of(page, 8);
+        // 상품에 카테고리 테이블 연결 시 삭제
+        String category = "BREAD";
+        // 상점내역 조회, 페이징 객체로 리턴
+        Page<ShopEntity> shopList = mainService.getShopList(category, data, pageable);
+        if (shopList != null && shopList.getTotalElements() > 0) {
+            // 조회된 상점이 있다면
+            model.addAttribute("shopList", shopList);
+        }
+        return "main/shopList-common";
+    }
 
+    /**
+     * 상점 상세, 상품 목록 페이지
+     * 
+     * @param shopNo
+     * @param model
+     * @return productList.html
+     */
     @GetMapping("shopList/productList/{shopNo}")
     public String getProductList(@PathVariable(name = "shopNo") long shopNo, Model model) {
 

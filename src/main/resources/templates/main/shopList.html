@@ -23,32 +23,8 @@
                 <div class="list-title">
                     <h1 th:text="${param.category}"></h1>
                 </div>
-                <!--카테고리 상점 내역-->
-                <div class="list-shop">
-                    <!--상점 내역이 없을 경우-->
-                    <div th:if="${noShopList}">
-                        <h3 th:text="${noShopList}"></h3>
-                    </div>
-                    <!--상점 내역이 있을 경우-->
-                    <div th:if="${shopList}">
-                        <div class="shopCard-box" th:each="shop, loop : ${shopList}">
-                            <!--상점 카드-->
-                            <div class="shopCard">
-                                <a class="shop-link" th:href="@{|/shopList/productList/${shop.shopNo}|}">
-                                    <div class="shopImg-box">
-                                        <!-- <img th:src="" class="shopImg" alt="" /> -->
-                                    </div>
-                                    <div class="shopName" th:text="${shop.shopName}"></div>
-                                    <div class="shopOrderCount"></div>
-                                    <div class="shopReviewCount"></div>
-                                    <div class="shopAvgRating"></div>
-                                    <div class="shopAddress" th:text="${shop.shopAddress}"></div>
-                                    <!-- 주문수 총리뷰 수 평균 별점 주소 (현재 위치와의 직선 거리) -->
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!--상점 내역-->
+                <div class="shopList"></div>
             </div>
         </div>
 

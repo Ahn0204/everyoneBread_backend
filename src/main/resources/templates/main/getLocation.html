@@ -2,7 +2,7 @@
     <div class="d-flex align-items-center">
         <i class="bi bi-geo-alt user_location fs-1 fw-bold me-2" title="내 위치 저장"></i>
         <div class="selectLocation me-2">
-            <input type="text" class="address locationNow" />
+            <input type="text" class="address" size="40" placeholder="아이콘으로 자동 조회 또는 주소를 입력해주세요." />
         </div>
         <button class="search">검색</button>
     </div>
@@ -17,9 +17,9 @@
             checkInitLocation();
         });
 
-        //세션에 저장된 location이 있는지 확인하는 함수
+        //0. 세션에 저장된 location이 있는지 확인하는 함수
         function checkInitLocation() {
-            console.log('작동');
+            console.log('0. 초기 작동 함수');
             //세션 스토리지에 위치 정보가 저장되어있다면
             if (sessionStorage.getItem('location') != null || sessionStorage.getItem('location') != undefined) {
                 //세션스토리지에 값이 있다
@@ -50,7 +50,7 @@
             getAutoLocation();
         });
 
-        //자동으로 위치를 반영하는 함수
+        //1. 자동으로 위치를 반영하는 함수
         function getAutoLocation() {
             showConfirmAlert(
                 '현재 위치를 저장합니다.',
@@ -83,7 +83,7 @@
             );
         }
 
-        //기본 위치 설정하기
+        //1-2. 기본 위치 설정하기
         async function setDefaultLocation() {
             let radiusKm = 3.0; //검색 반경
             const defalutAddr = '서울 관악구 남부순환로 1820'; //기본 주소
@@ -97,33 +97,36 @@
             showToast('기본 위치가 저장되었습니다.', 'success');
         }
 
-        //위치 기반으로 상점(상품) 검색하기 -> @param 위치정보가 key:value로 담긴 객체
+        //2. 위치 기반으로 상점(상품) 검색하기 -> @param 위치정보가 key:value로 담긴 객체
+        // 403에러 발생: 시큐리티 컨피그에서 ignoreMatcher로 해당 경로 설정, csrf토큰 생성 무시되도록함
         function getShopList(location) {
-            $('.address').val(location.addr);
             //서버에 location값 전달
-            // $.ajax({
-            //     url: '/getShopList',
-            //     type: 'POST',
-            //     contentType: 'application/json',
-            //     data: { lat: location.lat, lng: location.lng, addr: location.addr, radiusKm: location.radiusKm },
-            //     success: function (shopList) {
-            //         showToast('반경 3km 상점이 검색되었습니다.');
-            //         //주소input에 주소 입력
-            //         $('.address').val(address);
-            //     },
-            //     error: function (error) {
-            //         showConfirmAlert(
-            //             '상점 목록을 가져올 수 없어 페이지가 새로고침 됩니다.',
-            //             () => {
-            //                 location.reload();
-            //             },
-            //             () => {}
-            //         );
-            //     },
-            // });
+            $.ajax({
+                url: '/getShopList',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ lat: location.lat, lng: location.lng, addr: location.addr, radiusKm: location.radiusKm }),
+                success: function (shopList) {
+                    console.log(shopList); //응답 값 확인
+                    //응답이 담긴 shopList.html 가져오기(fragment)
+                    $('.shopList').html(shopList);
+                    showToast('반경 ' + location.radiusKm + 'km 상점이 검색되었습니다.');
+                    //주소input에 주소 입력
+                    $('.address').val(location.addr);
+                },
+                error: function (error) {
+                    showConfirmAlert(
+                        '상점 목록을 가져올 수 없습니다. 주소를 직접 설정해주세요.',
+                        () => {
+                            //다음 우편번호 입력 창
+                        },
+                        () => {}
+                    );
+                },
+            });
         }
 
-        //위치 정보 초기화 (+ 세션 스토리지에 저장된 위치정보 삭제
+        //4. 위치 정보 초기화 (+ 세션 스토리지에 저장된 위치정보 삭제
         $(document).on('click', '.user_location.bi-geo-alt-fill', function () {
             showConfirmAlert(
                 '위치 정보를 초기화합니다.', // 표시할 메시지
@@ -139,6 +142,42 @@
                     /*아니오*/
                 }
             );
+        });
+
+        //주소input 클릭 시 우편번호 검색 조회창
+        $('.address').on('click', function () {
+            searchAddress();
+        });
+
+        //다음 우편번호 조회 팝업 열기
+        function searchAddress() {
+            new daum.Postcode({
+                //사용자가 입력한 주소 정보 리턴
+                oncomplete: function (data) {
+                    //주소꺼내기
+                    const addr = data.roadAddress || data.jibunAddress || data.autoRoadAddress || data.autoJibunAddress;
+                    $('.address').val(addr);
+                },
+            }).open();
+        }
+        //검색 버튼 클릭 시 input의 주소 기준 상점 조회
+        $('.search').on('click', async function () {
+            showToast('위치 정보를 반영중입니다', 'info', 5000);
+            //위치좌표 가져와서 주소로 변환
+            let radiusKm = 3.0; //검색 반경
+            let addr = $('.address').val(); //입력된 주소
+            console.log(addr);
+            const { lat, lng } = await getLngLat(addr); //위도, 경도
+            // let { addr } = await getAddress(lat, lng); //주소 문자열
+            let location = { lat: lat, lng: lng, addr: addr, radiusKm: radiusKm }; //위치 정보를 가진 객체
+            //(있을지도 모르는) 기존 location삭제
+            sessionStorage.removeItem('location');
+            //해당 좌표,주소를 세션에 저장
+            sessionStorage.setItem('location', JSON.stringify(location));
+            //위치 반영
+            $('.user_location').removeClass('bi-geo-alt').addClass('bi-geo-alt-fill');
+            getShopList(location);
+            showToast('위치 정보가 반영되었습니다', 'success');
         });
     </script>
 </div>
