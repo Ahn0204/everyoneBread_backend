@@ -1,5 +1,6 @@
 package com.eob.member.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -163,9 +164,60 @@ public class MemberController {
      * 마이페이지 - 후기
      */
     @GetMapping("mypage/reviewList")
-    public String reviewList(Model model) {
+    public String reviewList(@RequestParam(defaultValue="0")int page, Model model) {
+
+        // 1️. Spring Security 인증 객체 가져오기
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        // 2️. 로그인 사용자 정보 꺼내기
+        CustomSecurityDetail user =
+                (CustomSecurityDetail) authentication.getPrincipal();
+
+        // 3️. 로그인 회원 번호 추출
+        Long memberNo = user.getMember().getMemberNo();
+
+        // 페이징 후기 조회
+        var reviewPage = mypageService.getMyReviews(memberNo, page);
+
+        // 서비스 호출 → 후기 리스트 조회
+        model.addAttribute("reviewList", mypageService.getMyReviews(memberNo) );
+        // 페이징 정보
+        model.addAttribute("page", reviewPage);
+        // 마이페이지 메뉴 활성화용
         model.addAttribute("menu", "reviewList");
+
+        // 6️. 후기 리스트 화면 이동
         return "member/mypage/reviewList";
+    }
+
+    /**
+     * 마이페이지 - 후기 삭제 (AJAX)
+     * 
+     * 기능 설명
+     * - 로그인한 회원의 후기만 삭제 가능
+     * - 실제 삭제가 아닌 status = DELETED 처리 (soft delete)
+     */
+    @PostMapping("mypage/review/delete")
+    @ResponseBody
+    public ResponseEntity<String> deleteReview(@RequestParam Long reviewNo) {
+
+        // 1️. Spring Security 인증 객체
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        // 2️. 로그인 사용자 정보
+        CustomSecurityDetail user =
+                (CustomSecurityDetail) authentication.getPrincipal();
+
+        // 3️. 로그인 회원 번호
+        Long memberNo = user.getMember().getMemberNo();
+
+        // 4️. 서비스 호출 (삭제 처리)
+        mypageService.deleteMyReview(reviewNo, memberNo);
+
+        // 성공 응답
+        return ResponseEntity.ok("후기가 삭제되었습니다.");
     }
 
     /**
