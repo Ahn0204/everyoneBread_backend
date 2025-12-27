@@ -12,6 +12,7 @@ import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 import com.eob.member.service.MypageService;
+import com.eob.member.service.WishlistService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ public class MemberController {
     private final MemberService memberService;
     private final SmsService smsService;
     private final MypageService mypageService;
+    private final WishlistService wishlistService;
 
     /*
         로그인 페이지
@@ -139,7 +141,21 @@ public class MemberController {
      */
     @GetMapping("mypage/wishList")
     public String wishList(Model model) {
-        model.addAttribute("menu", "wishList");
+        // Security 인증 객체
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 로그인 사용자 정보
+        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();     
+
+        // 회원 번호
+        Long memberNo = user.getMember().getMemberNo();           
+
+        // 즐겨찾기 목록 조회
+        model.addAttribute("wishlist", wishlistService.getMyActiveWishlist(memberNo));
+
+        // 메뉴 활성화용
+        model.addAttribute("menu", "wishlist");
+
         return "member/mypage/wishList";
     }
 
