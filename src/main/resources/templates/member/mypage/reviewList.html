@@ -179,12 +179,12 @@
 
                         let errorMessage = '리뷰 삭제 중 오류가 발생했습니다.';
 
-                        // 1️⃣ 서버에서 문자열 메시지를 내려준 경우
+                        // 1️. 서버에서 문자열 메시지를 내려준 경우
                         if (xhr.responseText) {
                             errorMessage = xhr.responseText;
                         }
 
-                        // 2️⃣ 상태 코드별 추가 설명
+                        // 2️. 상태 코드별 추가 설명
                         if (xhr.status === 400) {
                             errorMessage += '\n\n[원인]\n잘못된 요청입니다.';
                         } 
