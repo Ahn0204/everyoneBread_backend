@@ -89,16 +89,8 @@ public class mainController {
      * 위치 기반 상점 검색 ajax응답
      */
     @PostMapping("getShopList")
-    // @ResponseBody
-    // public Page<ShopEntity> ajaxGetShopList(@RequestBody Map<String, Object>
-    // data,
     public String ajaxGetShopList(@RequestBody Map<String, Object> data,
             @RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession httpSession) {
-
-        // double lat = (double) data.get("lat"); // 위도
-        // double lng = (double) data.get("lng"); // 경도
-        // httpSession.setAttribute("lat", lat); //세션에 사용자 위도 저장
-        // httpSession.setAttribute("lng", lng); //세션에 사용자 경도 저장
 
         // 반경 내 상점목록 조회
         // pageable객체 생성-> distance 오름차순
@@ -132,16 +124,22 @@ public class mainController {
         // 위치좌표와 shop 간의 거리 계산
         double distance = mainService.haversine(lat, lng, shop.getLatitude(), shop.getLongitude());
         distance = Math.floor(distance * 10) / 10; // km로 환산
-        // shop.setDistance(distance); // distance저장
+        String d = null;
+        // 배달비 계산
         int deliveryFee = 0;
         if (distance < 1) {
+            d = (int) (distance * 1000 / 10) * 10 + "m"; // m로 환산
             deliveryFee = mainService.getDeliveryFeeByDistance(1);
-        } else if (distance < 2) {
-            deliveryFee = mainService.getDeliveryFeeByDistance(2);
-        } else if (distance < 3) {
-            deliveryFee = mainService.getDeliveryFeeByDistance(3);
+        } else {
+            d = Math.floor(distance * 10) / 10 + "km"; // km로 환산
+            if (distance < 2) {
+                deliveryFee = mainService.getDeliveryFeeByDistance(2);
+            } else if (distance < 3) {
+                deliveryFee = mainService.getDeliveryFeeByDistance(3);
+            }
         }
-        model.addAttribute("deliveryFee", deliveryFee);
+        shop.setDistance(d); // distance저장
+        model.addAttribute("deliveryFee", deliveryFee); // deliveryFee전달
 
         // shopNo에 해당하는 productList 조회
         List<ProductEntity> productList = productService.getProductList(shopNo);

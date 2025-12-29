@@ -2,9 +2,9 @@
     <div class="d-inline-flex p-3 align-items-center border">
         <i class="bi bi-geo-alt user_location fs-1 fw-bold me-2" title="내 위치 저장"></i>
         <div class="selectLocation me-2">
-            <input type="text" class="address" size="40" placeholder="아이콘으로 자동 조회 또는 주소를 입력해주세요." />
+            <input type="text" class="address" size="40" placeholder="주소를 입력해주세요." />
         </div>
-        <button class="search btn btn-dark">검색</button>
+        <!-- <button class="search btn btn-dark">검색</button> -->
     </div>
 
     <!--카카오맵 활용해 위치 좌표얻기-->
@@ -144,24 +144,29 @@
             );
         });
 
-        //주소input 클릭 시 우편번호 검색 조회창
+        //주소input 클릭 시 주소 입력 후 상점 조회
         $('.address').on('click', function () {
+            //우편번호 팝업 열기 = ( 주소 입력 + 상점 조회 )
             searchAddress();
         });
 
         //다음 우편번호 조회 팝업 열기
         function searchAddress() {
             new daum.Postcode({
+                //*비동기 API 결과(우편번호api의 결과)를 쓰는 로직은 반드시 oncomplete 안에서 이어서 실행해야 한다
                 //사용자가 입력한 주소 정보 리턴
-                oncomplete: function (data) {
+                oncomplete: async function (data) {
                     //주소꺼내기
                     const addr = data.roadAddress || data.jibunAddress || data.autoRoadAddress || data.autoJibunAddress;
                     $('.address').val(addr);
+                    //주소 기준 상점 조회
+                    await searchShopList();
                 },
             }).open();
         }
         //검색 버튼 클릭 시 input의 주소 기준 상점 조회
-        $('.search').on('click', async function () {
+        // $('.search').on('click', async function () {
+        async function searchShopList() {
             showToast('위치 정보를 반영중입니다', 'info', 5000);
             //위치좌표 가져와서 주소로 변환
             let radiusKm = 3.0; //검색 반경
@@ -177,7 +182,8 @@
             //상점 조회
             getShopList(location);
             showToast('위치 정보가 반영되었습니다', 'success');
-        });
+        }
+        // });
 
         //상점으로 이동 시 사용자 좌표 전달
         function goShop(shopNo) {

@@ -5,7 +5,7 @@
     </div>
     <div th:if="${shopList}">
         <!--상점 내역이 있을 경우-->
-        <div class="shopCard-box" th:each="shop, loop : ${shopList}">
+        <div class="shopCard-box border" th:each="shop, loop : ${shopList}">
             <!--상점 카드-->
             <div class="shopCard">
                 <a class="shop-link linkDefault" th:onclick="|goShop(${shop.shopNo})|">
