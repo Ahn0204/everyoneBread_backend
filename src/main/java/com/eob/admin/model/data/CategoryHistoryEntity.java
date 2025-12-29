@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
@@ -32,6 +33,7 @@ public class CategoryHistoryEntity {
      * 카테고리 고유번호
      */
     @ManyToOne
+    @JoinColumn(name = "category_no")
     private CategoryEntity category;
     /**
      * 기존 카테고리명
@@ -54,6 +56,7 @@ public class CategoryHistoryEntity {
      * 작업자 멤버 번호
      */
     @ManyToOne
+    @JoinColumn(name = "member_No")
     private MemberEntity member;
 
     /**

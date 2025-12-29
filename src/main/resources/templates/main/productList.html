@@ -20,8 +20,9 @@
                     <!--상품 리스트 상부 - 상점 정보-->
                     <div class="shopInfo" th:object="${shop}">
                         <div class="shopName" th:text="${shop.shopName}"></div>
-                        <!--페이지에 shopNo부여-->
+                        <!--shopNo-->
                         <input type="hidden" class="shopNo" id="shopNo" th:value="${shop.shopNo}" />
+                        <input type="hidden" class="distance" id="distance" th:value="${shop.distance}" />
                     </div>
                     <!--상품 리스트 하부 - 상품 리스트-->
                     <div class="productList">

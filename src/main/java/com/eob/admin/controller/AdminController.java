@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.eob.admin.model.data.DistanceFeeForm;
+import com.eob.admin.model.data.DistanceFeeHistoryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
+import com.eob.admin.model.repository.DistanceFeeHistoryRepository;
 import com.eob.admin.model.service.AdminService;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
@@ -34,6 +37,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
@@ -47,6 +51,7 @@ public class AdminController {
     public final RiderService riderService;
     public final RiderRepository riderRepository;
     public final MemberRepository memberRepository;
+    public final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -101,8 +106,74 @@ public class AdminController {
 
     // 배송비 변경 페이지
     @GetMapping("/settlement/distanceFeeHistory-list")
-    public String getDistanceFeeHistoryList() {
+    public String getDistanceFeeHistoryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+
+        // redirect 시에는 flashAttribute에 distanceFeeForm이 담아져옴(필드 에러 출력에 필요) -> 필드별 표시
+        // 안해줄거같아서 주석해놓음
+        // 필드 에러로 redirect되지 않은 새 페이지라면
+        if (!model.containsAttribute("distanceFeeForm")) {
+            // distanceFeeForm객체 생성
+            model.addAttribute("distanceFeeForm", new DistanceFeeForm());
+        }
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 배송비 변경 내역 - 페이징 객체로 리턴
+        Page<DistanceFeeHistoryEntity> distanceFeeP = distanceFeeHistoryRepository.findAll(pageable);
+
+        // 배송비 변경 내역이 존재 하지 않을 때
+        if (distanceFeeP.getTotalElements() == 0) { // distanceFeeP 요소의 총 갯수가 0이면
+            model.addAttribute("noUpdate", "조회된 내역이 없습니다.");
+        } else {
+            // Page를 List로 바꾸지 않아 오류가 난다면 다시 변환...
+            // // 배송비 변경 내역이 존재한다면, adminList 생성
+            // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("adminList", distanceFeeP);
+
+            // 글번호 시작값 계산
+            int start = distanceFeeP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("distanceFeeP", distanceFeeP);
+
         return "admin/settlement/distanceFeeHistory-list";
+    }
+
+    // 배송비 생성/변경/삭제
+    @PostMapping("/settlement/insertDistanceFee")
+    public String crudDistanceFee(@Valid DistanceFeeForm distanceFeeForm, BindingResult bindingResult,
+            RedirectAttributes rttr) {
+
+        // 입력값 유효성 검사
+        // insertAdminForm에 담긴 값에 대한 유효성검사결과를 bindingResult객체로 사용
+        if (bindingResult.hasErrors()) { // 오류가 있다면
+            // 실패 알림 뜨게 하는 파라미터
+            rttr.addFlashAttribute("isSucceeded", false);
+            // 입력했던 값
+            rttr.addFlashAttribute("distanceFeeForm", distanceFeeForm);
+            // 필드 에러
+            // rttr.addFlashAttribute("org.springframework.validation.BindingResult.distanceFeeForm",
+            // bindingResult);
+            return "redirect:/admin/user/admin-list";
+        }
+
+        // 입력값에 오류가 없다면
+        // crud
+        // boolean insert = adminService.insertAdmin(distanceFeeForm);
+
+        // if (insert) {// 성공 시
+        // log.info("adminName:" + distanceFeeForm.getAdminName()); // 터미널에 계정이름 출력
+        // rttr.addFlashAttribute("isSucceeded", true); // 뷰로 success(ture) 전달
+        // } else { // 실패시
+        // rttr.addFlashAttribute("isSucceeded", false);
+        // }
+
+        return "redirect:/admin/user/admin-list"; // 새 admin-list 페이지가 다시 요청됨(redirect)
     }
 
     // ============== 회원 /admin/user
@@ -309,10 +380,10 @@ public class AdminController {
         // 페이징 설정 객체 초기화
         // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-        // 라이더 내역 - 페이징 객체로 리턴
+        // 관리자 내역 - 페이징 객체로 리턴
         Page<MemberEntity> adminP = memberRepository.findByMemberRoleAdmin(pageable);
 
-        // 라이더 내역이 존재 하지 않을 때
+        // 관리자 내역이 존재 하지 않을 때
         if (adminP.getTotalElements() == 0) { // adminP 요소의 총 갯수가 0이면
             model.addAttribute("noAdmin", "조회된 내역이 없습니다.");
         } else {

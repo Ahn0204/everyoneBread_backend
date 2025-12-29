@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
@@ -31,6 +32,7 @@ public class DistanceFeeHistoryEntity {
      * 배송료 고유번호
      */
     @ManyToOne
+    @JoinColumn(name = "distance_fee_no")
     private DistanceFeeEntity distanceFee;
     /**
      * 기존 배송료
@@ -53,6 +55,7 @@ public class DistanceFeeHistoryEntity {
      * 작업자 멤버 번호
      */
     @ManyToOne
+    @JoinColumn(name = "member_No")
     private MemberEntity member;
 
     /**

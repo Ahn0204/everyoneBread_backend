@@ -1,11 +1,14 @@
 package com.eob.main.model.service;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.eob.admin.model.data.DistanceFeeEntity;
+import com.eob.admin.model.repository.DistanceFeeRepository;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ShopRepository;
 
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 public class MainService {
 
     private final ShopRepository shopRepository;
+    public final DistanceFeeRepository distanceFeeRepository;
 
     // 상점내역 반환
     public Page<ShopEntity> getShopList(String category, Map<String, Object> data, Pageable pageable) {
@@ -53,7 +57,7 @@ public class MainService {
     }
 
     // 직선거리 구하기 -> lat1,lng2= 사용자 위치 / lat2,lng2=상점 위치
-    public static double haversine(
+    public double haversine(
             double lat1, double lng1,
             double lat2, double lng2) {
 
@@ -70,5 +74,17 @@ public class MainService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         return R * c;
+    }
+
+    // 거리에 해당하는 배송비 꺼내기
+    public int getDeliveryFeeByDistance(int distance) {
+        int deliveryFee = -1;
+        Optional<DistanceFeeEntity> _distanceFee = distanceFeeRepository.findByDistance(distance);
+        if (!_distanceFee.isEmpty()) {
+            // 값이 있다면
+            DistanceFeeEntity distanceFee = _distanceFee.get();
+            deliveryFee = distanceFee.getDeliveryFee();
+        }
+        return deliveryFee;
     }
 }

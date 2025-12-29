@@ -8,7 +8,7 @@
         <div class="shopCard-box" th:each="shop, loop : ${shopList}">
             <!--상점 카드-->
             <div class="shopCard">
-                <a class="shop-link" th:href="@{|/shopList/productList/${shop.shopNo}|}">
+                <a class="shop-link linkDefault" th:onclick="|goShop(${shop.shopNo})|">
                     <div class="shopImg-box">
                         <!-- <img th:src="" class="shopImg" alt="" /> -->
                     </div>
