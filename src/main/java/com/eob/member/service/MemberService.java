@@ -2,6 +2,7 @@ package com.eob.member.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
@@ -93,7 +94,7 @@ public class MemberService {
 
         session.removeAttribute("SMS_VERIFIED");
 
-        return memberRepository.save(entity);
+        return saved;
     }
 
     /*
@@ -152,6 +153,7 @@ public class MemberService {
      * - BindingResult 사용하지 않음
      * - 1단계에서 이미 검증이 끝났기 때문에 중복검사 필요 없음
      */
+    @Transactional
     public MemberEntity createShopMember(RegisterRequest dto) {
 
         // 중복검사 (선택) — 세션이 조작되는 경우 방지
@@ -165,7 +167,9 @@ public class MemberService {
         MemberEntity entity = toEntity(dto);
 
         entity.setMemberRole(MemberRoleStatus.SHOP);
-        entity.setStatus(MemberApprovalStatus.ACTIVE);
+        entity.setStatus(MemberApprovalStatus.ACTIVE); // 테스트용
+        // 실제 구동 시 해당 코드 주석 해제 후 위 코드 삭제
+        // entity.setStatus(MemberApprovalStatus.PENDING);
 
         return memberRepository.save(entity);
     }

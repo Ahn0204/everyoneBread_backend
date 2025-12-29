@@ -13,109 +13,31 @@
     <!-- 공통 폰트 -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
 
-
     <!-- Daum 주소 API -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    
+    <!-- CSRF 토큰 -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <style>
         * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; }
-
-        body {
-            margin: 0;
-            padding: 40px 0;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .signup-container {
-            width: 100%;
-            max-width: 550px;
-            padding: 40px;
-            border: 2px solid #000;
-            border-radius: 10px;
-            background-color: #fff;
-        }
-
-        .signup-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .signup-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            width: 130px;
-            font-weight: 700;
-            font-size: 15px;
-            flex-shrink: 0;
-            color: #333;
-        }
-
-        .input-text {
-            flex: 1;
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-
-        .input-with-btn {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-        }
-
-        .btn-small {
-            height: 45px;
-            padding: 0 15px;
-            background-color: #fff;
-            border: 1px solid #000;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 700;
-        }
+        body { margin: 0; padding: 40px 0; background-color: #fff; display: flex; justify-content: center; min-height: 100vh; }
+        .signup-container { width: 100%; max-width: 550px; padding: 40px; border: 2px solid #000; border-radius: 10px; background-color: #fff; }
+        .signup-header { text-align: center; margin-bottom: 30px; }
+        .signup-header h1 { font-size: 32px; font-weight: 700; margin-bottom: 20px; }
+        .form-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .form-label { width: 130px; font-weight: 700; font-size: 15px; flex-shrink: 0; color: #333; }
+        .input-text { flex: 1; height: 45px; padding: 0 10px; border: 1px solid #000; border-radius: 4px; font-size: 14px; }
+        .input-with-btn { display: flex; flex: 1; gap: 8px; }
+        .btn-small { height: 45px;  padding: 0 15px; background-color: #fff; border: 1px solid #000; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 700; }
         .btn-small:hover { background-color: #f0f0f0; }
-
-        .action-buttons {
-            margin-top: 40px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .btn-submit {
-            width: 200px;
-            height: 50px;
-            background-color: #fff;
-            border: 2px solid #000;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .btn-submit:hover {
-            background-color: #000;
-            color: #fff;
-        }
-        .file-info {
-            font-size: 12px;
-            color: #555;
-            margin-left: 130px;
-            margin-top: -10px;
-            margin-bottom: 10px;
-        }
+        .action-buttons { margin-top: 40px; display: flex; justify-content: center; }
+        .btn-submit { width: 200px; height: 50px; background-color: #fff; border: 2px solid #000; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .btn-submit:hover { background-color: #000; color: #fff; }
+        .btn-back { width: 200px; height: 50px; background-color: #fff; border: 2px solid #aaa; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .btn-back:hover { background-color: #f5f5f5; }
+        .file-info { font-size: 12px; color: #555; margin-left: 130px; margin-top: -10px; margin-bottom: 10px; }
     </style>
 </head>
 
@@ -163,12 +85,17 @@
             <div class="file-info" id="fileInfo"><span id="fileNameDisplay"></span></div>
 
             <div class="action-buttons">
+                <button type="button" class="btn-back" id="backBtn">뒤로가기</button>
                 <button type="submit" class="btn-submit">가입</button>
             </div>
 
         </form>
     </div>
         <script>
+
+            const token = $('meta[name="_csrf"]').attr('content');
+            const header = $('meta[name="_csrf_header"]').attr('content');
+
             /* ------------------------------
             1) 상점명 중복확인
             ------------------------------ */
@@ -230,7 +157,7 @@
                         //[예솔] 위치 좌표 등록하기
                         //입력받은 주소 좌표로 변환, longitude, latitude에 저장
                         const { lat, lng } = await getLngLat(addr);
-                        $('#logitude').val(lng);
+                        $('#longitude').val(lng);
                         $('#latitude').val(lat);
                         console.log('좌표 변환 성공');
                     },
@@ -293,24 +220,30 @@
                 data: formData,
                 processData: false,
                 contentType: false,
+                beforeSend: function (xhr) { xhr.setRequestHeader(header, token); },
+                success: function(res) {
+                    console.log("서버 응답:", res);
 
-                success: function() {
-                    showSuccessAlert({
-                        icon: "success",
-                        title: "입점 신청이 완료되었습니다!",
-                        confirmButtonText: "확인"
-                    }).then(() => {
-                        window.location.href = "/shop/login";
-                    });
+                    // 서버 응답 검사
+                    if (res.result !== "OK") {
+                        showErrorAlert({
+                            icon: "error",
+                            title: "입점 신청 실패",
+                            text: res.message || "입점 신청에 실패했습니다.",
+                            confirmButtonText: "확인"
+                        });
+                        return;
+                    }
+                    showSuccessAlert("입점 신청이 완료되었습니다!").then(() => {
+    window.location.href = "/shop/login";
+});
+                    
                 },
 
-                error: function() {
-                    showErrorAlert({
-                        icon: "error",
-                        title: "서버 오류가 발생했습니다.",
-                        text: "잠시 후 다시 시도해주세요.",
-                        confirmButtonText: "확인"
-                    }).then(() => {
+                error: function(xhr) {
+                    console.log("에러 응답:", xhr.responseJSON);
+
+                    showErrorAlert("서버 오류가 발생했습니다.");
 
                         // form 내부 입력값 전체 초기화
                         $("form")[0].reset();
@@ -323,7 +256,6 @@
 
                         // 페이지 다시 로드하여 완전 초기화
                         window.location.href = "/shop/register/step";
-                    });
                 }
 
             });
@@ -331,7 +263,9 @@
             return false;
         });
 
+        $("#backBtn").click(function () {
+            window.location.href = "/shop/register/start";
+        });
     </script>
-
 </body>
 </html>

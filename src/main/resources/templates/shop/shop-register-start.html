@@ -18,125 +18,25 @@
     <title>판매자 회원가입</title>
 
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-
-        body {
-            margin: 0;
-            padding: 40px 0;
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .signup-container {
-            width: 100%;
-            max-width: 550px;
-            padding: 40px;
-            border: 2px solid #000;
-            border-radius: 10px;
-            background-color: #fff;
-        }
-
-        .signup-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .signup-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin: 0 0 20px 0;
-        }
-
-        .form-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .form-label {
-            width: 120px;
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
-            flex-shrink: 0;
-        }
-
-        .input-text {
-            flex: 1;
-            height: 45px;
-            padding: 0 10px;
-            border: 1px solid #000;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .input-text:focus {
-            background-color: #f9f9f9;
-            border-width: 2px;
-        }
-
-        .input-with-btn {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-        }
-
-        .btn-small {
-            height: 45px;
-            padding: 0 15px;
-            background-color: #fff;
-            border: 1px solid #000;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: bold;
-        }
+        * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; }
+        body { margin: 0; padding: 40px 0; background-color: #fff; display: flex; justify-content: center; min-height: 100vh; }
+        .signup-container { width: 100%;  max-width: 550px; padding: 40px; border: 2px solid #000; border-radius: 10px; background-color: #fff; }
+        .signup-header { text-align: center; margin-bottom: 30px; }
+        .signup-header h1 { font-size: 32px; font-weight: 700; margin: 0 0 20px 0; }
+        .form-row { display: flex; align-items: center; margin-bottom: 15px; }
+        .form-label { width: 120px; font-weight: 700; font-size: 15px; color: #333; flex-shrink: 0; }
+        .input-text { flex: 1; height: 45px; padding: 0 10px; border: 1px solid #000; border-radius: 4px; font-size: 14px; }
+        .input-text:focus { background-color: #f9f9f9; border-width: 2px; }
+        .input-with-btn { display: flex; flex: 1; gap: 8px; }
+        .btn-small { height: 45px; padding: 0 15px; background-color: #fff; border: 1px solid #000; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .btn-small:hover { background-color: #f0f0f0; }
-
-        .jumin-area {
-            display: flex;
-            flex: 1;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .input-jumin {
-            width: 100%;
-            height: 45px;
-            text-align: center;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
-
-        .action-buttons {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .btn-large {
-            width: 200px;
-            height: 50px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .btn-next {
-            background-color: #000;
-            border: 2px solid #000;
-            color: #fff;
-        }
+        .jumin-area { display: flex; flex: 1; gap: 8px; align-items: center; }
+        .input-jumin { width: 100%; height: 45px; text-align: center; border: 1px solid #000; border-radius: 4px; }
+        .action-buttons { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn-large { width: 200px; height: 50px; font-size: 16px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .btn-next { background-color: #000; border: 2px solid #000; color: #fff; }
         .btn-next:hover { opacity: 0.8; }
-
         .auth-code-row { padding-left: 120px; }
-
     </style>
 </head>
 
@@ -511,8 +411,7 @@ $(document).ready(function () {
     /* ---------------- submit 직전 검증 ---------------- */
     $("form").submit(function () {
 
-        $(this).find("button[type='submit']").prop("disabled", true);
-
+        
         let id = $("input[name='memberId']").val().trim();
         let pw = $("input[name='memberPw']").val();
 
@@ -527,54 +426,55 @@ $(document).ready(function () {
         let email = $("input[name='memberEmail']").val().trim();
         let phone = $("input[name='memberPhone']").val().trim();
         let address = $("input[name='memberAddress']").val().trim();
-
+        
         if (!idCheck) {
             showErrorAlert("아이디 중복확인을 완료해주세요.");
             return false;
         }
-
+        
         if (/^\d+$/.test(id)) {
             showErrorAlert("아이디는 숫자만으로 구성할 수 없습니다.");
             return false;
         }
-
+        
         // let nameReg = /^[가-힣]{2,20}$/;
         // if (!nameReg.test(name)) {
-        //     showErrorAlert("이름은 한글 2~20자만 가능합니다.");
-        //     return false;
-        // }
-
-        let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
-        if (!pwReg.test(pw)) {
-            showErrorAlert("비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.");
-            return false;
-        }
-
-        if (pw !== pw2) {
-            showErrorAlert("비밀번호가 일치하지 않습니다.");
-            return false;
-        }
-
-        if (!emailCheck) {
-            showErrorAlert("이메일 중복확인을 완료해주세요.");
-            return false;
-        }
-
-        if (!phoneAuthOk) {
-            showErrorAlert("휴대폰 인증을 완료해주세요.");
-            return false;
-        }
-
-        if (address.length < 5) {
-            showErrorAlert("주소를 정확히 입력해주세요.");
-            return false;
-        }
-
-        return true;
+            //     showErrorAlert("이름은 한글 2~20자만 가능합니다.");
+            //     return false;
+            // }
+            
+            let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
+            if (!pwReg.test(pw)) {
+                showErrorAlert("비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.");
+                return false;
+            }
+            
+            if (pw !== pw2) {
+                showErrorAlert("비밀번호가 일치하지 않습니다.");
+                return false;
+            }
+            
+            if (!emailCheck) {
+                showErrorAlert("이메일 중복확인을 완료해주세요.");
+                return false;
+            }
+            
+            if (!phoneAuthOk) {
+                showErrorAlert("휴대폰 인증을 완료해주세요.");
+                return false;
+            }
+            
+            if (address.length < 5) {
+                showErrorAlert("주소를 정확히 입력해주세요.");
+                return false;
+            }
+            
+            $(this).find("button[type='submit']").prop("disabled", true);
+            return true;
+        });
+        
     });
     
-});
-
 // 주소 검색 API
 function execDaumPostcode() {
     // 카카오 주소 API 호출

@@ -2,11 +2,13 @@ package com.eob.shop.controller;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -178,61 +180,81 @@ public class ShopController {
     @Transactional
     @PostMapping("register/step")
     @ResponseBody
-    public String registerStep(@Valid ShopEntity shop, BindingResult bindingResult, HttpSession session, @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
+    public ResponseEntity<?> registerStep(ShopEntity shop, BindingResult bindingResult, HttpSession session, @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
         // @RequestParam(name = "longitude") String longitude, @RequestParam(name = "latitude") String latitude
 
         // 상점 정보 유효성 검증
-        if(bindingResult.hasErrors()){
-            return "INVALID_SHOP_DATA";
-        }
+        // if(bindingResult.hasErrors()){
+        //     return ResponseEntity.badRequest()
+        //         .body(Map.of("result","FAIL", "message", "INVALID_SHOP_DATA"));
+        // }
+        
+
         if (shop.getShopName() == null || shop.getShopName().isBlank()) {
-            return "SHOP_NAME_REQUIRED";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "SHOP_NAME_REQUIRED"));
         }
 
         if (shop.getShopAddress() == null || shop.getShopAddress().isBlank()) {
-            return "SHOP_ADDRESS_REQUIRED";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "SHOP_ADDRESS_REQUIRED"));
         }
 
+        shop.setBizNo(shop.getBizNo().replaceAll("-", ""));
+
         if (shop.getBizNo() == null || !shop.getBizNo().matches("\\d{10}")) {
-            return "INVALID_BIZ_NO";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "INVALID_BIZ_NO"));
         }
 
         // 이미 가입 완료된 경우 중복 실행 방지
-        if(session.getAttribute("shopRegisterCompleted") != null){
-            return "ALREADY_DONE";
+        if (session.getAttribute("shopRegisterCompleted") != null) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "ALREADY_DONE"));
         }
 
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
         if (temp == null) {
-            return "NO_SESSION";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "NO_SESSION"));
         }
 
         // 상점명 최종 중복 검증 (서버)
         if (shopService.existsByShopName(shop.getShopName())) {
-            return "DUPLICATE_SHOP_NAME";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "DUPLICATE_SHOP_NAME"));
         }
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors()
+                .forEach(e -> System.out.println(e.toString()));
+        }
+
 
         // 회원 저장 (MemberEntity 생성)
         MemberEntity member = memberService.createShopMember(temp);
-        System.out.println("저장된 MemberNo =" + member.getMemberNo());
-
-        // // 파일 업로드 처리
-        // String fileName = null;
-        // if (!bizFile.isEmpty()) {
-        //     fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
-        //     String savePath = "C:/upload/shop/" + fileName;
-
-        //     File folder = new File("C:/upload/shop/");
-        //     if (!folder.exists()) {
-        //         folder.mkdirs();
-        //     }
-        //     bizFile.transferTo(new File(fileName + savePath));
-        // }
 
         // member status값 지정
         member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
 
+        System.out.println("저장된 MemberNo =" + member.getMemberNo());
+
+        // // 파일 업로드 처리
+        // String fileName = null;
+        // if (bizFile != null && !bizFile.isEmpty()) {
+        //     fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
+        //     String savePath = "C:/upload/shop/" + fileName;
+        //
+        //     File folder = new File("C:/upload/shop/");
+        //     if (!folder.exists()) {
+        //         folder.mkdirs();
+        //     }
+        //
+        //     bizFile.transferTo(new File(savePath));
+        // }
+
+        
         // ShopEntity 값 설정
         shop.setMember(member); // FK 연결
         shop.setSellerName(member.getMemberName()); // 대표자명
@@ -258,8 +280,8 @@ public class ShopController {
 
         // 저장
         shopService.saveShop(shop);
-        ShopEntity saved = shopService.findByMemberNo(member.getMemberNo());
-        System.out.println("저장된 Shop No =" + saved.getShopNo());
+        ShopEntity savedShop = shopService.findByMemberNo(member.getMemberNo());
+        System.out.println("저장된 Shop No =" + savedShop.getShopNo());
 
         // 가입 완료 플래그
         session.setAttribute("shopRegisterCompleted", true);
@@ -267,7 +289,9 @@ public class ShopController {
         // 세션 초기화
         session.removeAttribute("tempShopMember");
 
-        return "OK";
+        return ResponseEntity.ok(
+                Map.of("result", "OK")
+        );
     }
 
     /**

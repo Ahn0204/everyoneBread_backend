@@ -100,7 +100,8 @@ public class SmsService {
             // 문자 내용 구성
             String message = "[모두의 빵] 인증번호는 [" + authCode + "] 입니다. (3분 이내 입력)";
             // SMS 발송
-            smsSender.sendSms(phone, fromNumber, message);
+            // 실제 구동 시 주석 해제 해야 함
+            // smsSender.sendSms(phone, fromNumber, message);
 
             // 발송 성공 -> 횟수 증가
             session.setAttribute(SESSION_SMS_COUNT, count + 1);
