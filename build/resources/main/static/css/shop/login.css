@@ -1,0 +1,117 @@
+        /* 기본 초기화 및 폰트 설정 */
+        * {
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #fff;
+        }
+
+        /* 전체 컨테이너 */
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 로그인 타이틀 */
+        .login-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: #000;
+        }
+
+        /* 입력창 */
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+            outline: none;
+        }
+
+        .login-input:focus {
+            background-color: #f9f9f9;
+        }
+
+        /* 옵션 영역 */
+        .login-options {
+            text-align: left;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* 자동 로그인 체크박스 */
+        .auto-login-area {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .auto-login-area input {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        /* 링크 영역 */
+        .links-area {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .links-area a {
+            text-decoration: none;
+            color: #333;
+            margin: 0 5px;
+        }
+
+        .links-area a:hover {
+            text-decoration: underline;
+        }
+
+        /* 로그인 버튼 */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .login-btn:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* 우측 상단 드롭다운 */
+        .other-login-box {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .other-login-select {
+            padding: 8px 12px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #fff;
+            cursor: pointer;
+        }

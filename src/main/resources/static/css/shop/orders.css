@@ -1,0 +1,63 @@
+        /* ===== 기존 스타일 유지 ===== */
+        .orders-container { width: 100%; padding: 25px; box-sizing: border-box; }
+        .page-title { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+        .top-controls { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .date-input { padding: 7px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { padding: 7px 14px; border: 1px solid #000; background: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; }
+        .btn:hover { background: #000; color: #fff; }
+
+        .status-tabs { display: flex; margin-bottom: 20px; }
+        .status-tab { flex: 1; padding: 10px; text-align: center; border: 1px solid #ddd; background: #f9f9f9; text-decoration: none; color: #000; }
+        .status-tab.active { background: #000; color: #fff; font-weight: 600; }
+
+        .order-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; background: #fff; }
+        .order-row { display: flex; justify-content: space-between; align-items: center; }
+        .order-left { display: flex; gap: 15px; }
+        .order-img { width: 60px; height: 60px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #777; }
+        .order-info { display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+        .order-date { color: #777; }
+        .order-actions { display: flex; gap: 10px; align-items: center; }
+
+        .pagination { text-align: center; margin-top: 30px; }
+        .pagination a { margin: 0 4px; text-decoration: none; color: #000; }
+        .pagination a.current { font-weight: bold; text-decoration: underline; }
+
+        /* ===== 추가: 거절 모달 ===== */
+        .modal {
+            display: none; /* 기본 숨김 */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            width: 400px;
+            border-radius: 6px;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 10px;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            height: 100px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .text-reject {
+            color: red;
+            font-weight: 600;
+        }
