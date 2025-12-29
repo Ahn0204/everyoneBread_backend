@@ -98,7 +98,10 @@
                 if (shopNo) {
                     //장바구니가 있음
                     $('.goCart-btn').show(); //출력시키기
-                    $('#goCart-btn').append(`<a href="/shopList/productList/${shopNo}" class="linkDefault p-2">주문표</a>`);
+                    const location = JSON.parse(sessionStorage.getItem('location'));
+                    const lat = location.lat;
+                    const lng = location.lng;
+                    $('#goCart-btn').append(`<a href="/shopList/productList/${shopNo}?lat=${lat}&lng=${lng}" class="linkDefault p-2">주문표</a>`);
                 } else {
                 }
             });

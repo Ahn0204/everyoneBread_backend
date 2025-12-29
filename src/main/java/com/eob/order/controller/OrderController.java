@@ -30,8 +30,12 @@ public class OrderController {
 
     // 주문 페이지 접속
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/orderForm")
-    public String getOrderForm(OrderForm orderForm) {
+    @PostMapping("/orderForm")
+    public String getOrderForm(OrderForm orderForm, @RequestParam(name = "deliveryFee") String deliveryFee,
+            Model model) {
+        // 배송비 미리 저장
+        orderForm.setDeliveryFee(Integer.parseInt(deliveryFee));
+        model.addAttribute("orderForm", orderForm);
         return "order/orderForm";
     }
 

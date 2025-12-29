@@ -78,7 +78,7 @@
                             <div class="deliveryFeeBox justify-content-between">
                                 <!--배송비 산출할 때까지 기본값 출력-->
                                 <div class="deliveryFee heading">배송비</div>
-                                <span class="deliveryFee" name="deliveryFee" id="deliveryFee">3000</span>
+                                <span class="deliveryFee" name="deliveryFee" id="deliveryFee" th:text="${orderForm.deliveryFee}"></span>
                             </div>
                             <div class="orderPriceBox" justify-content-between>
                                 <div class="orderForm-orderPrice heading">결제 금액</div>

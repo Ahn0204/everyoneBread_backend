@@ -13,6 +13,9 @@
                 input::-webkit-outer-spin-button {
                     opacity: 1;
                 }
+                .cart-deleteBtn {
+                    cursor: pointer;
+                }
             </style>
         </th:block>
     </head>
@@ -139,31 +142,56 @@
                 //주문 내역의 shopNo
                 const shopNo = sessionStorage.getItem('shopNo');
                 const cart = JSON.parse(sessionStorage.getItem('cart'));
-                let totalPrice = Number($('.deliveryFee').text()); //shop과 주문 위치 사이의 거리 기반 배송비...
-                console.log('주문 금액(시작):' + totalPrice);
                 if (cart) {
                     //장바구니에 값이 있다면
                     $('.cart-product').empty(); //이전 목록 삭제
                     cart.forEach((item) => {
                         $('.cart-product').append(`
-                    <div class="cart-item">
-                        <div class="cart-name">${item.productName}</div>
-                        <div class="justify-content-between">
-                            <input type="number" name="quantity" class="cart-qty" width="10" min="0" maxlength="3" value="${item.quantity}" />
-                            <div class="cart-price">${item.productPrice * item.quantity}원</div>
+                    <div class="cart-item ">
+                        <div class="d-flex justify-content-between">
+                            <div class="cart-name pb-2">${item.productName}</div>
+                            <div class="cart-deleteBtn">&times;</div> 
                         </div>
+                        <div class="d-flex justify-content-between">
+                            <input type="number" name="quantity" class="cart-qty" min="1" max="999" value="${item.quantity}" />
+                            <div class="cart-price">${item.productPrice}원</div>
+                        </div>
+                        <input type="hidden" name="cart-productNo" class="cart-productNo" value="${item.productNo}"/>
                     </div>
                     `);
-                        totalPrice += item.productPrice * item.quantity;
                     });
-                    console.log('주문 금액(끝):' + totalPrice);
-                    //총 금액 출력
-                    $('.cart-totalPrice').text(totalPrice + '원');
+                    //총 주문 금액 출력
+                    showTotalPrice(cart);
                     //주문 버튼 보이기
-                    $('.orderBtn').removeAttr('disabled');
+                    $('.beforeLogin, .orderBtn').removeAttr('disabled');
                 } else {
                     //장바구니가 비었다면
                     $('.cart-product').append('<div class="noCart"> 담긴 상품이 없습니다.</div>');
+                }
+
+                //수량이 바뀌면 주문총액 바꾸기
+                $('.cart-qty').on('change', function () {
+                    const cartQty = $(this);
+                    const newQty = Number(cartQty.val());
+                    const productNo = cartQty.closest('.cart-item').find('.cart-productNo').val();
+                    const cart = JSON.parse(sessionStorage.getItem('cart'));
+
+                    //cart에서 해당 상품 찾기
+                    const target = cart.find((c) => c.productNo === Number(productNo));
+                    //새 수량 대입
+                    target.quantity = newQty;
+                    sessionStorage.setItem('cart', JSON.stringify(cart));
+                    //주문 총액 새로 반영
+                    showTotalPrice(cart);
+                });
+
+                //주문 총액 새로 반영하는 함수
+                function showTotalPrice(cart) {
+                    let totalPrice = Number($('.deliveryFee').text());
+                    cart.forEach((item) => {
+                        totalPrice += item.productPrice * item.quantity;
+                    });
+                    $('.cart-totalPrice').text(totalPrice);
                 }
             }
         </script>

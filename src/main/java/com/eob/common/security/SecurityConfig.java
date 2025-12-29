@@ -399,8 +399,9 @@ public class SecurityConfig {
                                                                 "/", // 메인 페이지
                                                                 "/getCategory",
                                                                 "/shopList/**", // 상점 목록 페이지
-                                                                "/shopList/detail", // 상품 선택페이지
-                                                                "/shopList/detail/**", // 상품 선택페이지
+                                                                "/order/**",
+                                                                // "/shopList/detail", // 상품 선택페이지
+                                                                // "/shopList/detail/**", // 상품 선택페이지
                                                                 "/member/register", // 회원가입 페이지(GET/POST)
                                                                 "/member/register/**",
                                                                 "/member/select", // 계정 유형 선택 페이지(GET)
