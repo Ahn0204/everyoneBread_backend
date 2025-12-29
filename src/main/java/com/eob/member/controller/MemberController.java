@@ -9,6 +9,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import com.eob.common.security.CustomSecurityDetail;
+import com.eob.common.sms.dto.SmsSendRequest;
+import com.eob.common.sms.dto.SmsVerifyRequest;
 import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
@@ -108,6 +110,88 @@ public class MemberController {
     @ResponseBody
     public boolean checkEmail(@RequestParam("memberEmail") String memberEmail){
         return memberService.isMemberEmailAvailable(memberEmail);
+    }
+
+    /*
+       아이디 찾기 - 휴대폰 인증번호 요청 (회원 존재 여부 체크)
+    */
+    @PostMapping("find/phone/send")
+    @ResponseBody
+    public ResponseEntity<?> findIdPhoneSend(
+            @RequestBody SmsSendRequest request,
+            HttpSession session
+    ) {
+        // 이름 + 휴대폰으로 회원 존재 여부 확인
+        if (!memberService.existsByNameAndPhone(request.getName(), request.getPhone())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("일치하는 회원이 없습니다.");
+        }
+
+        // SMS 인증번호 발송 (기존 SmsService 재사용)
+        smsService.sendAuthCode(request.getPhone(), session);
+
+        // 아이디 찾기 목적 저장
+        session.setAttribute("FIND_PURPOSE", "FIND_ID");
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+       아이디 찾기 - 휴대폰 인증번호 확인
+    */
+    @PostMapping("find/phone/check")
+    @ResponseBody
+    public ResponseEntity<?> findIdPhoneCheck(
+            @RequestBody SmsVerifyRequest request,
+            HttpSession session
+    ) {
+        String result = smsService.verifyAuthCode(
+                request.getPhone(),
+                request.getAuthCode(),
+                session
+        );
+
+        if (!"SUCCESS".equals(result)) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("인증번호가 올바르지 않습니다.");
+        }
+
+        // 인증 성공 → 아이디 찾기 가능 상태로 세션 저장
+        session.setAttribute("authVerified", true);
+        session.setAttribute("authType", "PHONE");
+        session.setAttribute("authValue", request.getPhone());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+       아이디 찾기 결과 페이지
+       - 인증 완료된 사용자만 접근 가능
+    */
+    @GetMapping("find/id/result")
+    public String findIdResult(HttpSession session, Model model) {
+
+        // 인증 여부 확인
+        if (session.getAttribute("authVerified") == null) {
+            return "redirect:/member/login";
+        }
+
+        String phone = (String) session.getAttribute("authValue");
+
+        // 휴대폰 기준으로 아이디 조회
+        String memberId = memberService.findMemberIdByPhone(phone);
+
+        model.addAttribute("memberId", memberId);
+
+        // 아이디 조회 후 인증 세션 제거 (재사용 방지)
+        session.removeAttribute("authVerified");
+        session.removeAttribute("authType");
+        session.removeAttribute("authValue");
+        session.removeAttribute("FIND_PURPOSE");
+        
+        return "member/find-id-result";
     }
 
     /**

@@ -14,4 +14,6 @@ public class SmsSendRequest {
      */
     private String phone;
 
+    public String name;
+
 }

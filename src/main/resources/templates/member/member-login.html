@@ -4,11 +4,15 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
         <!-- JQuery CDN -->
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <!-- SweetAlert2 CDN -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
         <link rel="stylesheet" th:href="@{/css/member/login.css}">
         <title>모두의빵</title>
@@ -16,9 +20,6 @@
 
     <body>
         <div class="login-container">
-            <!-- <a th:href="@{/}">
-                <img src="/image/common/everyoneBread_main_logo.png" th:src="@{/image/common/everyoneBread_main_logo.png}" class="logo-img" alt="Logo" />
-            </a> -->
 
             <!-- 우측 상단 드롭다운 -->
             <div class="other-login-box">
@@ -42,9 +43,9 @@
                     </div>
 
                     <div class="links-area">
-                        <a th:href="@{/member/find-modal}">아이디 찾기</a>
+                        <a href="javascript:void(0)" id="findIdBtn">아이디 찾기</a>
                         |
-                        <a th:href="@{/member/find-modal}">비밀번호 재설정</a>
+                        <a href="javascript:void(0)" id="findPwBtn">비밀번호 재설정</a>
                         |
                         <a th:href="@{/member/select}">회원가입</a>
                     </div>
@@ -55,6 +56,7 @@
         </div>
 
         <input type="hidden" id="loginError" th:value="${param.error}" />
+        <th:block th:replace="~{member/find-modal :: findAuthModal}"></th:block>
         <script th:src="@{/js/member/mypage/login.js}"></script>
     </body>
 </html>
