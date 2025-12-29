@@ -1,19 +1,31 @@
-<div class="cartList">
-    <div class="cartListBox d-flex flex-column gap-2">
-        <!--상점명-->
-        <div class="shopNameBox">
-            <h4 class="shopName" th:text="${shop.shopName}"></h4>
+<div class="cartListBox border d-flex flex-column gap-2 p-2" style="width: 30vw">
+    <h4>주문표</h4>
+    <!--상점명-->
+    <div class="shopNameBox">
+        <button type="button" class="shopName btn btn-secondary" th:text="${shop.shopName}" readonly></button>
+    </div>
+    <!--상품 목록-->
+    <div class="cart-product rounded border p-2"></div>
+    <!--주문 금액-->
+    <div class="price-box justify-content-between">
+        <div class="justify-content-between">
+            <div>
+                <b>배송비</b>
+            </div>
+            <div>
+                <span class="deliveryFee" th:text="${deliveryFee}"></span>
+                <span>원</span>
+            </div>
         </div>
-        <!--상품 목록-->
-        <div class="cart-product"></div>
-        <!--주문 금액-->
-        <div class="deliveryFee"></div>
-        <div class="cart-totalPrice">0원</div>
-        <!--주문 버튼-->
-        <div class="cart-btns">
-            <button class="deleteAllBtn btn btn-secondary">비우기</button>
-            <button class="orderBtn btn btn-primary" th:onclick="|window.location='@{/order/orderForm}'|" disabled>주문</button>
+        <div>
+            <b>주문 금액</b>
+            <span class="cart-totalPrice"></span>
         </div>
+    </div>
+    <!--주문 버튼-->
+    <div class="cart-btns">
+        <button class="deleteAllBtn btn btn-secondary">비우기</button>
+        <button class="orderBtn btn btn-primary" th:onclick="|window.location='@{/order/orderForm}'|" disabled>주문</button>
     </div>
 </div>
 
@@ -34,6 +46,7 @@
 
         //장바구니 비우기
         function deleteCart() {
+            sessionStorage.removeItem('shopNo');
             sessionStorage.removeItem('cart');
             location.reload(); //페이지 새로고침
         }

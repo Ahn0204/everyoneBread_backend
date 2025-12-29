@@ -1,11 +1,8 @@
 package com.eob.shop.model.data;
 
+import java.beans.Transient;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.locationtech.jts.geom.Point;
 
 import com.eob.member.model.data.MemberEntity;
 
@@ -181,4 +178,10 @@ public class ShopEntity {
      * 상점 위치 - 위도
      */
     private Double latitude;
+
+    /**
+     * 상점과 사용자 위치간의 직선 거리 출력용(DB에 저장되지않음)
+     */
+    @jakarta.persistence.Transient
+    private String distance;
 }

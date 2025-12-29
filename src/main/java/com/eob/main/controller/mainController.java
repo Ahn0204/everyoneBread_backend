@@ -2,31 +2,33 @@ package com.eob.main.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eob.admin.model.repository.CategoryRepository;
+import com.eob.admin.model.repository.DistanceFeeRepository;
 import com.eob.main.model.service.MainService;
 import com.eob.shop.model.data.ProductEntity;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequestMapping("/")
@@ -41,6 +43,7 @@ public class mainController {
     public final MainService mainService;
     public final ProductService productService;
     public final ShopService shopService;
+    public final DistanceFeeRepository distanceFeeRepository;
 
     // 메인 페이지
     @GetMapping("")
@@ -72,51 +75,71 @@ public class mainController {
 
     }
 
-    // 상점 목록
+    /**
+     * 상점 목록 페이지
+     * 
+     */
     @GetMapping("shopList")
-    public String getShopList(@RequestParam(name = "category") String category,
-            @RequestParam(name = "page", defaultValue = "0") int page, Model model) {
-
-        // pageable객체 생성
-        // -> 일단 등록일자 최신순
-        Pageable pageable = PageRequest.of(page, 8, Sort.by("createdAt").descending());
-
-        // 상품에 카테고리 테이블 연결 시 삭제
-        category = "BREAD";
-        // 상점내역 조회, 페이징 객체로 리턴
-        Page<ShopEntity> shopList = mainService.getShopList(category, pageable);
-
-        if (shopList.getTotalElements() == 0) {
-            // 지역, category에 해당하는 상점이 없을 경우
-            model.addAttribute("noShopList", "주문 가능한 상점이 없습니다.");
-        } else {
-            // 지역, category에 해당하는 상점이 있을 경우
-            model.addAttribute("shopList", shopList);
-        }
-
+    public String getShopList() {
+        // shopList는 ajax로 불러오기
         return "main/shopList";
     }
 
     /**
-     * 위치 기반 상점 검색
-     * 
-     * @param location 객체
-     * @return Page<ShopEntity>
+     * 위치 기반 상점 검색 ajax응답
      */
-    // @PostMapping("getShopList")
-    // @ResponseBody
-    // public Page<ShopEntity> ajaxGetShopList(@RequestBody Map< entity) {
-    // TODO: process POST request
+    @PostMapping("getShopList")
+    public String ajaxGetShopList(@RequestBody Map<String, Object> data,
+            @RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession httpSession) {
 
-    // return entity;
-    // }
+        // 반경 내 상점목록 조회
+        // pageable객체 생성-> distance 오름차순
+        Pageable pageable = PageRequest.of(page, 8);
+        // 상품에 카테고리 테이블 연결 시 삭제
+        String category = "BREAD";
+        // 상점내역 조회, 페이징 객체로 리턴
+        Page<ShopEntity> shopList = mainService.getShopList(category, data, pageable);
+        if (shopList != null && shopList.getTotalElements() > 0) {
+            // 조회된 상점이 있다면
+            model.addAttribute("shopList", shopList);
+        }
+        return "main/shopList-common";
+    }
 
+    /**
+     * 상점 상세, 상품 목록 페이지
+     * 
+     * @param shopNo
+     * @param model
+     * @return productList.html
+     */
     @GetMapping("shopList/productList/{shopNo}")
-    public String getProductList(@PathVariable(name = "shopNo") long shopNo, Model model) {
+    public String getProductList(@PathVariable(name = "shopNo") long shopNo, @RequestParam(name = "lat") double lat,
+            @RequestParam(name = "lng") double lng, Model model) {
 
         // shopNo에 해당하는 shop 조회
         ShopEntity shop = shopService.findByShopNo(shopNo);
         model.addAttribute("shop", shop);
+
+        // 위치좌표와 shop 간의 거리 계산
+        double distance = mainService.haversine(lat, lng, shop.getLatitude(), shop.getLongitude());
+        distance = Math.floor(distance * 10) / 10; // km로 환산
+        String d = null;
+        // 배달비 계산
+        int deliveryFee = 0;
+        if (distance < 1) {
+            d = (int) (distance * 1000 / 10) * 10 + "m"; // m로 환산
+            deliveryFee = mainService.getDeliveryFeeByDistance(1);
+        } else {
+            d = Math.floor(distance * 10) / 10 + "km"; // km로 환산
+            if (distance < 2) {
+                deliveryFee = mainService.getDeliveryFeeByDistance(2);
+            } else if (distance < 3) {
+                deliveryFee = mainService.getDeliveryFeeByDistance(3);
+            }
+        }
+        shop.setDistance(d); // distance저장
+        model.addAttribute("deliveryFee", deliveryFee); // deliveryFee전달
 
         // shopNo에 해당하는 productList 조회
         List<ProductEntity> productList = productService.getProductList(shopNo);

@@ -394,6 +394,7 @@ public class SecurityConfig {
                                                 /* 인증 없이 접근 가능한 요청 목록 */
                                                 .requestMatchers(HttpMethod.GET, "/member/login").permitAll() // 로그인
                                                                                                               // 페이지(GET)
+                                                .requestMatchers(HttpMethod.POST, "/getShopList").permitAll() // 로그인
                                                 .requestMatchers( // 예솔: 메인 홈페이지에서 비회원도 접근가능한 링크 추가했습니다.
                                                                 "/", // 메인 페이지
                                                                 "/getCategory",
@@ -486,7 +487,9 @@ public class SecurityConfig {
                                 // 예솔: csrf토큰 기능을 활성화 했습니다.
                                 // .csrf(csrf -> csrf.disable())
                                 .csrf(csrf -> csrf
-                                        .ignoringRequestMatchers("/sms/**", "POST")
+                                                .ignoringRequestMatchers("/sms/**", "POST")
+                                                .ignoringRequestMatchers(
+                                                                new AntPathRequestMatcher("/getShopList", "POST"))
                                                 .csrfTokenRepository(new HttpSessionCsrfTokenRepository()))
                                 .userDetailsService(customDetailService);
                 return http.build();
