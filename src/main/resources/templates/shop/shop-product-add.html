@@ -9,6 +9,7 @@
 
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
 
     <style>
         .product-add-container {
@@ -192,14 +193,14 @@
         const allowExt = ["jpg", "jpeg", "png"];
         let ext = file.name.split(".").pop().toLowerCase();
         if (!allowExt.includes(ext)) {
-            Swal.fire("JPG, PNG 이미지만 업로드 가능합니다.");
+            showErrorAlert("JPG, PNG 이미지만 업로드 가능합니다.");
             e.target.value = "";
             return;
         }
     
         // 용량 검사 (5MB 이하)
         if (file.size > 5 * 1024 * 1024) {
-            Swal.fire("이미지 용량은 5MB 이하만 가능합니다.");
+            showErrorAlert("이미지 용량은 5MB 이하만 가능합니다.");
             e.target.value = "";
             return;
         }
@@ -208,7 +209,7 @@
         let img = new Image();
         img.onload = function () {
             if (img.width < 600 || img.height < 600) {
-                Swal.fire("이미지는 최소 600×600px 이상이어야 합니다.");
+                showErrorAlert("이미지는 최소 600×600px 이상이어야 합니다.");
                 e.target.value = "";
                 return;
             }
@@ -247,7 +248,7 @@
     
     // 등록 버튼 클릭 시
     document.getElementById("submitBtn").addEventListener("click", () => {
-        Swal.fire({
+        showConfirmAlert({
             title: "상품을 등록할까요?",
             icon: "question",
             showCancelButton: true,

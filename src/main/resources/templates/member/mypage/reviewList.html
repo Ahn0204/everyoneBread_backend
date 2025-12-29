@@ -1,188 +1,109 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
 
 <head>
     <meta charset="UTF-8">
-    <title>리뷰관리</title>
+    <title>후기관리</title>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
 
     <style>
-        .review-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
+        .review-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
         /* 리뷰 박스 */
-        .review-item {
-            display: flex;
-            border: 2px solid #000;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            gap: 20px;
-        }
-
+        .review-item { display: flex; border: 2px solid #000; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 25px; gap: 20px; }
         /* 왼쪽 상품 이미지 */
-        .review-img-box {
-            width: 120px;
-            height: 120px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            flex-shrink: 0;
-        }
-
-        .review-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        .review-img-box { width: 120px; height: 120px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; flex-shrink: 0; }
+        .review-img-box img { width: 100%; height: 100%; object-fit: cover; }
         /* 중앙 내용 */
-        .review-middle {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .review-top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .review-date {
-            font-size: 14px;
-            color: #777;
-        }
-
-        .review-status {
-            font-size: 14px;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 8px;
-            background: #e1f0ff;
-            color: #3069d9;
-        }
-
-        /* 상품명 링크 */
-        .review-product a {
-            font-size: 16px;
-            font-weight: 700;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .review-product a:hover {
-            text-decoration: underline;
-        }
-
+        .review-middle { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .review-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .review-date { font-size: 14px; color: #777; }
+        /* 상품명 */
+        .review-product a { font-size: 16px; font-weight: 700; text-decoration: none; color: #333; }
+        .review-product a:hover { text-decoration: underline; }
         /* 리뷰 내용 */
-        .review-content {
-            margin-top: 10px;
-            font-size: 15px;
-            color: #444;
-            white-space: pre-line;
-        }
-
+        .review-content { margin-top: 10px; font-size: 15px; color: #444; white-space: pre-line; }
         /* 삭제 버튼 */
-        .review-right {
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .review-delete-btn {
-            padding: 10px 18px;
-            border-radius: 8px;
-            border: 2px solid #000;
-            background: #fff;
-            cursor: pointer;
-            font-weight: 700;
-            transition: 0.2s;
-        }
-
-        .review-delete-btn:hover {
-            background: #000;
-            color: #fff;
-        }
+        .review-right { display: flex; align-items: flex-start; }
+        .review-delete-btn { padding: 10px 18px; border-radius: 8px; border: 2px solid #000; background: #fff; cursor: pointer; font-weight: 700; transition: 0.2s; }
+        .review-delete-btn:hover { background: #000; color: #fff; }
+        /* ===== 페이징 ===== */
+        .paging { margin-top: 40px; text-align: center; }
+        .paging a { margin: 0 6px; text-decoration: none; color: #333; font-weight: 500; }
+        .paging a.active { font-weight: 700; text-decoration: underline; }
+        /* ===== 별점 ===== */
+        .review-rating { margin-top: 6px; font-size: 18px; letter-spacing: 1px; display: flex; }
+        .star { position: relative; display: inline-block; color: #ddd; /* 기본: 빈 별 */ }
+        /* 꽉 찬 별 */
+        .star.full { color: #f5b301;}
+        /* 반개 별 */
+        .star.half::before { content: '★'; position: absolute; left: 0; width: 50%; overflow: hidden; color: #f5b301;}
     </style>
 </head>
 
-<body layout:decorate="~{/member/mypage/mypage-layout}">
+<body>
 
-<section layout:fragment="content">
+<section layout:fragment="mypage-content">
 
-    <h2 class="review-title">리뷰관리</h2>
+    <h2 class="review-title">후기 관리</h2>
 
-    <!-- ===== 샘플 리뷰 1개 ===== -->
-    <div class="review-item">
-
-        <!-- 왼쪽 이미지 -->
-        <div class="review-img-box">
-            <img src="/images/sample/bread.png" alt="상품 사진">
-        </div>
-
-        <!-- 중앙 내용 -->
-        <div class="review-middle">
-
-            <div>
-                <!-- 작성일 & 답변 여부 -->
-                <div class="review-top-row">
-                    <div class="review-date">작성일자 : 2025-12-03</div>
-                    <div class="review-status">답변 완료</div>
-                </div>
-
-                <!-- 상품명 (링크) -->
-                <div class="review-product">
-                    <a href="#">상품명 외 2개</a>
-                </div>
-
-                <!-- 리뷰 내용 -->
-                <div class="review-content">
-                    빵이 정말 맛있었습니다! 다음에도 구매하고 싶어요.
-                </div>
-            </div>
-
-        </div>
-
-        <!-- 오른쪽 삭제 버튼 -->
-        <div class="review-right">
-            <button class="review-delete-btn" onclick="deleteReview(1)">
-                삭제
-            </button>
-        </div>
+    <!-- 후기 없을 때 -->
+    <div th:if="${#lists.isEmpty(reviewList)}"
+         style="padding:40px; text-align:center; color:#777;">
+        작성한 후기가 없습니다.
     </div>
 
-    <!-- ===== 동적 반복 ===== -->
+    <!-- ===== 후기 리스트 ===== -->
     <th:block th:each="review : ${reviewList}">
         <div class="review-item">
 
+            <!-- 상품 이미지 -->
             <div class="review-img-box">
                 <img th:src="@{${review.productImg}}" alt="상품 사진">
             </div>
 
+            <!-- 중앙 내용 -->
             <div class="review-middle">
+                <div>
+                    <!-- 작성일 -->
+                    <div class="review-top-row">
+                        <div class="review-date"
+                             th:text="'작성일자 : ' + ${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">
+                        </div>
+                    </div>
 
-                <div class="review-top-row">
-                    <div class="review-date" th:text="'작성일자 : ' + ${review.regDate}"></div>
-                    <div class="review-status" 
-                         th:text="${review.replyYn == 'Y'} ? '답변 완료' : '답변 대기'"></div>
+                    <!-- 상품명 -->
+                    <div class="review-product">
+                        <a th:href="@{/member/mypage/orderList}"
+                           th:text="${review.productName}">
+                        </a>
+                    </div>
+
+                    <!-- 별점 표시 (반개 별 지원) -->
+                    <div class="review-rating">
+                        <span th:each="i : ${#numbers.sequence(1,5)}"
+                            class="star"
+                            th:classappend="
+                                ${review.rating >= i} ? ' full' :
+                                (${review.rating >= i - 0.5} ? ' half' : '')
+                            ">
+                            ★
+                        </span>
+                    </div>
+
+                    <!-- 리뷰 내용 -->
+                    <div class="review-content"
+                         th:text="${review.content}">
+                    </div>
                 </div>
-
-                <div class="review-product">
-                    <a th:href="@{/order/detail(orderNo=${review.orderNo})}"
-                       th:text="${review.productName}">상품명</a>
-                </div>
-
-                <div class="review-content" th:text="${review.content}"></div>
-
             </div>
 
+            <!-- 삭제 버튼 -->
             <div class="review-right">
                 <button class="review-delete-btn"
                         th:onclick="|deleteReview(${review.reviewNo})|">
@@ -193,26 +114,96 @@
         </div>
     </th:block>
 
+    <!-- ===== 페이징 UI ===== -->
+    <div class="paging" th:if="${page.totalPages > 1}">
+        <!-- 이전 -->
+        <a th:if="${!page.first}"
+           th:href="@{/member/mypage/reviewList(page=${page.number - 1})}">
+            이전
+        </a>
+
+        <!-- 페이지 번호 -->
+        <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+           th:href="@{/member/mypage/reviewList(page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == page.number} ? 'active' : ''">
+        </a>
+
+        <!-- 다음 -->
+        <a th:if="${!page.last}"
+           th:href="@{/member/mypage/reviewList(page=${page.number + 1})}">
+            다음
+        </a>
+    </div>
+
 </section>
 
 <script>
+    /**
+     * 후기 삭제 요청
+     * - 공통 SweetAlert 유틸 사용
+     * - 성공 / 실패 케이스 명확히 분기
+     * - 서버 에러 메시지까지 최대한 표시
+     */
     function deleteReview(reviewNo) {
-        if (!confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
 
-        $.ajax({
-            url: "/member/mypage/review/delete",
-            type: "POST",
-            data: { reviewNo: reviewNo },
-            success: function () {
-                alert("리뷰가 삭제되었습니다.");
-                location.reload();
-            },
-            error: function () {
-                alert("리뷰 삭제 중 오류가 발생했습니다.");
+        // 삭제 여부 확인 Alert
+        showConfirmAlert(
+            '후기 삭제',
+            '정말 이 리뷰를 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.',
+            function () {
+
+                // 삭제 AJAX 요청
+                $.ajax({
+                    url: "/member/mypage/review/delete",
+                    type: "POST",
+                    data: { reviewNo: reviewNo },
+
+                    /**
+                     * 성공 시
+                     * - 서버에서 내려준 메시지 표시
+                     * - 확인 누르면 페이지 새로고침
+                     */
+                    success: function (message) {
+                        showSuccessAlert(message || '리뷰가 삭제되었습니다.', function () {
+                            location.reload();
+                        });
+                    },
+
+                    /**
+                     * 실패 시
+                     * - HTTP 상태 코드 기준으로 분기
+                     * - 서버에서 내려준 에러 메시지 최대한 노출
+                     */
+                    error: function (xhr) {
+
+                        let errorMessage = '리뷰 삭제 중 오류가 발생했습니다.';
+
+                        // 1️⃣ 서버에서 문자열 메시지를 내려준 경우
+                        if (xhr.responseText) {
+                            errorMessage = xhr.responseText;
+                        }
+
+                        // 2️⃣ 상태 코드별 추가 설명
+                        if (xhr.status === 400) {
+                            errorMessage += '\n\n[원인]\n잘못된 요청입니다.';
+                        } 
+                        else if (xhr.status === 403) {
+                            errorMessage += '\n\n[원인]\n본인의 리뷰만 삭제할 수 있습니다.';
+                        } 
+                        else if (xhr.status === 404) {
+                            errorMessage += '\n\n[원인]\n이미 삭제되었거나 존재하지 않는 리뷰입니다.';
+                        } 
+                        else if (xhr.status === 500) {
+                            errorMessage += '\n\n[원인]\n서버 내부 오류가 발생했습니다.\n잠시 후 다시 시도해주세요.';
+                        }
+
+                        showErrorAlert(errorMessage);
+                    }
+                });
             }
-        });
+        );
     }
 </script>
-
 </body>
 </html>

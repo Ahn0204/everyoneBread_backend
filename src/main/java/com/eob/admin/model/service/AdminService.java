@@ -3,7 +3,6 @@ package com.eob.admin.model.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.cglib.core.Local;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -127,4 +126,11 @@ public class AdminService {
         }
     }
 
+    /**
+     * 거리별 배송료 등록
+     */
+
+    /**
+     * 카테고리 변경
+     */
 }

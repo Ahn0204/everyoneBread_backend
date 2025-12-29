@@ -233,16 +233,18 @@
                     <label class="form-label">휴대폰</label>
                     <div class="input-with-btn">
                         <input type="text" name="memberPhone" class="input-text" required />
-                        <!-- <button type="button" class="btn-small" id="phone-chk-btn">인증</button> -->
+                        <!-- 휴대폰 인증번호 받는 인증 버튼 -->
+                        <button type="button" class="btn-small" id="phone-chk-btn">인증</button>
                     </div>
                 </div>
 
-                <!-- <div class="form-row auth-code-row">
-                <div class="input-with-btn">
-                    <input type="text" name="authCode" class="input-text" placeholder="인증번호 입력" required>
-                    <button type="button" class="btn-small" id="auth-code-btn">확인</button>
+                <!-- 인증번호 입력 후 확인 버튼 -->
+                <div class="form-row auth-code-row">
+                    <div class="input-with-btn">
+                        <input type="text" name="authCode" class="input-text" placeholder="인증번호 입력" required />
+                        <button type="button" class="btn-small" id="auth-code-btn">확인</button>
+                    </div>
                 </div>
-            </div> -->
 
                 <!-- 기본 주소 + 검색 버튼 -->
                 <div class="form-row">
@@ -273,7 +275,14 @@
                 let idCheck = false; // 아이디 중복확인 여부
                 let emailCheck = false; // 이메일 중복확인 여부
                 //    let phoneAuthSent = false;      // 인증번호 발송 여부
-                //    let phoneAuthOk = false;        // 인증 성공 여부
+                let phoneAuthOk = false; // 인증 성공 여부
+
+                // CSRF 토큰 설정 - 개발 단계에서는 미사용 / 운영 시 주석 해제 예정
+                const token = $('meta[name="_csrf"]').attr('content');
+                const header = $('meta[name="_csrf_header"]').attr('content');
+                $(document).ajaxSend(function (e, xhr) {
+                    if (token && header) xhr.setRequestHeader(header, token);
+                });
 
                 /*
         아이디 중복확인
@@ -286,21 +295,21 @@
 
                     // 기본 빈칸 체크
                     if (memberId === '') {
-                        Swal.fire('아이디를 입력해주세요.');
+                        showErrorAlert('아이디를 입력해주세요.');
                         return;
                     }
 
                     // 영문으로 시작 + 영문/숫자만 가능 + 5~20자
                     let idReg = /^[a-zA-Z][a-zA-Z0-9]{4,19}$/;
                     if (!idReg.test(memberId)) {
-                        Swal.fire('아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.');
+                        showErrorAlert('아이디는 영문으로 시작하며, 영문+숫자 조합 5~20자리여야 합니다.');
                         return;
                     }
 
                     // 연속 문자를 금지 (aaa, 111, abc)
                     let repeatReg = /(.)\1\1/; // 같은 문자 3연속
                     if (repeatReg.test(memberId)) {
-                        Swal.fire('같은 문자를 3번 이상 반복할 수 없습니다.');
+                        showErrorAlert('같은 문자를 3번 이상 반복할 수 없습니다.');
                         return;
                     }
 
@@ -311,10 +320,10 @@
                         data: { memberId: memberId },
                         success: function (result) {
                             if (result === true) {
-                                Swal.fire('사용 가능한 아이디입니다.');
+                                showSuccessAlert('사용 가능한 아이디입니다.');
                                 idCheck = true;
                             } else {
-                                Swal.fire('이미 사용 중인 아이디입니다.');
+                                showErrorAlert('이미 사용 중인 아이디입니다.');
                                 idCheck = false;
                             }
                         },
@@ -381,14 +390,14 @@
                     let email = $("input[name='memberEmail']").val().trim();
 
                     if (email === '') {
-                        Swal.fire('이메일을 입력해주세요.');
+                        showErrorAlert('이메일을 입력해주세요.');
                         return;
                     }
 
                     // 이메일 정규식 (기본적인 RFC 형태)
                     let emailReg = /^[a-zA-Z0-9._%+-]{2,20}@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
                     if (!emailReg.test(email)) {
-                        Swal.fire('올바른 이메일 형식이 아닙니다.');
+                        showErrorAlert('올바른 이메일 형식이 아닙니다.');
                         return;
                     }
 
@@ -398,10 +407,10 @@
                         data: { memberEmail: email },
                         success: function (result) {
                             if (result === true) {
-                                Swal.fire('사용 가능한 이메일입니다.');
+                                showSuccessAlert('사용 가능한 이메일입니다.');
                                 emailCheck = true;
                             } else {
-                                Swal.fire('이미 사용 중인 이메일입니다.');
+                                showErrorAlert('이미 사용 중인 이메일입니다.');
                                 emailCheck = false;
                             }
                         },
@@ -443,68 +452,75 @@
 
                 /*
         휴대폰 인증번호 발송
+        POST /sms/send
     */
-                /*    $("#phone-chk-btn").click(function () {
+                $('#phone-chk-btn').click(function () {
+                    const phone = $("input[name='memberPhone']").val().replace(/-/g, '');
 
-        let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
+                    // 기본 유효성
+                    if (phone.length !== 11 || !/^010\d{8}$/.test(콜)) {
+                        showErrorAlert('올바른 휴대폰 번호를 입력해주세요.');
+                        return;
+                    }
 
-        // 이동통신사 번호 & 길이 체크
-        let phoneReg = /^(010|011|016|017|018|019)[0-9]{7,8}$/;
+                    $.ajax({
+                        url: '/sms/send',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ phone: phone }),
+                        success: function (res) {
+                            if (res.success) {
+                                showSuccessAlert(res.message);
+                                $("input[name= 'authCode']").focus();
+                            } else {
+                                showErrorAlert(res.message);
+                            }
+                        },
+                        error: function () {
+                            showErrorAlert('서버 오류로 인증번호 발송에 실패했습니다.');
+                        },
+                    });
+                });
 
-        if (!phoneReg.test(phone)) {
-            Swal.fire("휴대폰 번호 형식을 확인해주세요.");
-            return;
-        }
-
-        $.ajax({
-            url: "/member/send-auth-code",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ phone: phone }),
-            success: function (res) {
-                if (!res.success) {
-                    Swal.fire("인증번호 발송에 실패했습니다. 다시 시도해주세요.");
-                    phoneAuthSent = false;
-                    return;
-                }
-                Swal.fire("인증번호가 발송되었습니다.");
-                phoneAuthSent = true;
-                // 테스트용
-                console.log("인증번호(테스트) :", res.authCode);
-            }
-        });
-    });
-*/
                 /*
         인증번호 확인
+        POST /sms/check
     */
-                /*    $("#auth-code-btn").click(function () {
+                $('#auth-code-btn').click(function () {
+                    const phone = $("input[name='memberPhone']").val().replace(/-/g, '');
+                    const authCode = $("input[name='authCode']").val().trim();
 
-        if (!phoneAuthSent) {
-            Swal.fire("먼저 인증번호를 발송해주세요.");
-            return;
-        }
+                    if (authCode === '') {
+                        showErrorAlert('인증번호를 입력해주세요.');
+                        return;
+                    }
 
-        let phone = $("input[name='memberPhone']").val().replace(/-/g, "");
-        let inputCode = $("input[name='authCode']").val().trim();
+                    $.ajax({
+                        url: '/sms/check',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ phone: phone, authCode: authCode }),
+                        success: function (res) {
+                            if (res.success) {
+                                phoneAuthOk = true;
+                                showSuccessAlert(res.message);
 
-        $.ajax({
-            url: "/member/verify-auth-code",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ phone: phone, authCode: inputCode }),
-            success: function (res) {
-                if (res.success) {
-                    Swal.fire("휴대폰 인증이 완료되었습니다.");
-                    phoneAuthOk = true;
-                } else {
-                    Swal.fire("인증번호가 일치하지 않습니다.");
-                    phoneAuthOk = false;
-                }
-            }
-        });
-    });
-*/
+                                // 인증 완료 후 입력 잠금
+                                $("input[name='memberPhone']").prop('readonly', true);
+                                $("input[name='authCode']").prop('readonly', true);
+                                $('#phone-chk-btn').prop('disabled', true);
+                                $('#auth-code-btn').prop('disabled', true);
+                            } else {
+                                phoneAuthOk = false;
+                                showErrorAlert(res.message);
+                            }
+                        },
+                        error: function () {
+                            showErrorAlert('서버 통신 오류');
+                        },
+                    });
+                });
+
                 /*
         주민등록번호 입력 제한
         - 앞6자리 YYMMDD → 숫자만
@@ -552,50 +568,50 @@
 
                     /* 아이디 */
                     if (!idCheck) {
-                        Swal.fire('아이디 중복확인을 완료해주세요.');
+                        showErrorAlert('아이디 중복확인을 완료해주세요.');
                         return false;
                     }
 
                     // 아이디 앞뒤 공백 금지
                     if (/^\s+|\s+$/g.test(id)) {
-                        Swal.fire('아이디 앞뒤에 공백을 포함할 수 없습니다.');
+                        showErrorAlert('아이디 앞뒤에 공백을 포함할 수 없습니다.');
                         return false;
                     }
 
                     // 숫자만으로 구성 금지
                     if (/^\d+$/.test(id)) {
-                        Swal.fire('아이디는 숫자만으로 구성할 수 없습니다.');
+                        showErrorAlert('아이디는 숫자만으로 구성할 수 없습니다.');
                         return false;
                     }
 
                     /* 이름 - 한글만 허용 */
                     let nameReg = /^[가-힣]{2,20}$/;
                     if (!nameReg.test(name)) {
-                        Swal.fire('이름은 한글 2~20자만 가능합니다.');
+                        showErrorAlert('이름은 한글 2~20자만 가능합니다.');
                         return false;
                     }
 
                     /* 비밀번호 */
                     let pwReg = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*]).{8,20}$/;
                     if (!pwReg.test(pw)) {
-                        Swal.fire('비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.');
+                        showErrorAlert('비밀번호는 영문+숫자+특수문자 포함 8~20자입니다.');
                         return false;
                     }
 
                     // 공백 포함 금지
                     if (/\s/.test(pw)) {
-                        Swal.fire('비밀번호에는 공백을 포함할 수 없습니다.');
+                        showErrorAlert('비밀번호에는 공백을 포함할 수 없습니다.');
                         return false;
                     }
 
                     if (pw !== pw2) {
-                        Swal.fire('비밀번호가 일치하지 않습니다.');
+                        showErrorAlert('비밀번호가 일치하지 않습니다.');
                         return false;
                     }
 
                     /* 주민등록번호 */
                     if (j1.length !== 6 || j2.length !== 1) {
-                        Swal.fire('주민등록번호를 정확히 입력해주세요.');
+                        showErrorAlert('주민등록번호를 정확히 입력해주세요.');
                         return false;
                     }
                     // 주민등록번호 앞자리 날짜 유효성 검사 (YYMMDD)
@@ -604,7 +620,7 @@
                     let day = parseInt(j1.substring(4, 6));
 
                     if (month < 1 || month > 12 || day < 1 || day > 31) {
-                        Swal.fire('주민등록번호 앞자리를 다시 확인해주세요.');
+                        showErrorAlert('주민등록번호 앞자리를 다시 확인해주세요.');
                         return false;
                     }
 
@@ -613,43 +629,44 @@
                     let dateObj = new Date(fullYear, month - 1, day);
 
                     if (dateObj.getFullYear() !== fullYear || dateObj.getMonth() + 1 !== month || dateObj.getDate() !== day) {
-                        Swal.fire('주민등록번호 앞자리 날짜가 실제 존재하지 않습니다.');
+                        showErrorAlert('주민등록번호 앞자리 날짜가 실제 존재하지 않습니다.');
                         return false;
                     }
 
                     // 주민등록번호 뒷자리는 1~4로 시작해야 함
                     if (!/^[1-4]$/.test(j2)) {
-                        Swal.fire('주민등록번호 뒷자리는 1~4로 시작해야 합니다.');
+                        showErrorAlert('주민등록번호 뒷자리는 1~4로 시작해야 합니다.');
                         return false;
                     }
 
                     /* 이메일 */
                     if (!emailCheck) {
-                        Swal.fire('이메일 중복확인을 완료해주세요.');
+                        showErrorAlert('이메일 중복확인을 완료해주세요.');
                         return false;
                     }
 
                     // 특수문자 연속 금지
                     if (email.includes('..') || email.includes('__') || email.includes('--')) {
-                        Swal.fire('이메일에 특수문자를 연속으로 사용할 수 없습니다.');
+                        showErrorAlert('이메일에 특수문자를 연속으로 사용할 수 없습니다.');
                         return false;
                     }
 
                     /* 휴대폰 인증 */
-                    // if (!phoneAuthOk) {
-                    //     Swal.fire("휴대폰 인증을 완료해주세요.");
-                    //     return false;
-                    // }
+                    // 나중에 주석 제거
+                    if (!phoneAuthOk) {
+                        showErrorAlert('휴대폰 인증을 완료해주세요.');
+                        return false;
+                    }
 
                     // 010만 허용
-                    if (!/^010/.test(phone)) {
-                        Swal.fire('휴대폰 번호는 010으로 시작해야 합니다.');
+                    if (!/^010/.test(콜)) {
+                        showErrorAlert('휴대폰 번호는 010으로 시작해야 합니다.');
                         return false;
                     }
 
                     /* 주소 */
                     if (address.length < 5) {
-                        Swal.fire('주소를 정확히 입력해주세요.');
+                        showErrorAlert('주소를 정확히 입력해주세요.');
                         return false;
                     }
 
@@ -678,13 +695,13 @@
 
                 //예솔 추가
                 //ajax사용시 csrf헤더 생성
-                $(function () {
-                    const token = $('meta[name="_csrf"]').attr('content');
-                    const header = $('meta[name="_csrf_header"]').attr('content');
-                    $(document).ajaxSend(function (e, xhr) {
-                        if (token && header) xhr.setRequestHeader(header, token);
-                    });
-                });
+                // $(function () {
+                //     const token = $('meta[name="_csrf"]').attr('content');
+                //     const header = $('meta[name="_csrf_header"]').attr('content');
+                //     $(document).ajaxSend(function (e, xhr) {
+                //         if (token && header) xhr.setRequestHeader(header, token);
+                //     });
+                // });
             }
         </script>
     </body>

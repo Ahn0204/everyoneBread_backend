@@ -11,34 +11,28 @@
             <link rel="stylesheet" th:href="@{/css/admin/comm/list-comm.css}" />
             <style>
                 /*항목 너비 설정하는 레이아웃css*/
-.div-cols {
-    /*항목을 담는 div에 지정*/
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    padding: 20px 10px 10px 20px;
-}
-.div-col-1 {
-    flex: 0.7;
-} /* 번호 */
-.div-col-2 {
-    flex: 1;
-} /* 상태 */
-.div-col-3 {
-    flex: 1.2;
-} /* 아이디 */
-.div-col-4 {
-    flex: 1;
-} /* 이름 */
-.div-col-5 {
-    flex: 1.5;
-} /* 신청일시 */
-.div-col-6 {
-    flex: 1.5;
-} /* 승인일시 */
-/* .div-col-7 {
-    flex: 1.5;
-} 상점명 */
+                .div-cols {
+                    /*항목을 담는 div에 지정*/
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    padding: 20px 10px 10px 20px;
+                }
+                .div-col-1 {
+                    flex: 0.7;
+                } /* 번호 */
+                .div-col-2 {
+                    flex: 1;
+                } /* 상태 */
+                .div-col-3 {
+                    flex: 1.2;
+                } /* 아이디 */
+                .div-col-4 {
+                    flex: 1;
+                } /* 이름 */
+                .div-col-5 {
+                    flex: 1.5;
+                } /* 가입일시 */
             </style>
         </th:block>
     </head>
@@ -77,42 +71,52 @@
                         </th:block>
                     </form>
                 </div>
-                <div class="admin-list" style="max-width: 1000px; min-width: 800px"><div class="div-cols border-bottom border-3 border-dark fw-b text-center">
+                <div class="admin-list" style="max-width: 1000px; min-width: 800px">
+                    <div class="div-cols border-bottom border-3 border-dark fw-b text-center">
                         <div class="div-col-1 fw-bold">번호</div>
                         <div class="div-col-2 fw-bold">상태</div>
                         <div class="div-col-3 fw-bold">아이디</div>
                         <div class="div-col-4 fw-bold">이름</div>
-                        <div class="div-col-5 fw-bold">&nbsp;신청일시&nbsp;</div>
-                        <div class="div-col-6 fw-bold">&nbsp;승인일시&nbsp;</div>
-                        <div class="div-col-7"></div>
+                        <div class="div-col-5 fw-bold">&nbsp;가입일시&nbsp;</div>
                     </div>
-                    <!--라이더 내역이 없을 때-->
-                    <div th:if="${noRider}">
-                        <div class="p-2 flex-fill" th:text="${noRider}"></div>
+                    <!--관리자 내역이 없을 때-->
+                    <div th:if="${noAdmin}">
+                        <div class="p-2 flex-fill" th:text="${noAdmin}"></div>
                     </div>
-                    <!--라이더 내역이 있을 때-->
-                    <div th:unless="${noRider}">
-                        <!--아코디언 속성이 적용된 리스트-->
-                        <div class="accordion" id="riderApproval-List">
-                            <!--미검토 PENDING, UNDER_REVIEW 리스트-->
-                            <!--항목 1개 : 목록에서 보이는 헤더 + 클릭 시 나타나는 바디 구성-->
-                            <div class="accordion-item" th:each="rider, loop : ${pendingList}">
-                                <!--내역마다 반복되는 출력부 fragment, 글번호 시작값 전달-->
-                                <div th:replace="~{/admin/user/riderApproval-common(start=${pendingStart})}"></div>
-                            </div>
-                            <!--보완요청 REVISION_REQUIRED 리스트-->
-                            <div class="accordion-item" th:each="rider,loop : ${rejectedList}">
-                                <div th:replace="~{/admin/user/riderApproval-common(start=${rejectedStart})}"></div>
-                            </div>
-                            <!--승인완료 APPROVED 리스트-->
-                            <div class="accordion-item" th:each="rider,loop : ${approvedList}">
-                                <div th:replace="~{/admin/user/riderApproval-common(start=${approvedStart})}"></div>
+                    <!--관리자 내역이 있을 때-->
+                    <div th:unless="${noAdmin}">
+                        <div class="admin-list">
+                            <!--항목 담는 div(css 레이아웃 틀)-->
+                            <div class="accordion-item div-cols border-bottom border-1 border-secondary text-center" th:each="admin, loop : ${adminList}">
+                                <!--항목-->
+                                <div class="div-col-1" th:text="${start - loop.index}"></div>
+                                <div class="div-col-2" th:text="${admin.status.description}"></div>
+                                <div class="div-col-3" th:text="${admin.memberId}"></div>
+                                <div class="div-col-4" th:text="${admin.memberName}"></div>
+                                <div class="div-col-5" th:text="${#temporals.format(admin.createdAt, 'YY-MM-dd HH:mm')}"></div>
                             </div>
                         </div>
+                        <!--페이지 블럭-->
+                        <div th:unless="${noAdmin}">
+                            <ul class="pagination justify-content-center p-2 mt-3">
+                                <!--이전 버튼-->
+                                <li class="page-item" th:classappend="${!adminP.hasPrevious} ? 'disabled' ">
+                                    <a class="page-link" th:text="이전" th:href="@{|?page=${adminP.number-1}|}"></a>
+                                </li>
+                                <!--페이지 숫자 버튼-->
+                                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,adminP.totalPages-1)}" th:classappend="${pageNum == adminP.number} ? 'active'">
+                                    <a class="page-link" th:href="@{|?page=${pageNum}|}" th:text="${pageNum}+1"></a>
+                                </li>
+                                <!--다음 버튼-->
+                                <li class="page-item" th:classappend="${!adminP.hasNext} ? 'disabled'">
+                                    <a class="page-link" th:href="@{|?page=${adminP.number+1}|}" th:text="다음"></a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+                </div>
             </div>
         </div>
-
         <script layout:fragment="script">
             $('.insertAdmin').on('click', function () {
                 showConfirmAlert(

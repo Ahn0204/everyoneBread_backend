@@ -15,37 +15,89 @@ import com.eob.shop.model.data.ShopEntity;
 
 public interface ShopRepository extends JpaRepository<ShopEntity, Long> {
 
-    // 로그인한 MemberEntity 로 상점 조회
-    @Query("select s from ShopEntity s where s.member = :member")
-    Optional<ShopEntity> loginShop(@Param("member") MemberEntity member);
+        // 로그인한 MemberEntity 로 상점 조회
+        @Query("select s from ShopEntity s where s.member = :member")
+        Optional<ShopEntity> loginShop(@Param("member") MemberEntity member);
 
-    /**
-     * 상점명 중복 확인
-     */
-    boolean existsByShopName(String shopName);
+        /**
+         * 상점명 중복 확인
+         */
+        boolean existsByShopName(String shopName);
 
-    /**
-     * 회원 번호로 상점 조회
-     * (s.member.memberNo)
-     */
-    Optional<ShopEntity> findByMember_MemberNo(Long memberNo);
+        /**
+         * 회원 번호로 상점 조회
+         * (s.member.memberNo)
+         */
+        Optional<ShopEntity> findByMember_MemberNo(Long memberNo);
 
-    /**
-     * 상점 status별 조회 - 등록일Desc순
-     * (예솔 추가)
-     */
-    ArrayList<ShopEntity> findByStatusOrderByCreatedAtDesc(ShopApprovalStatus status);
+        /**
+         * 상점 status별 조회 - 등록일Desc순
+         * (예솔 추가)
+         */
+        ArrayList<ShopEntity> findByStatusOrderByCreatedAtDesc(ShopApprovalStatus status);
 
-    /**
-     * 전체 입점 신청내역 조회 - 페이징 객체 리턴
-     * (예솔 추가)
-     */
-    Page<ShopEntity> findAll(Pageable pageable);
+        /**
+         * 전체 입점 신청내역 조회 - 페이징 객체 리턴
+         * (예솔 추가)
+         */
+        Page<ShopEntity> findAll(Pageable pageable);
 
-    /**
-     * 폐점 신청내역 조회 - 페이징 객체 리턴
-     * (예솔 추가)
-     */
-    @Query("select s from ShopEntity s where s.status='CLOSE_REVIEW'")
-    Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
+        /**
+         * 폐점 신청내역 조회 - 페이징 객체 리턴
+         * (예솔 추가)
+         */
+        @Query("select s from ShopEntity s where s.status='CLOSE_REVIEW'")
+        Page<ShopEntity> findByStatusOrderByCreatedAtDesc(Pageable pageable);
+
+        /**
+         * 상품 카테고리&반경 내 해당하는 상점 조회 - 페이징 객체 리턴
+         * 직선 거리를 db에서 구해 페이징 처리 시 반영한다.
+         * (예솔 추가)
+         */
+        @Query(value = """
+                        SELECT s.*,
+                        (6371 * ACOS(
+                                COS(:lat * ACOS(-1) / 180) *
+                                COS(s.latitude * ACOS(-1) / 180) *
+                                COS((s.longitude - :lng) * ACOS(-1) / 180) +
+                                SIN(:lat * ACOS(-1) / 180) *
+                                SIN(s.latitude * ACOS(-1) / 180)
+                        )) AS distance
+                        FROM shop s
+                        JOIN product p ON p.shop_no = s.shop_no
+                        WHERE p.cat_name = :category
+                          AND s.status = 'APPLY_APPROVED'
+                          AND s.latitude BETWEEN :minLat AND :maxLat
+                          AND s.longitude BETWEEN :minLng AND :maxLng
+                        ORDER BY distance
+                        """, countQuery = """
+                        SELECT count(*)
+                        FROM shop s
+                        JOIN product p ON p.shop_no = s.shop_no
+                        WHERE p.cat_name = :category
+                          AND s.status = 'APPLY_APPROVED'
+                          AND s.latitude BETWEEN :minLat AND :maxLat
+                          AND s.longitude BETWEEN :minLng AND :maxLng
+                        """, nativeQuery = true)
+        Page<ShopEntity> findNearBy(
+                        @Param("category") String category, @Param("lat") double lat, @Param("lng") double lng,
+                        @Param("minLat") double minLat,
+                        @Param("maxLat") double maxLat,
+                        @Param("minLng") double minLng, @Param("maxLng") double maxLng, Pageable pageable);
+
+        @Query("""
+                            select distinct s from ShopEntity s
+                            join ProductEntity p on p.shop = s
+                            where s.status = 'APPLY_APPROVED'
+                            and p.catName = :category
+                        """)
+        Page<ShopEntity> findByProductCatName(@Param("category") String category, Pageable pageable);
+
+        /**
+         * 상점조회
+         * 
+         * @param shopNo
+         *               return ShopEntity
+         */
+        ShopEntity findByShopNo(long shopNo);
 }

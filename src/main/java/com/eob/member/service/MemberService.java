@@ -9,6 +9,7 @@ import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.repository.MemberRepository;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.BindingResult;
 
@@ -68,7 +69,14 @@ public class MemberService {
     /*
         일반 회원 가입
     */
-    public MemberEntity registerUser(RegisterRequest dto, BindingResult bindingResult) {
+    public MemberEntity registerUser(RegisterRequest dto, BindingResult bindingResult, HttpSession session) {
+
+        // 휴대폰 인증 여부 체크
+        Boolean smsVerified = (Boolean) session.getAttribute("SMS_VERIFIED");
+        if(smsVerified == null || !smsVerified){
+            bindingResult.reject("sms.not.verified", "휴대폰 인증을 완료해주세요.");
+            return null;
+        }
 
         // 중복 및 PW 검사
         validateDuplicate(dto, bindingResult);
@@ -80,6 +88,10 @@ public class MemberService {
         // 역할 / 상태 지정
         entity.setMemberRole(MemberRoleStatus.USER);
         entity.setStatus(MemberApprovalStatus.ACTIVE);
+
+        MemberEntity saved = memberRepository.save(entity);
+
+        session.removeAttribute("SMS_VERIFIED");
 
         return memberRepository.save(entity);
     }

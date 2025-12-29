@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
 
 <head>
     <meta charset="UTF-8">
@@ -76,9 +77,9 @@
     </style>
 </head>
 
-<body layout:decorate="~{/member/mypage/mypage-layout}">
+<body>
 
-<section layout:fragment="content">
+<div layout:fragment="mypage-content">
 
     <h2 class="delivery-title">배송지 관리</h2>
 
@@ -126,7 +127,7 @@
         </div>
     </th:block>
 
-</section>
+</div>
 
 <script>
     // 삭제 시 확인창

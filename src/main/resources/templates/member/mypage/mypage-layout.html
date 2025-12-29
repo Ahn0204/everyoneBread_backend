@@ -1,103 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{main/main-layout}">
 
 <head>
-    <meta charset="UTF-8">
     <title>마이페이지</title>
 
     <style>
         * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; }
-
-        body {
-            background: #fafafa;
-            padding: 40px 0;
-        }
-
-        .mypage-wrapper {
-            width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            gap: 30px;
-        }
+        body { background: #fafafa; padding: 40px 0; }
+        .mypage-wrapper { width: 1200px; margin: 0 auto; display: flex; gap: 30px; }
 
         /* ===== 사이드바 ===== */
-        .mypage-sidebar {
-            width: 230px;
-            padding: 25px;
-            background: #fff;
-            border: 2px solid #000;
-            border-radius: 12px;
-            height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
+        .mypage-sidebar { width: 230px; padding: 25px; background: #fff; border: 2px solid #000; border-radius: 12px; height: fit-content; }
+        .sidebar-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center; }
         .sidebar-menu { list-style: none; }
         .sidebar-menu li { margin-bottom: 18px; }
-
-        .sidebar-menu a {
-            display: block;
-            padding: 7px 5px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            text-decoration: none;
-            border-radius: 6px;
-            transition: 0.15s;
-        }
-
-        .sidebar-menu a:hover {
-            background: #e4f3ff;
-            color: #0077cc;
-        }
-
-        .sidebar-menu .active {
-            background: #79C3FF;
-            color: #fff !important;
-        }
-
+        .sidebar-menu a { display: block; padding: 7px 5px; font-size: 16px; font-weight: 600; color: #333; text-decoration: none; border-radius: 6px; transition: 0.15s; }
+        .sidebar-menu a:hover { background: #e4f3ff; color: #0077cc; }
+        .sidebar-menu .active { background: #79C3FF; color: #fff !important; }
         /* ===== 컨텐츠 ===== */
-        .mypage-content {
-            flex: 1;
-            padding: 30px;
-            background: #fff;
-            border: 2px solid #000;
-            border-radius: 12px;
-            min-height: 600px;
-        }
+        .mypage-content { flex: 1; padding: 30px; background: #fff; border: 2px solid #000; border-radius: 12px; min-height: 600px; }
     </style>
 </head>
 
 <body>
+<div layout:fragment="content">
+    <div class="mypage-wrapper">
 
-<div class="mypage-wrapper">
+        <!-- ===== 사이드바 ===== -->
+        <aside class="mypage-sidebar">
+            <div class="sidebar-title">마이페이지</div>
 
-    <!-- ===== 사이드바 ===== -->
-    <aside class="mypage-sidebar">
-        <div class="sidebar-title">마이페이지</div>
+            <ul class="sidebar-menu">
+                <li><a th:href="@{/member/mypage/orderList}"   th:classappend="${menu=='orderList'} ? 'active'">주문내역</a></li>
+                <li><a th:href="@{/member/mypage/wishList}"    th:classappend="${menu=='wishList'} ? 'active'">즐겨찾기</a></li>
+                <li><a th:href="@{/member/mypage/reviewList}"  th:classappend="${menu=='reviewList'} ? 'active'">후기</a></li>
+                <li><a th:href="@{/member/mypage/qnaList}"     th:classappend="${menu=='qnaList'} ? 'active'">문의</a></li>
+                <li><a th:href="@{/member/mypage/deliveryList}"th:classappend="${menu=='deliveryList'} ? 'active'">배송지 관리</a></li>
+                <li><a th:href="@{/member/mypage/info}"        th:classappend="${menu=='info'} ? 'active'">개인정보 수정</a></li>
+            </ul>
+        </aside>
 
-        <ul class="sidebar-menu">
-            <li><a href="/member/mypage/orderList"   th:classappend="${menu=='orderList'} ? 'active'">주문내역</a></li>
-            <li><a href="/member/mypage/wishList"    th:classappend="${menu=='wishList'} ? 'active'">즐겨찾기</a></li>
-            <li><a href="/member/mypage/reviewList"  th:classappend="${menu=='reviewList'} ? 'active'">리뷰</a></li>
-            <li><a href="/member/mypage/qnaList"     th:classappend="${menu=='qnaList'} ? 'active'">문의</a></li>
-            <li><a href="/member/mypage/deliveryList"th:classappend="${menu=='deliveryList'} ? 'active'">배송지 관리</a></li>
-            <li><a href="/member/mypage/info"        th:classappend="${menu=='info'} ? 'active'">개인정보 수정</a></li>
-        </ul>
-    </aside>
+        <!-- ===== 오른쪽 컨텐츠 (자식이 여기에 들어감) ===== -->
+        <section class="mypage-content">
+            <div layout:fragment="mypage-content"></div>
+        </section>
 
-    <!-- ===== 오른쪽 컨텐츠 (자식이 여기에 들어감) ===== -->
-    <section class="mypage-content">
-        <div layout:fragment="content"></div>
-    </section>
-
+    </div>
 </div>
+
 </body>
 </html>

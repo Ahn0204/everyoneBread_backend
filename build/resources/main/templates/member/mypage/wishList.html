@@ -1,110 +1,63 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>즐겨찾기</title>
-
     <style>
-        .wish-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
-        .wish-item {
-            display: flex;
-            border: 2px solid #000;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            align-items: center;
-        }
-
+        .wish-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; }
+        .wish-item { display: flex; border: 2px solid #000; background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 25px; align-items: center; }
         /* 왼쪽 가게 이미지 */
-        .wish-img-box {
-            width: 120px;
-            height: 120px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-            margin-right: 20px;
-        }
-
-        .wish-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        .wish-img-box { width: 120px; height: 120px; border-radius: 12px; overflow: hidden; border: 1px solid #ddd; margin-right: 20px; }
+        .wish-img-box img { width: 100%; height: 100%; object-fit: cover; }
         /* 상점 정보 */
-        .wish-info {
-            flex: 1;
-        }
-
-        .wish-name {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 6px;
-        }
-
-        .wish-desc {
-            font-size: 14px;
-            color: #555;
-        }
-
+        .wish-info { flex: 1; }
+        .wish-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .wish-desc { font-size: 14px; color: #555; }
         /* 오른쪽 즐겨찾기 버튼(하트) */
-        .wish-heart {
-            width: 26px;
-            height: 26px;
-            cursor: pointer;
-        }
+        .wish-heart { width: 26px; height: 26px; cursor: pointer; }
+        /* 빈 목록 안내 문구 */
+        .empty-text { text-align: center; color: #777; padding: 60px 0; font-size: 15px; }
     </style>
 </head>
 
-<body layout:decorate="~{/member/mypage/mypage-layout}">
+<body>
 
-<!-- content 영역만 채우기 -->
-<section layout:fragment="content">
+<section layout:fragment="mypage-content" id="wishlist-container">
 
     <h2 class="wish-title">즐겨찾기</h2>
 
-    <!-- ===== 샘플 1개 ===== -->
-    <div class="wish-item">
-
-        <div class="wish-img-box">
-            <img src="/images/sample/store.png" alt="가게 사진">
-        </div>
-
-        <div class="wish-info">
-            <div class="wish-name">성진이 빵집</div>
-            <div class="wish-desc">인기 메뉴: 소금빵, 크루아상, 바게트</div>
-        </div>
-
-        <!-- 활성화된 즐겨찾기 아이콘 -->
-        <img class="wish-heart"
-             src="/images/icon/heart-fill.png"
-             alt="즐겨찾기 해제"
-             data-shopNo="1"
-             onclick="toggleWish(this)">
+    <!-- 즐겨찾기 목록이 비어 있을 때 -->
+    <div th:if="${#lists.isEmpty(wishlist)}" class="empty-text">
+        아직 즐겨찾기한 빵집이 없어요 🍞<br>
+        마음에 드는 빵집을 찜해보세요!
     </div>
 
-    <!-- 여기서부터 시작 -->
-    <th:block th:each="wish : ${wishList}">
+    <!-- 즐겨찾기 목록 출력 -->
+    <th:block th:each="wish : ${wishlist}">
         <div class="wish-item">
 
+            <!-- 상점 이미지 -->
             <div class="wish-img-box">
                 <img th:src="@{${wish.shopImg}}" alt="가게 사진">
             </div>
 
+            <!-- 상점 정보 -->
             <div class="wish-info">
-                <div class="wish-name" th:text="${wish.shopName}">가게이름</div>
-                <div class="wish-desc" th:text="${wish.description}">설명</div>
+                <div class="wish-name" th:text="${wish.shopName}">
+                    가게이름
+                </div>
+                <div class="wish-desc" th:text="${wish.description}">
+                    가게 설명
+                </div>
             </div>
 
+            <!-- 찜 해제 버튼 -->
             <img class="wish-heart"
                  src="/images/icon/heart-fill.png"
                  alt="즐겨찾기 해제"
@@ -112,8 +65,82 @@
                  onclick="toggleWish(this)">
         </div>
     </th:block>
-
 </section>
+<script>
+    const csrfToken  = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+    /**
+     * 즐겨찾기(찜) 토글 처리
+     * - 하트 클릭 시 호출
+     * - 서버에 shopNo 전달
+     * - DELETED면 카드 제거
+     */
+    function toggleWish(el) {
+        
+        // 중복 클릭 방지
+        el.style.pointerEvents = 'none';
 
+        // 1️. 클릭된 하트에서 상점 번호 추출
+        const shopNo = el.dataset.shopno;
+
+        // 2️. 서버에 토글 요청
+        fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({
+                shopNo: shopNo
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('찜 처리 중 오류가 발생했습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+
+            // 3️. 서버 응답 상태 확인
+            // status: ACTIVE / DELETED
+            if (data.status === 'DELETED') {
+
+                // 마이페이지에서는 찜 해제 시 카드 제거
+                const wishItem = el.closest('.wish-item');
+                wishItem.remove();
+
+                // 찜 목록이 모두 사라졌다면 안내 문구 표시
+                if (document.querySelectorAll('.wish-item').length === 0) {
+                    showEmptyMessage();
+                }
+            }
+
+            // ACTIVE인 경우 (마이페이지에서는 특별한 처리 없음)
+        })
+        .catch(error => {
+            console.error(error);
+            alert('즐겨찾기 처리 중 문제가 발생했습니다.');
+        });
+    }
+
+    /**
+     * 즐겨찾기 목록이 비었을 때 안내 문구 표시
+     */
+    function showEmptyMessage() {
+
+        // id 기반 DOM 접근
+        const container = document.getElementById('wishlist-container');
+
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty-text';
+        emptyDiv.innerHTML = `
+            아직 즐겨찾기한 빵집이 없어요 🍞<br>
+            마음에 드는 빵집을 찜해보세요!
+        `;
+
+        container.appendChild(emptyDiv);
+    }
+</script>
 </body>
 </html>

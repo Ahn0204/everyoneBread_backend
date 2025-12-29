@@ -1,8 +1,11 @@
 package com.eob.order.model.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.eob.order.model.data.OrderHistoryEntity;
@@ -30,6 +33,28 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistoryEntity
      */
     List<OrderHistoryEntity> findByShop_ShopNoAndStatus(Long shopNo, OrderStatus status);
 
+    /**
+     * [판매자]
+     * 오늘 주문 수 조회
+     */
+    @Query("select count(o) from OrderHistoryEntity o where o.shop.shopNo = :shopNo and o.orderTime is not null and o.orderTime.orderedAt between :start and :end")
+    long countTodayOrders( @Param("shopNo") Long shopNo, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end );
+
+    /**
+     * [판매자]
+     * 상태별 주문 수 조회
+     */
+    long countByShop_ShopNoAndStatus(Long shopNo, OrderStatus status);
+
+    /**
+     * [회원]
+     * - 회원 마이페이지 주문 내역 조회
+     * - 회원 기준 주문 전체 조회 (최신순)
+     * @param memberNo 회원 고유 번호
+     * @return 회원의 주문 내역 리스트
+     */
+    @Query("select o from OrderHistoryEntity o where o.member.memberNo = :memberNo order by o.orderTime.orderedAt desc")
+    List<OrderHistoryEntity> findMyOrders(@Param("memberNo") Long memberNo);
 
 
 }

@@ -1,13 +1,17 @@
 package com.eob.order.model.data;
 
+import java.time.LocalDateTime;
+
+import com.eob.shop.model.data.ProductEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -32,4 +36,30 @@ public class OrderDetailEntity {
     @ManyToOne
     @JoinColumn(name = "order_no", nullable = false)
     private OrderHistoryEntity orderNo;
+
+    // 여기 아래부터 성진 추가 12/17 00:24 AM
+    /**
+     * 상품 번호
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_no", nullable = false)
+    private ProductEntity productNo;
+
+    /**
+     * 주문 수량
+     */
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
+    /**
+     * 상품 가격
+     */
+    @Column(name = "price", nullable = false)
+    private int price;
+
+    /**
+     * 입력된 일시
+     */
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

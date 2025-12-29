@@ -7,7 +7,7 @@
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
     <title>모두의빵 - 판매자 로그인</title>
 
@@ -148,6 +148,7 @@
 
         <!-- 판매자 로그인 POST 요청 -->
         <form th:action="@{/shop/login}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
             <input type="text" class="login-input" name="shopId" placeholder="판매자 아이디를 입력해주세요." required />
             <input type="password" class="login-input" name="shopPw" placeholder="비밀번호를 입력해주세요." required />
 
@@ -179,7 +180,7 @@
        =========================== */
     if (params.get("success") === "login-ok") {
 
-        Swal.fire("로그인 성공!", null);
+        showSuccessAlert("로그인 성공!", null);
 
         // 알럿 한 번만 뜨도록 URL 파라미터 제거
         const cleanUrl = window.location.origin + window.location.pathname;
@@ -193,7 +194,7 @@
 
         let msg = params.get("error");
 
-        Swal.fire(msg, null);
+        showErrorAlert(msg, null);
 
         // 중복 알럿 방지
         const cleanUrl = window.location.origin + window.location.pathname;
