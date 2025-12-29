@@ -458,7 +458,7 @@
                     const phone = $("input[name='memberPhone']").val().replace(/-/g, '');
 
                     // 기본 유효성
-                    if (phone.length !== 11 || !/^010\d{8}$/.test(콜)) {
+                    if (phone.length !== 11 || !/^010\d{8}$/.test(phone)) {
                         showErrorAlert('올바른 휴대폰 번호를 입력해주세요.');
                         return;
                     }
@@ -659,7 +659,7 @@
                     }
 
                     // 010만 허용
-                    if (!/^010/.test(콜)) {
+                    if (!/^010/.test(phone)) {
                         showErrorAlert('휴대폰 번호는 010으로 시작해야 합니다.');
                         return false;
                     }

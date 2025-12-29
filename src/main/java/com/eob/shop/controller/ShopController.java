@@ -3,10 +3,6 @@ package com.eob.shop.controller;
 import java.io.File;
 import java.time.LocalDateTime;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +41,6 @@ public class ShopController {
     private final ProductService productService;
     private final SmsService smsService;
     // location저장용 - Point객체 생성 객체
-    private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * 판매자 로그인 페이지
@@ -68,7 +63,7 @@ public class ShopController {
     @GetMapping("register/start")
     public String registerStartForm(HttpSession session, Model model) {
         // 이미 start를 완료한 상태면 step으로 이동
-        if(session.getAttribute("tempShopMember") != null){
+        if (session.getAttribute("tempShopMember") != null) {
             return "redirect:/shop/register/step";
         }
 
@@ -86,10 +81,11 @@ public class ShopController {
      * - DB 저장은 하지 않고 세션에 임시 저장
      */
     @PostMapping("register/start")
-    public String registerStart(@Valid @ModelAttribute("registerRequest") RegisterRequest dto, BindingResult bindingResult, HttpSession session) {
+    public String registerStart(@Valid @ModelAttribute("registerRequest") RegisterRequest dto,
+            BindingResult bindingResult, HttpSession session) {
 
         // 이미 세션에 tempShopMember 있으면 중복 접근 차단
-        if(session.getAttribute("tempShopMember") != null){
+        if (session.getAttribute("tempShopMember") != null) {
             return "redirect:/shop/register/step";
         }
 
@@ -99,13 +95,13 @@ public class ShopController {
         }
 
         // 휴대폰 번호 서버 검증
-        if(dto.getMemberPhone() == null || !dto.getMemberPhone().matches("^010\\d{8}$")){
+        if (dto.getMemberPhone() == null || !dto.getMemberPhone().matches("^010\\d{8}$")) {
             bindingResult.rejectValue("memberPhone", "invalid", "올바른 휴대폰 번호가 아닙니다.");
             return "shop/shop-register-start";
         }
 
         // SMS 휴대폰 인증 서버 검증
-        if(!smsService.isVerified(session)){
+        if (!smsService.isVerified(session)) {
             bindingResult.reject("phoneAuth", "휴대폰 인증을 완료해주세요.");
             return "shop/shop-register-start";
         }
@@ -113,20 +109,18 @@ public class ShopController {
         // memberId 최종 중복 검증
         if (!memberService.isMemberIdAvailable(dto.getMemberId())) {
             bindingResult.rejectValue(
-                "memberId",
-                "duplicate",
-                "이미 사용 중인 아이디입니다."
-            );
+                    "memberId",
+                    "duplicate",
+                    "이미 사용 중인 아이디입니다.");
             return "shop/shop-register-start";
         }
 
         // email 최종 중복 검증
         if (!memberService.isMemberEmailAvailable(dto.getMemberEmail())) {
             bindingResult.rejectValue(
-                "memberEmail",
-                "duplicate",
-                "이미 사용 중인 이메일입니다."
-            );
+                    "memberEmail",
+                    "duplicate",
+                    "이미 사용 중인 이메일입니다.");
             return "shop/shop-register-start";
         }
 
@@ -156,7 +150,7 @@ public class ShopController {
             return "redirect:/shop/register/start";
         }
 
-        if(session.getAttribute("shopRegisterCompleted") != null){
+        if (session.getAttribute("shopRegisterCompleted") != null) {
             return "redirect:/shop/login";
         }
 
@@ -178,11 +172,13 @@ public class ShopController {
     @Transactional
     @PostMapping("register/step")
     @ResponseBody
-    public String registerStep(@Valid ShopEntity shop, BindingResult bindingResult, HttpSession session, @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
-        // @RequestParam(name = "longitude") String longitude, @RequestParam(name = "latitude") String latitude
+    public String registerStep(@Valid ShopEntity shop, BindingResult bindingResult, HttpSession session,
+            @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
+        // @RequestParam(name = "longitude") String longitude, @RequestParam(name =
+        // "latitude") String latitude
 
         // 상점 정보 유효성 검증
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "INVALID_SHOP_DATA";
         }
         if (shop.getShopName() == null || shop.getShopName().isBlank()) {
@@ -198,7 +194,7 @@ public class ShopController {
         }
 
         // 이미 가입 완료된 경우 중복 실행 방지
-        if(session.getAttribute("shopRegisterCompleted") != null){
+        if (session.getAttribute("shopRegisterCompleted") != null) {
             return "ALREADY_DONE";
         }
 
@@ -220,14 +216,14 @@ public class ShopController {
         // // 파일 업로드 처리
         // String fileName = null;
         // if (!bizFile.isEmpty()) {
-        //     fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
-        //     String savePath = "C:/upload/shop/" + fileName;
+        // fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
+        // String savePath = "C:/upload/shop/" + fileName;
 
-        //     File folder = new File("C:/upload/shop/");
-        //     if (!folder.exists()) {
-        //         folder.mkdirs();
-        //     }
-        //     bizFile.transferTo(new File(fileName + savePath));
+        // File folder = new File("C:/upload/shop/");
+        // if (!folder.exists()) {
+        // folder.mkdirs();
+        // }
+        // bizFile.transferTo(new File(fileName + savePath));
         // }
 
         // member status값 지정

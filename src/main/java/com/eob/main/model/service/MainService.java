@@ -53,6 +53,7 @@ public class MainService {
             }
             shop.setDistance(d); // distance저장
         }
+        System.out.println("mainService : shopList : " + shopList);
         return shopList;
     }
 
