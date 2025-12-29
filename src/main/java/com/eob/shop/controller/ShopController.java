@@ -4,10 +4,10 @@ import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
+// import org.locationtech.jts.geom.Coordinate;
+// import org.locationtech.jts.geom.GeometryFactory;
+// import org.locationtech.jts.geom.Point;
+// import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -47,7 +47,7 @@ public class ShopController {
     private final ProductService productService;
     private final SmsService smsService;
     // location저장용 - Point객체 생성 객체
-    private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    // private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * 판매자 로그인 페이지
@@ -239,21 +239,6 @@ public class ShopController {
         member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
 
         System.out.println("저장된 MemberNo =" + member.getMemberNo());
-
-        // // 파일 업로드 처리
-        // String fileName = null;
-        // if (bizFile != null && !bizFile.isEmpty()) {
-        //     fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
-        //     String savePath = "C:/upload/shop/" + fileName;
-        //
-        //     File folder = new File("C:/upload/shop/");
-        //     if (!folder.exists()) {
-        //         folder.mkdirs();
-        //     }
-        //
-        //     bizFile.transferTo(new File(savePath));
-        // }
-
         
         // ShopEntity 값 설정
         shop.setMember(member); // FK 연결
