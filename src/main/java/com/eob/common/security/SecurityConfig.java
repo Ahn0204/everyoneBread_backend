@@ -270,7 +270,7 @@ public class SecurityConfig {
                                                 .deleteCookies("JSESSIONID"))
 
                                 /* 개발 단계에서 CSRF 비활성화 */
-                                .csrf(csrf -> csrf.disable());
+                                .csrf(csrf -> csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
 
                 return http.build();
         }

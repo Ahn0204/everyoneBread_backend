@@ -11,8 +11,6 @@ import org.springframework.data.repository.query.Param;
 import com.eob.admin.model.data.DistanceFeeEntity;
 
 public interface DistanceFeeRepository extends JpaRepository<DistanceFeeEntity, Long> {
-    // 조건에 맞는 categoryEntity객체를 리턴함..?
-
     /**
      * ~거리에 해당하는 레코드 조회
      */

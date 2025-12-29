@@ -8,21 +8,30 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
     <head>
         <th:block layout:fragment="head">
-            <!--css link태그 등 자식 페이지에서 head에 담겨야 할 태그-->
+            <style>
+                input::-webkit-inner-spin-button,
+                input::-webkit-outer-spin-button {
+                    opacity: 1;
+                }
+            </style>
         </th:block>
     </head>
     <body>
         <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
         <div layout:fragment="content">
-            <!--상품 리스트-->
-            <div class="d-flex row">
-                <div class="listBox">
+            <!--본문(상품리스트, 주문표) 나란히 배치-->
+            <div class="d-flex flex-row" style="width: 80vw">
+                <!--상품 리스트-->
+                <div class="listBox border p-2 me-2 d-flex flex-column" style="width: 70vw">
                     <!--상품 리스트 상부 - 상점 정보-->
-                    <div class="shopInfo" th:object="${shop}">
+                    <div class="shopInfo border" th:object="${shop}">
+                        <div>
+                            <h3>상점 정보</h3>
+                        </div>
                         <div class="shopName" th:text="${shop.shopName}"></div>
+                        <div class="distance" id="distance" th:text="${shop.distance}"></div>
                         <!--shopNo-->
                         <input type="hidden" class="shopNo" id="shopNo" th:value="${shop.shopNo}" />
-                        <input type="hidden" class="distance" id="distance" th:value="${shop.distance}" />
                     </div>
                     <!--상품 리스트 하부 - 상품 리스트-->
                     <div class="productList">
@@ -41,7 +50,7 @@
                     </div>
                 </div>
                 <!--장바구니/주문표-->
-                <div th:replace="~{main/cartList}" class="cartList"></div>
+                <div th:replace="~{main/cartList}"></div>
             </div>
         </div>
 
@@ -131,7 +140,7 @@
                 const shopNo = sessionStorage.getItem('shopNo');
                 const cart = JSON.parse(sessionStorage.getItem('cart'));
                 let totalPrice = Number($('.deliveryFee').text()); //shop과 주문 위치 사이의 거리 기반 배송비...
-                console.log(totalPrice);
+                console.log('주문 금액(시작):' + totalPrice);
                 if (cart) {
                     //장바구니에 값이 있다면
                     $('.cart-product').empty(); //이전 목록 삭제
@@ -139,12 +148,15 @@
                         $('.cart-product').append(`
                     <div class="cart-item">
                         <div class="cart-name">${item.productName}</div>
-                <div class="cart-qty">수량: ${item.quantity}</div>
-                <div class="cart-price">${item.productPrice * item.quantity}원</div>
-                </div>
-                `);
+                        <div class="justify-content-between">
+                            <input type="number" name="quantity" class="cart-qty" width="10" min="0" maxlength="3" value="${item.quantity}" />
+                            <div class="cart-price">${item.productPrice * item.quantity}원</div>
+                        </div>
+                    </div>
+                    `);
                         totalPrice += item.productPrice * item.quantity;
                     });
+                    console.log('주문 금액(끝):' + totalPrice);
                     //총 금액 출력
                     $('.cart-totalPrice').text(totalPrice + '원');
                     //주문 버튼 보이기
