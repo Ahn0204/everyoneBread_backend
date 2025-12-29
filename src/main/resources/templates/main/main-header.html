@@ -287,6 +287,7 @@
                         let hasMore = true; // 더 불러올 데이터가 있는가?
 
                         $(function () {
+                            test();
                             // 읽지 않은 알림 카운트
                             getAlertCount();
                             // 알림 버튼 클릭 → 토글
@@ -311,6 +312,30 @@
                                 e.stopPropagation();
                             });
                         });
+
+                        function test() {
+                            const data = {
+                                shoppingCart: {
+                                    shopNo: 1,
+                                    products: [
+                                        { productNo: 101, productName: '식빵', category: 'BREAD', productPrice: 3000 },
+                                        {
+                                            productNo: 102,
+                                            productName: '크루아상',
+                                            category: 'BREAD',
+                                            productPrice: 3500,
+                                        },
+                                        {
+                                            productNo: 103,
+                                            productName: '치즈케이크',
+                                            category: 'DESSERT',
+                                            productPrice: 5000,
+                                        },
+                                    ],
+                                },
+                            };
+                            console.log(data);
+                        }
 
                         // 탭 클릭시
                         $('.alert-tab').on('click', function () {

@@ -2,7 +2,9 @@ package com.eob.alert.model.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -123,10 +125,46 @@ public class AlertService {
         if (!_toMember.isPresent()) {
             return;
         }
+
         String url = "";
         String title = "";
         String content = "";
-        // 아래 스위치 문에서 해당 type 과 typeCode에 따른 url , title ,content 삽입하기
+        Map<String, String> resultMap;
+        if (_toMember.get().getShop() != null) {
+            resultMap = buildShopAlert(type, typeCode);
+        } else {
+            resultMap = buildUserAlert(type, typeCode);
+        }
+
+        url = resultMap.get("url");
+        title = resultMap.get("title");
+        content = resultMap.get("content");
+
+        alert.setTitle(title);
+        alert.setContent(content);
+        alert.setLinkUrl(url);
+        alert.setToMember(_toMember.get());
+        alert.setFromMember(fromMember);
+        alert.setReadYn("N");
+        alert.setType(type);
+        alert.setTypeCode(typeCode);
+
+        this.alertRepository.save(alert);
+
+    }
+
+    public int ajaxAlertCount(MemberEntity member) {
+        int result = 0;
+        result = this.alertRepository.countByToMemberAndReadYn(member, "N");
+        return result;
+    }
+
+    private Map<String, String> buildShopAlert(String type, String typeCode) {
+        Map<String, String> result = new HashMap<String, String>();
+        String title = null;
+        String url = null;
+        String content = null;
+
         switch (type) {
             case "ORDER":
                 title = "주문";
@@ -134,6 +172,14 @@ public class AlertService {
                     case "ACCEPTED":
                         url = "/order/";
                         content = "주문이 수락되었습니다.";
+                        break;
+                    case "CANCELED":
+                        url = "/order/";
+                        content = "주문이 취소되었습니다.";
+                        break;
+                    case "REJECTED":
+                        url = "/order/";
+                        content = "주문이 거절되었습니다.";
                         break;
 
                     default:
@@ -198,22 +244,100 @@ public class AlertService {
             default:
                 break;
         }
-        alert.setTitle(title);
-        alert.setContent(content);
-        alert.setLinkUrl(url);
-        alert.setToMember(_toMember.get());
-        alert.setFromMember(fromMember);
-        alert.setReadYn("N");
-        alert.setType(type);
-        alert.setTypeCode(typeCode);
-
-        this.alertRepository.save(alert);
-
+        result.put("url", url);
+        result.put("title", title);
+        result.put("content", content);
+        return result;
     }
 
-    public int ajaxAlertCount(MemberEntity member) {
-        int result = 0;
-        result = this.alertRepository.countByToMemberAndReadYn(member, "N");
+    private Map<String, String> buildUserAlert(String type, String typeCode) {
+        Map<String, String> result = new HashMap<String, String>();
+        String title = null;
+        String url = null;
+        String content = null;
+
+        switch (type) {
+            case "ORDER":
+                title = "주문";
+                switch (typeCode) {
+                    case "ACCEPTED":
+                        url = "/order/";
+                        content = "주문이 수락되었습니다.";
+                        break;
+                    case "CANCELED":
+                        url = "/order/";
+                        content = "주문이 취소되었습니다.";
+                        break;
+                    case "REJECTED":
+                        url = "/order/";
+                        content = "주문이 거절되었습니다.";
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case "DELIVERY":
+                title = "배송";
+                switch (typeCode) {
+                    case "":
+
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case "INQUIRY":
+                title = "문의";
+                switch (typeCode) {
+                    case "":
+
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case "REVIEW":
+                title = "리뷰";
+                switch (typeCode) {
+                    case "":
+
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case "APPROVAL":
+                title = "가입관련";
+                switch (typeCode) {
+                    case "":
+
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            case "SYSTEM":
+                title = "시스템";
+                switch (typeCode) {
+                    case "":
+
+                        break;
+
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+        result.put("url", url);
+        result.put("title", title);
+        result.put("content", content);
         return result;
     }
 

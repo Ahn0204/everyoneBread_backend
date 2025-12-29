@@ -1,0 +1,163 @@
+/* 리스트 비어있을 때 */
+.end-text {
+    color: #ffffff;
+    margin: 20px 0px 10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 주문 카드 */
+.order-card {
+    background: #1e1e1e;
+    border: 1px solid #2c2c2c;
+    color: #fff;
+    border-radius: 10px;
+    height: 120px;
+    padding: 12px;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+    cursor: pointer;
+}
+
+/* 활성 카드 */
+.active-card {
+    border: 2px solid #e7e7e7 !important;
+}
+
+/* 헤더 */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #333;
+    gap: 20px;
+}
+
+.order-no {
+    font-weight: bold;
+    font-size: 14px;
+    color: #ffcc00;
+    margin-right: 8px;
+}
+
+.order-time {
+    font-size: 13px;
+    color: #ccc;
+    margin-right: 8px;
+}
+
+.order-status {
+    font-weight: bold;
+    font-size: 13px;
+    color: #4da6ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.order-status.대기 {
+    color: #ffaa00;
+}
+
+.order-status.요청 {
+    color: #4da6ff;
+}
+
+.order-status.완료 {
+    color: #00cc66;
+}
+
+/* 금액/거리 */
+.order-price {
+    flex: 1;
+    text-align: right;
+    font-size: 15px;
+    font-weight: bold;
+    color: #00ff99;
+    white-space: nowrap;
+}
+
+.distance {
+    margin-right: 10px;
+}
+
+/* 바디 */
+.order-body {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+    padding: 8px 0;
+    font-size: 13px;
+    border-left: 3px solid #444;
+    padding-left: 10px;
+}
+
+.order-body > .d-flex:last-of-type {
+    margin-right: 10px;
+}
+
+/* 결제 정보 */
+.payment {
+    font-weight: bold;
+}
+
+/* 주소 */
+.address {
+    color: #ddd;
+    font-size: 12px;
+    margin-top: 4px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* 푸터 */
+.order-footer {
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #333;
+    padding-top: 6px;
+}
+
+/* 버튼 공통 */
+.accept-btn,
+.shop-btn,
+.pickup-btn,
+.delivery-btn,
+.complete-btn {
+    background: linear-gradient(135deg, #ff2e63, #ff5c8a);
+    box-shadow: 0 4px 10px rgba(255, 46, 99, 0.4);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #fff;
+    font-weight: bold;
+    padding: 6px 14px;
+    transition: transform 0.15s ease;
+}
+
+/* 내용 없으면 숨김 */
+.accept-btn:empty,
+.shop-btn:empty,
+.pickup-btn:empty,
+.delivery-btn:empty,
+.complete-btn:empty {
+    display: none;
+}
+
+.accept-btn:hover,
+.shop-btn:hover,
+.pickup-btn:hover,
+.delivery-btn:hover,
+.complete-btn:hover {
+    transform: scale(1.05);
+    background: linear-gradient(135deg, #e02655, #ff2e63);
+}

@@ -62,17 +62,7 @@
         </div>
 
         <th:block layout:fragment="content">
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <img th:src="@{/upload/rider/licenseFile/{file}(file=${#authentication.principal.member.rider.licenseFile})}" />
-            <h3 th:text="${#authentication.principal.member.rider.licenseFile}"></h3>
+            <th:block th:replace="~{rider/fragment_order :: orderList}"></th:block>
         </th:block>
     </body>
 </html>
