@@ -7,13 +7,13 @@
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
     <!--예솔: csrf토근 헤더 추가-->
     <meta name="_csrf" th:content="${_csrf.token}" />
     <meta name="_csrf_header" th:content="${_csrf.headerName}" />
     <!-- 카카오 주소 API -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
     <title>모두의빵</title>
 
     <style>
