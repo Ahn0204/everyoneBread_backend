@@ -16,6 +16,13 @@
                 .cart-deleteBtn {
                     cursor: pointer;
                 }
+                .btn-primary {
+                    --bs-btn-color: cornflowerblue;
+                    --bs-btn-bg: #fff;
+                    --bs-btn-border-color: cornflowerblue;
+                    --bs-btn-hover-color: #fff;
+                    --bs-btn-hover-bg: cornflowerblue;
+                }
             </style>
         </th:block>
     </head>
@@ -27,9 +34,9 @@
                 <!--상품 리스트-->
                 <div class="listBox border p-2 me-2 d-flex flex-column" style="width: 70vw">
                     <!--상품 리스트 상부 - 상점 정보-->
-                    <div class="shopInfo border" th:object="${shop}">
+                    <div class="shopInfo border p-2" th:object="${shop}">
                         <div>
-                            <h3>상점 정보</h3>
+                            <h4 class="border-bottom border-3 p-1">상점 정보</h4>
                         </div>
                         <div class="shopName" th:text="${shop.shopName}"></div>
                         <div class="distance" id="distance" th:text="${shop.distance}"></div>
@@ -37,8 +44,9 @@
                         <input type="hidden" class="shopNo" id="shopNo" th:value="${shop.shopNo}" />
                     </div>
                     <!--상품 리스트 하부 - 상품 리스트-->
-                    <div class="productList">
-                        <div class="product" th:each="product:${productList}">
+                    <div class="productList border p-2 mt-3">
+                        <h4 class="border-bottom border-3 p-1">상품 목록</h4>
+                        <div class="product border-bottom" th:each="product:${productList}">
                             <!--상품 사진 url 경로 몰라서 주석 처리-->
                             <!-- <div><img th:src="@{|/${product.imgUrl}|}" alt="" /></div> -->
                             <div class="productName" th:text="${product.productName}"></div>
@@ -147,10 +155,10 @@
                     $('.cart-product').empty(); //이전 목록 삭제
                     cart.forEach((item) => {
                         $('.cart-product').append(`
-                    <div class="cart-item ">
+                    <div class="cart-item border-bottom p-2">
                         <div class="d-flex justify-content-between">
-                            <div class="cart-name pb-2">${item.productName}</div>
-                            <div class="cart-deleteBtn">&times;</div> 
+                            <div class="cart-name pb-1">${item.productName}</div>
+                            <div class="cart-deleteBtn">&times;</div>
                         </div>
                         <div class="d-flex justify-content-between">
                             <input type="number" name="quantity" class="cart-qty" min="1" max="999" value="${item.quantity}" />
@@ -168,7 +176,19 @@
                     //장바구니가 비었다면
                     $('.cart-product').append('<div class="noCart"> 담긴 상품이 없습니다.</div>');
                 }
+            }
 
+            //주문 총액 새로 반영하는 함수
+            function showTotalPrice(cart) {
+                let totalPrice = Number($('.deliveryFee').text());
+                cart.forEach((item) => {
+                    totalPrice += item.productPrice * item.quantity;
+                });
+                $('.cart-totalPrice').text(totalPrice);
+            }
+
+            //동적으로 생성한 스크립트에 적용하기 위함
+            $(function () {
                 //수량이 바뀌면 주문총액 바꾸기
                 $('.cart-qty').on('change', function () {
                     const cartQty = $(this);
@@ -185,15 +205,28 @@
                     showTotalPrice(cart);
                 });
 
-                //주문 총액 새로 반영하는 함수
-                function showTotalPrice(cart) {
-                    let totalPrice = Number($('.deliveryFee').text());
-                    cart.forEach((item) => {
-                        totalPrice += item.productPrice * item.quantity;
-                    });
-                    $('.cart-totalPrice').text(totalPrice);
+                //주문표 상품 옆 x 눌렀을 때
+                $('.cart-deleteBtn').on('click', function () {
+                    const thisProduct = showConfirmAlert(
+                        '주문을 삭제합니다.',
+                        () => {
+                            deleteCartProduct($(this));
+                        },
+                        () => {}
+                    );
+                });
+
+                function deleteCartProduct(btn) {
+                    const productNo = btn.closest('.cart-item').find('.cart-productNo').val();
+                    const cart = JSON.parse(sessionStorage.getItem('cart'));
+
+                    //해당 상품 제외하고 새 배열 생성
+                    const newCart = cart.filter((c) => c.productNo !== Number(productNo));
+                    //배열 cart 갱신
+                    sessionStorage.setItem('cart', JSON.stringify(newCart));
+                    showCart();
                 }
-            }
+            });
         </script>
     </body>
 </html>

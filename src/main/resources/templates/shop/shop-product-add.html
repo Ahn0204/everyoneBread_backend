@@ -1,97 +1,81 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{shop/common/shop-layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{shop/common/shop-layout}">
+    <head>
+        <meta charset="UTF-8" />
+        <!-- SweetAlert2 -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+        <link rel="stylesheet" th:href="@{/css/shop/product-add.css}" />
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
-    <link rel="stylesheet" th:href="@{/css/shop/product-add.css}">
-</head>
+    <body>
+        <div layout:fragment="content">
+            <div class="product-add-container">
+                <div class="product-title">상품 등록</div>
 
-<body>
+                <form id="productForm" th:action="@{/shop/products/add}" method="post" enctype="multipart/form-data">
+                    <table class="product-form-table">
+                        <!-- 상품명 -->
+                        <tr>
+                            <td class="product-label">상품명</td>
+                            <td><input type="text" name="productName" class="product-input" required /></td>
+                        </tr>
 
-<div layout:fragment="content">
+                        <!-- 이미지 -->
+                        <tr>
+                            <td class="product-label">대표 이미지</td>
+                            <td>
+                                <div class="image-upload-wrapper">
+                                    <div class="image-preview-box" id="previewBox">기본 이미지</div>
 
-    <div class="product-add-container">
+                                    <div style="display: flex; flex-direction: column; gap: 8px">
+                                        <input type="file" name="image" id="imageInput" accept="image/*" class="product-input" />
+                                        <!-- <span class="file-name" id="fileName"></span> -->
+                                        <button type="button" class="delete-img-btn" id="deleteImgBtn">이미지 삭제</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
 
-        <div class="product-title">상품 등록</div>
+                        <!-- 가격 -->
+                        <tr>
+                            <td class="product-label">가격</td>
+                            <td><input type="text" id="priceInput" class="product-input" required /></td>
+                        </tr>
 
-        <form id="productForm" th:action="@{/shop/products/add}" method="post" enctype="multipart/form-data">
+                        <!-- 숨겨진 input (숫자만 서버로 전송) -->
+                        <input type="hidden" name="price" id="priceHidden" />
 
-            <table class="product-form-table">
+                        <!-- 한줄 소개 -->
+                        <tr>
+                            <td class="product-label">한줄 소개</td>
+                            <td><input type="text" name="summary" class="product-input" /></td>
+                        </tr>
 
-                <!-- 상품명 -->
-                <tr>
-                    <td class="product-label">상품명</td>
-                    <td><input type="text" name="productName" class="product-input" required></td>
-                </tr>
+                        <!-- 재료 -->
+                        <tr>
+                            <td class="product-label">재료</td>
+                            <td><input type="text" name="ingredient" class="product-input" /></td>
+                        </tr>
 
-                <!-- 이미지 -->
-                <tr>
-                    <td class="product-label">대표 이미지</td>
-                    <td>
-                        <div class="image-upload-wrapper">
+                        <!-- 카테고리 -->
+                        <tr>
+                            <td class="product-label">카테고리</td>
+                            <td>
+                                <select name="catName" class="product-input" required>
+                                    <option value="빵">빵</option>
+                                    <option value="케이크">케이크</option>
+                                    <option value="디저트">디저트</option>
+                                    <option value="카페">커피</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
 
-                            <div class="image-preview-box" id="previewBox">
-                                기본 이미지
-                            </div>
-
-                            <div style="display:flex; flex-direction:column; gap:8px;">
-                                <input type="file" name="image" id="imageInput" accept="image/*" class="product-input">
-                                <!-- <span class="file-name" id="fileName"></span> -->
-                                <button type="button" class="delete-img-btn" id="deleteImgBtn">이미지 삭제</button>
-                            </div>
-
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- 가격 -->
-                <tr>
-                    <td class="product-label">가격</td>
-                    <td><input type="text" id="priceInput" class="product-input" required></td>
-                </tr>
-
-                <!-- 숨겨진 input (숫자만 서버로 전송) -->
-                <input type="hidden" name="price" id="priceHidden">
-
-                <!-- 한줄 소개 -->
-                <tr>
-                    <td class="product-label">한줄 소개</td>
-                    <td><input type="text" name="summary" class="product-input"></td>
-                </tr>
-
-                <!-- 재료 -->
-                <tr>
-                    <td class="product-label">재료</td>
-                    <td><input type="text" name="ingredient" class="product-input"></td>
-                </tr>
-
-                <!-- 카테고리 -->
-                <tr>
-                    <td class="product-label">카테고리</td>
-                    <td>
-                        <select name="catName" class="product-input" required>
-                            <option value="BREAD">빵</option>
-                            <option value="CAKE">케이크</option>
-                            <option value="DESERT">디저트</option>
-                            <option value="COFFEE">커피</option>
-                        </select>
-                    </td>
-                </tr>
-
-            </table>
-
-            <button type="button" id="submitBtn" class="submit-btn">등록</button>
-
-        </form>
-
-    </div>
-</div>
-<script th:src="@{/js/shop/product-add.js}"></script>
-</body>
+                    <button type="button" id="submitBtn" class="submit-btn">등록</button>
+                </form>
+            </div>
+        </div>
+        <script th:src="@{/js/shop/product-add.js}"></script>
+    </body>
 </html>

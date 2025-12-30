@@ -100,12 +100,15 @@
         //2. 위치 기반으로 상점(상품) 검색하기 -> @param 위치정보가 key:value로 담긴 객체
         // 403에러 발생: 시큐리티 컨피그에서 ignoreMatcher로 해당 경로 설정, csrf토큰 생성 무시되도록함
         function getShopList(location) {
+            //카테고리 value 전달
+            const category = new URLSearchParams(window.location.search).get('category');
+            console.log(category);
             //서버에 location값 전달
             $.ajax({
                 url: '/getShopList',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ lat: location.lat, lng: location.lng, addr: location.addr, radiusKm: location.radiusKm, category: 'category' }),
+                data: JSON.stringify({ lat: location.lat, lng: location.lng, addr: location.addr, radiusKm: location.radiusKm, category: category }),
                 success: function (shopList) {
                     console.log(shopList); //응답 값 확인
                     //응답이 담긴 shopList.html 가져오기(fragment)

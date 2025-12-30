@@ -1,16 +1,16 @@
 <div class="cartListBox border d-flex flex-column p-2" style="width: 30vw">
-    <h4>주문표</h4>
     <form th:action="@{/order/orderForm}" method="POST" name="cartForm">
-        <!--상점명-->
-        <div class="shopNameBox">
+        <div class="shopNameBox d-flex justify-content-between border-bottom border-3 pt-1 ps-2 pe-2">
+            <h4>주문표</h4>
+            <!--상점명-->
             <h4>
                 <span class="shopName badge text-bg-dark" th:text="${shop.shopName}"></span>
             </h4>
         </div>
         <!--상품 목록-->
-        <div class="cart-product rounded border p-2"></div>
+        <div class="cart-product rounded border ps-2 pe-2 mt-2 mb-2"></div>
         <!--주문 금액-->
-        <div class="price-box">
+        <div class="price-box m-2">
             <div class="d-flex justify-content-between">
                 <div>
                     <b>배송비</b>
@@ -29,10 +29,12 @@
             </div>
         </div>
         <!--주문 버튼-->
-        <div class="cart-btns mt-2">
-            <button class="deleteAllBtn btn btn-secondary">비우기</button>
-            <button sec:authorize="isAnonymous()" class="beforeLogin btn btn-primary" disabled>주문</button>
-            <button sec:authorize="isAuthenticated()" class="orderBtn btn btn-primary">주문</button>
+        <div class="cart-btns m-2 d-flex justify-content-between">
+            <button type="button" class="deleteAllBtn btn btn-secondary">비우기</button>
+            <div>
+                <button sec:authorize="isAnonymous()" type="button" class="beforeLogin btn btn-primary" disabled>주문</button>
+                <button sec:authorize="isAuthenticated()" type="button" class="orderBtn btn btn-primary">주문</button>
+            </div>
         </div>
     </form>
 </div>
@@ -56,7 +58,8 @@
         function deleteCart() {
             sessionStorage.removeItem('shopNo');
             sessionStorage.removeItem('cart');
-            location.reload(); //페이지 새로고침
+            $('.cart-product').empty();
+            showCart();
         }
 
         //주문 버튼
