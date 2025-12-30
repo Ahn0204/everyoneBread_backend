@@ -66,7 +66,7 @@
     
     // 등록 버튼 클릭 시
     document.getElementById("submitBtn").addEventListener("click", () => {
-        showConfirmAlert({
+        Swal.fire({
             title: "상품을 등록할까요?",
             icon: "question",
             showCancelButton: true,

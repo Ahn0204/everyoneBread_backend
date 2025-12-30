@@ -1,6 +1,15 @@
     // URL 파라미터 읽기
     const params = new URLSearchParams(window.location.search);
+    /* ===============================
+     * 다른 로그인 이동
+     * =============================== */
 
+    $('#otherLoginSelect').on('change', function () {
+        const url = $(this).val();
+        if (url) {
+            location.href = url;
+        }
+    });
     /* ===========================
        로그인 성공 시 알럿
        =========================== */
