@@ -1,0 +1,22 @@
+.result-area {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.result-text {
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+#maskedId {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+}
+
+.hidden {
+    display: none;
+}

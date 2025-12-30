@@ -125,4 +125,8 @@ public class MemberEntity {
         // 생성일 자동 저장
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
+    
+    public void changePassword(String encodedPassword) {
+        this.memberPw = encodedPassword;
+    }
 }
