@@ -57,6 +57,7 @@ public class OrderController {
         // 결제완료 후 주문 내역 CRUD
         // 토큰발급받기
         String token = portOneService.getToken();
+        System.out.println("배달:" + orderForm.getDeliveryFee());
         try {
             // 결제 성공 시 DB에 주문내역 insert
             this.orderService.insertOrder(orderForm);

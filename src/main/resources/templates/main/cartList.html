@@ -33,7 +33,7 @@
             <button type="button" class="deleteAllBtn btn btn-secondary">비우기</button>
             <div>
                 <button sec:authorize="isAnonymous()" type="button" class="beforeLogin btn btn-primary" disabled>주문</button>
-                <button sec:authorize="isAuthenticated()" type="button" class="orderBtn btn btn-primary">주문</button>
+                <button sec:authorize="isAuthenticated()" type="button" class="orderBtn btn btn-primary" disabled>주문</button>
             </div>
         </div>
     </form>
