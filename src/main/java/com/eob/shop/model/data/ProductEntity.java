@@ -6,8 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.eob.shop.model.data.ShopEntity;
-
 @Entity
 @Table(name = "PRODUCT")
 @Getter
