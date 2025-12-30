@@ -68,6 +68,28 @@ public class MemberService {
     }
 
     /*
+        아이디 찾기
+        - 휴대폰 번호 기준으로 회원 아이디 조회
+    */
+    public String findMemberIdByPhone(String phone) {
+
+        MemberEntity member = memberRepository
+                .findByMemberPhone(phone)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("회원 정보를 찾을 수 없습니다.")
+                );
+
+        return member.getMemberId();
+    }
+
+    /*
+        아이디 찾기용 회원 존재 여부 체크
+    */
+    public boolean existsByNameAndPhone(String name, String phone) {
+        return memberRepository.existsByMemberPhoneAndMemberName(phone, name);
+    }
+
+    /*
         일반 회원 가입
     */
     public MemberEntity registerUser(RegisterRequest dto, BindingResult bindingResult, HttpSession session) {

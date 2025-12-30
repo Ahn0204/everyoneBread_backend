@@ -1,149 +1,25 @@
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
         <!-- JQuery CDN -->
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <!-- SweetAlert2 CDN -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" th:href="@{/css/member/login.css}">
         <title>모두의빵</title>
-
-        <style>
-            /* 기본 초기화 및 폰트 설정 */
-            * {
-                box-sizing: border-box;
-                font-family: 'Noto Sans KR', sans-serif;
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                background-color: #fff;
-            }
-
-            /* 전체 컨테이너 */
-            .login-container {
-                width: 100%;
-                max-width: 400px; /* 너비 제한 */
-                text-align: center;
-                padding: 20px;
-            }
-
-            /* 로고 이미지 */
-            .logo-img {
-                width: 100%;
-                max-width: 250px; /* 로고 크기 조절 */
-                margin-bottom: 20px;
-            }
-
-            /* "로그인" 타이틀 */
-            .login-title {
-                font-size: 32px;
-                font-weight: 700;
-                margin-bottom: 40px;
-                color: #000;
-            }
-
-            /* 입력창 스타일 (이미지처럼 테두리 있고 텍스트 중앙 정렬) */
-            .login-input {
-                width: 100%;
-                padding: 15px;
-                margin-bottom: 15px;
-                border: 2px solid #000; /* 진한 테두리 */
-                border-radius: 5px; /* 살짝 둥글게 */
-                font-size: 16px;
-                text-align: center; /* 텍스트 중앙 정렬 */
-                outline: none;
-            }
-
-            .login-input:focus {
-                background-color: #f9f9f9;
-            }
-
-            /* 옵션 영역 (자동로그인, 링크들) */
-            .login-options {
-                text-align: left; /* 기본 정렬 */
-                margin-bottom: 30px;
-                font-size: 14px;
-                color: #333;
-            }
-
-            /* 자동 로그인 체크박스 영역 */
-            .auto-login-area {
-                margin-bottom: 10px;
-                display: flex;
-                align-items: center;
-            }
-
-            .auto-login-area input {
-                margin-right: 8px;
-                transform: scale(1.2); /* 체크박스 크기 살짝 키움 */
-            }
-
-            /* 링크 영역 (아이디 찾기 등) */
-            .links-area {
-                text-align: center;
-                margin-top: 10px;
-            }
-
-            .links-area a {
-                text-decoration: none;
-                color: #333;
-                margin: 0 5px;
-            }
-
-            .links-area a:hover {
-                text-decoration: underline;
-            }
-
-            /* 로그인 버튼 */
-            .login-btn {
-                width: 100%;
-                padding: 15px;
-                background-color: #fff;
-                border: 2px solid #000;
-                border-radius: 5px;
-                font-size: 18px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: all 0.2s;
-            }
-
-            .login-btn:hover {
-                background-color: #000;
-                color: #fff;
-            }
-
-            /* 우측 상단 드롭다운 박스 */
-            .other-login-box {
-                position: absolute;
-                top: 20px;
-                right: 20px;
-            }
-
-            /* 드롭다운 select 스타일 */
-            .other-login-select {
-                padding: 8px 12px;
-                border: 2px solid #000;
-                border-radius: 5px;
-                font-size: 14px;
-                background-color: #fff;
-                cursor: pointer;
-            }
-        </style>
     </head>
 
     <body>
         <div class="login-container">
-            <!-- <a th:href="@{/}">
-                <img src="/image/common/everyoneBread_main_logo.png" th:src="@{/image/common/everyoneBread_main_logo.png}" class="logo-img" alt="Logo" />
-            </a> -->
 
             <!-- 우측 상단 드롭다운 -->
             <div class="other-login-box">
@@ -167,9 +43,9 @@
                     </div>
 
                     <div class="links-area">
-                        <a th:href="@{/member/find-modal}">아이디 찾기</a>
+                        <a href="javascript:void(0)" id="findIdBtn">아이디 찾기</a>
                         |
-                        <a th:href="@{/member/find-modal}">비밀번호 재설정</a>
+                        <a href="javascript:void(0)" id="findPwBtn">비밀번호 재설정</a>
                         |
                         <a th:href="@{/member/select}">회원가입</a>
                     </div>
@@ -180,40 +56,7 @@
         </div>
 
         <input type="hidden" id="loginError" th:value="${param.error}" />
-
-        <script>
-            // 다른 로그인 이동
-            document.getElementById('otherLoginSelect').addEventListener('change', function () {
-                const url = this.value;
-                if (url) {
-                    window.location.href = url;
-                }
-            });
-
-            // 로그인 실패 / 계정 상태별 알럿 처리
-            document.addEventListener('DOMContentLoaded', function(){
-                const error = document.getElementById('loginError').value;
-
-                if(!error) return;
-
-                switch(error){
-                    case 'PENDING':
-                        showErrorAlert("가입 대기 중입니다. \n관리자 승인 후 이용 가능합니다.");
-                        break;
-                    case 'SUSPENDED':
-                        showErrorAlert("관리자에 의해 정지된 계정입니다.");
-                        break;
-                    case 'WITHDRAW':
-                        showErrorAlert("이미 탈퇴 처리된 계정입니다. \n재가입이 필요합니다.");
-                        break;
-                    case 'INACTIVE':
-                        showErrorAlert("휴면 계정입니다. \n본인 인증 후 사용 가능합니다.");
-                        break;
-                        
-                    default:
-                        showErrorAlert("아이디 또는 비밀번호를 다시 확인해주세요.");
-                }
-            })
-        </script>
+        <th:block th:replace="~{member/find-modal :: findAuthModal}"></th:block>
+        <script th:src="@{/js/member/mypage/login.js}"></script>
     </body>
 </html>

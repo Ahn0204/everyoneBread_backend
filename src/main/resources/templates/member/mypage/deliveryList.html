@@ -6,75 +6,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/member/mypage/deliveryList.css}">
     <title>배송지 관리</title>
-
-    <style>
-        .delivery-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
-        /* 박스 전체 */
-        .delivery-item {
-            border: 2px solid #000;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        /* 왼쪽 영역 */
-        .delivery-info {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .delivery-nickname {
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        .delivery-default {
-            font-size: 14px;
-            color: #0077cc;
-            font-weight: 700;
-        }
-
-        .delivery-address {
-            font-size: 14px;
-            color: #333;
-        }
-
-        /* 버튼 영역 */
-        .delivery-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .delivery-btn {
-            padding: 8px 14px;
-            font-weight: 700;
-            border-radius: 8px;
-            border: 2px solid #000;
-            background: #fff;
-            cursor: pointer;
-            transition: 0.15s;
-            text-align: center;
-            width: 70px;
-        }
-
-        .delivery-btn:hover {
-            background: #000;
-            color: #fff;
-        }
-    </style>
 </head>
 
 <body>
@@ -123,20 +56,9 @@
                     삭제
                 </button>
             </div>
-
         </div>
     </th:block>
-
 </div>
-
-<script>
-    // 삭제 시 확인창
-    function deleteAddress(id) {
-        if (confirm("정말 삭제하시겠습니까?")) {
-            location.href = "/member/mypage/delivery/delete/" + id;
-        }
-    }
-</script>
-
+<script th:src="@{/js/member/mypage/deliveryList.js}"></script>
 </body>
 </html>
