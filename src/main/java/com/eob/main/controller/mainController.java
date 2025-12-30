@@ -65,7 +65,6 @@ public class mainController {
         if (_category.isPresent() && !_category.get().isEmpty()) {
             // category에 Optional의 값 모두 add
             category.addAll(_category.get());
-            System.out.println("카테고리 불러오기 실행:" + category);
             // 카테고리 List보내기
             return ResponseEntity.ok(category);
         } else {
@@ -90,13 +89,12 @@ public class mainController {
      */
     @PostMapping("getShopList")
     public String ajaxGetShopList(@RequestBody Map<String, Object> data,
-            @RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession httpSession) {
+            @RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
+        String category = (String) data.get("category");
         // 반경 내 상점목록 조회
         // pageable객체 생성-> distance 오름차순
         Pageable pageable = PageRequest.of(page, 8);
-        // 상품에 카테고리 테이블 연결 시 삭제
-        String category = "BREAD";
         // 상점내역 조회, 페이징 객체로 리턴
         Page<ShopEntity> shopList = mainService.getShopList(category, data, pageable);
         if (shopList != null && shopList.getTotalElements() > 0) {
@@ -123,7 +121,6 @@ public class mainController {
 
         // 위치좌표와 shop 간의 거리 계산
         double distance = mainService.haversine(lat, lng, shop.getLatitude(), shop.getLongitude());
-        distance = Math.floor(distance * 10) / 10; // km로 환산
         String d = null;
         // 배달비 계산
         int deliveryFee = 0;
