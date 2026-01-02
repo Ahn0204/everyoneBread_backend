@@ -94,6 +94,7 @@ public class ProductService {
     public void delete(Long productNo) {
         ProductEntity product = findById(productNo); // 존재 여부 확인
         product.setStatus(ProductStatus.DELETED); // 상태 변경 (soft delete)
+        save(product);
     }
 
     /**

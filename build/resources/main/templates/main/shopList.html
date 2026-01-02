@@ -17,14 +17,16 @@
             <form th:action="@{/}" method="post">
                 <div th:replace="~{main/getLocation}"></div>
             </form>
-            <!--본문 출력-->
+            <!--내역 출력-->
             <div class="list">
                 <!--카테고리 제목-->
-                <div class="list-title text-center mt-3">
-                    <h1 th:text="${param.category}"></h1>
+                <div class="list-title text-center m-3">
+                    <h3 class="fw-bold" th:text="${param.category}"></h3>
                 </div>
+                <!--필터링 박스 (임시)-->
+                <div th:replace="~{main/shop-filtering}"></div>
                 <!--상점 내역-->
-                <div class="shopList"></div>
+                <div class="shopList" style="width: 50vw"></div>
             </div>
         </div>
 
