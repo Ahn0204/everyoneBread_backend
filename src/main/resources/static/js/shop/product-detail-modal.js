@@ -345,5 +345,18 @@ $(function () {
 
         return `${yyyy}.${mm}.${dd}`;
     }
+});
 
+$(document).on('productStatusChanged', function (e, data) {
+
+    // 모달이 열려 있고, 같은 상품일 때만 반영
+    if (
+        $('#productDetailModal').is(':visible') &&
+        window.currentProductId === data.productId
+    ) {
+        // 상태만 즉시 반영
+        $('#detailProductStatus').text(
+            data.status === 'ON_SALE' ? '판매중' : '품절'
+        );
+    }
 });

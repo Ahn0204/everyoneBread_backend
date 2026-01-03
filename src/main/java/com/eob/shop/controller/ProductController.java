@@ -9,6 +9,7 @@ import com.eob.shop.model.dto.ProductDetailResponse;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -175,6 +177,26 @@ public class ProductController {
         product.setUpdatedAt(LocalDateTime.now());
 
         // 저장
+        productService.save(product);
+    }
+
+    /**
+     * 상품 목록 드롭다운 / 모달 "판매중, 품절" 버튼 전용
+     */
+    @PostMapping("products/{id}/status")
+    @ResponseBody
+    public void updateProductStatus(@PathVariable Long id, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal){
+        ProductEntity product = productService.findById(id);
+
+        Long memberNo = principal.getMember().getMemberNo();
+        if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        ProductStatus status = ProductStatus.valueOf(body.get("status"));
+        product.setStatus(status);
+        product.setUpdatedAt(LocalDateTime.now());
+
         productService.save(product);
     }
 

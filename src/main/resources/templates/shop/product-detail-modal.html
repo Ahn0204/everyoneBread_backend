@@ -6,17 +6,7 @@
      - AJAX 조회 / 수정 / 삭제 전용
      ========================================= -->
 <th:block th:fragment="productDetailModal">
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
 
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <!-- SweetAlert 공통 래퍼 -->
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
     <!-- ===== 모달 오버레이 (기본 숨김) ===== -->
     <div id="productDetailModal" class="modal-overlay" style="display:none;">
 

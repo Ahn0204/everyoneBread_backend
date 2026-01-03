@@ -48,7 +48,7 @@ public class ProductService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         // Repository를 통해 페이징된 상품 목록 조회
-        return productRepository.findByShop_ShopNo(shopNo, pageable);
+        return productRepository.findByShop_ShopNoAndStatusNot(shopNo, ProductStatus.DELETED, pageable);
     }
 
     /**
@@ -102,7 +102,7 @@ public class ProductService {
      * (예솔 추가)
      */
     public List<ProductEntity> getProductList(long shopNo) {
-        List<ProductEntity> productList = productRepository.findByShop_ShopNo(shopNo);
+        List<ProductEntity> productList = productRepository.findByShop_ShopNoAndStatusNot(shopNo, ProductStatus.DELETED);
         return productList;
     }
 }

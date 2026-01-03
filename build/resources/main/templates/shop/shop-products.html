@@ -37,7 +37,7 @@
         </div>
 
         <!-- 상품 목록 -->
-        <div class="product-card open-product-detail"
+        <div class="product-card"
              th:each="p : ${productList}"
              th:data-id="${p.productNo}"
              th:classappend="' status-' + ${p.status.name()}">
@@ -47,7 +47,7 @@
                 <!-- 상품 정보 -->
                 <div class="product-info">
                     <div class="product-time" th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일</div>
-                    <div class="product-name" th:text="${p.productName}">상품명</div>
+                    <div class="product-name open-product-detail" th:text="${p.productName}" th:data-id="${p.productNo}">상품명</div>
                     <div class="product-price"><span th:text="${p.price}"></span>원</div>
                 </div>
 
@@ -61,10 +61,10 @@
                     </select>
 
                     <!-- 수정 버튼 -->
-                    <button class="btn-small btn-edit-product" th:data-id="${p.productNo}">수정</button>
+                    <!-- <button class="btn-small btn-edit-product" th:data-id="${p.productNo}">수정</button> -->
 
                     <!-- 삭제 버튼 -->
-                    <button class="btn-small btn-delete-product" th:data-id="${p.productNo}">삭제</button>
+                    <button type="button" class="btn-small btn-delete-product" th:data-id="${p.productNo}">삭제</button>
                 </div>
             </div>
         </div>
@@ -85,7 +85,7 @@
     </div>
 
     <th:block th:replace="shop/product-detail-modal :: productDetailModal"></th:block>
+    <script th:src="@{/js/shop/products.js}"></script>
 </div>
-<script th:src="@{/js/shop/products.js}"></script>
 </body>
 </html>
