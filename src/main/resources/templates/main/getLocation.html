@@ -120,6 +120,7 @@
                         '상점 목록을 가져올 수 없습니다. 주소를 직접 설정해주세요.',
                         () => {
                             //다음 우편번호 입력 창
+                            searchAddress();
                         },
                         () => {}
                     );
@@ -165,8 +166,8 @@
                 },
             }).open();
         }
-        //검색 버튼 클릭 시 input의 주소 기준 상점 조회
-        // $('.search').on('click', async function () {
+
+        //주소 입력창 input에 입력된 주소 기준 상점 조회
         async function searchShopList() {
             showToast('위치 정보를 반영중입니다', 'info', 5000);
             //위치좌표 가져와서 주소로 변환
@@ -184,14 +185,12 @@
             getShopList(location);
             showToast('위치 정보가 반영되었습니다', 'success');
         }
-        // });
 
         //상점으로 이동 시 사용자 좌표 전달
         function goShop(shopNo) {
             console.log('상점 이동');
             const loc = JSON.parse(sessionStorage.getItem('location'));
             const lat = loc.lat;
-            console.log(lat);
             const lng = loc.lng;
 
             if (!lat || !lng) {

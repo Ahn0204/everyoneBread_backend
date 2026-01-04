@@ -1,5 +1,6 @@
 package com.eob.admin.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -19,8 +20,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.eob.admin.model.data.DistanceFeeForm;
 import com.eob.admin.model.data.DistanceFeeHistoryEntity;
+import com.eob.admin.model.data.FeeHistoryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
+import com.eob.admin.model.data.SettleHistoryEntity;
 import com.eob.admin.model.repository.DistanceFeeHistoryRepository;
+import com.eob.admin.model.repository.FeeHistoryRepository;
+import com.eob.admin.model.repository.SettleHistoryRepository;
 import com.eob.admin.model.service.AdminService;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
@@ -37,7 +42,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
@@ -45,13 +49,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class AdminController {
 
-    public final AdminService adminService;
-    public final ShopService shopService;
-    public final ShopRepository shopRepository;
-    public final RiderService riderService;
-    public final RiderRepository riderRepository;
-    public final MemberRepository memberRepository;
-    public final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
+    private final AdminService adminService;
+    private final ShopService shopService;
+    private final ShopRepository shopRepository;
+    private final RiderService riderService;
+    private final RiderRepository riderRepository;
+    private final MemberRepository memberRepository;
+    private final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
+    private final FeeHistoryRepository feeHistoryRepository;
+    private final SettleHistoryRepository settleHistoryRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -94,14 +100,93 @@ public class AdminController {
 
     // 정산내역 페이지
     @GetMapping("/settlement/settlement-list")
-    public String getSettlementList() {
+    public String getSettlementList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 정산 내역 - 페이징 객체로 리턴
+        Page<SettleHistoryEntity> settleP = settleHistoryRepository.findAll(pageable);
+
+        // 정산 내역이 존재 하지 않을 때
+        if (settleP.getTotalElements() == 0) { // settleP 요소의 총 갯수가 0이면
+            model.addAttribute("noList", "조회된 내역이 없습니다.");
+        } else {
+            // Page를 List로 바꾸지 않아 오류가 난다면 다시 변환...
+            // // 정산 내역이 존재한다면, adminList 생성
+            // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("settleP", settleP);
+
+            // 글번호 시작값 계산
+            int start = settleP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        // model.addAttribute("settleP", settleP);
         return "admin/settlement/settlement-list";
     }
 
     // 수수료 변경 페이지
     @GetMapping("/settlement/feeHistory-list")
-    public String getFeeHistoryList() {
+    public String getFeeHistoryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 현재 수수료 비율 출력
+        // model.addAttribute("shopFeeRatio", shopFeeRatio);
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 배송비 변경 내역 - 페이징 객체로 리턴
+        Page<FeeHistoryEntity> feeP = feeHistoryRepository.findAll(pageable);
+
+        // 배송비 변경 내역이 존재 하지 않을 때
+        if (feeP.getTotalElements() == 0) { // distanceFeeP 요소의 총 갯수가 0이면
+            model.addAttribute("noUpdate", "조회된 내역이 없습니다.");
+        } else {
+            // Page를 List로 바꾸지 않아 오류가 난다면 다시 변환...
+            // // 배송비 변경 내역이 존재한다면, adminList 생성
+            // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("feeP", feeP);
+
+            // 글번호 시작값 계산
+            int start = feeP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("feeP", feeP);
         return "admin/settlement/feeHistory-list";
+    }
+
+    // 수수료 비율 변경 처리
+    @PostMapping("/settlement/insertFeeRatio")
+    public String insertFeeRatio(@RequestParam(name = "shopFeeRatio") double shopFeeRatio,
+            @RequestParam(name = "deliveryFeeRatio") double deliveryFeeRatio,
+            @RequestParam(name = "memberNo") int memberNo, RedirectAttributes rttr) {
+
+        try {
+            // 수수료 비율 변경 이력 insert
+            FeeHistoryEntity feeHistory = new FeeHistoryEntity();
+            // 작업자 member객체 꺼내기
+            MemberEntity member = memberRepository.findByMemberNo(memberNo);
+            feeHistory.setOperation("변경");
+            feeHistory.setShopFeeRatio(shopFeeRatio);
+            feeHistory.setRiderFeeRatio(deliveryFeeRatio);
+            feeHistory.setMemberNo(member);
+            feeHistory.setCreatedAt(LocalDateTime.now());
+            feeHistoryRepository.save(feeHistory);
+            // 성공 여부 alert보내기
+            rttr.addFlashAttribute("isSucceeded", true);
+        } catch (Exception e) {
+            // 실패 여부 alert보내기
+            rttr.addFlashAttribute("isSucceeded", false);
+
+        }
+
+        return "redirect:/admin/settlement/feeHistory-list";
     }
 
     // 배송비 변경 페이지
@@ -131,7 +216,7 @@ public class AdminController {
             // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
 
             // 뷰에 list전달
-            model.addAttribute("adminList", distanceFeeP);
+            model.addAttribute("distanceFeeList", distanceFeeP);
 
             // 글번호 시작값 계산
             int start = distanceFeeP.getSize();
