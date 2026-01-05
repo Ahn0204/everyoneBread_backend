@@ -21,10 +21,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.eob.admin.model.data.DistanceFeeForm;
 import com.eob.admin.model.data.DistanceFeeHistoryEntity;
 import com.eob.admin.model.data.FeeHistoryEntity;
+import com.eob.admin.model.data.InquiryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.data.SettleHistoryEntity;
 import com.eob.admin.model.repository.DistanceFeeHistoryRepository;
 import com.eob.admin.model.repository.FeeHistoryRepository;
+import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.repository.SettleHistoryRepository;
 import com.eob.admin.model.service.AdminService;
 import com.eob.member.model.data.MemberEntity;
@@ -58,6 +60,7 @@ public class AdminController {
     private final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
     private final FeeHistoryRepository feeHistoryRepository;
     private final SettleHistoryRepository settleHistoryRepository;
+    private final InquiryRepository inquiryRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -552,8 +555,56 @@ public class AdminController {
 
     // 일반문의 내역 페이지
     @GetMapping("/inquiry/inquiry-list")
-    public String getInquiryList() {
+    public String getInquiryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 문의 내역 - 페이징 객체로 리턴
+        Page<InquiryEntity> inquiryP = inquiryRepository.findAll(pageable);
+
+        // 문의 내역이 존재 하지 않을 때
+        if (inquiryP.getTotalElements() == 0) { // inquiryP의 요소의 총 갯수가 0이면
+            model.addAttribute("noInquiry", "조회된 내역이 없습니다.");
+        } else {
+            // 문의 내역이 존재한다면,
+            // inquiryP 값을 반복하며 status별로 구분하여 출력될 리스트에 대입
+            List<InquiryEntity> pendingList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("n"))
+                    .toList(); // 미답변
+            List<InquiryEntity> answeredList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("y")).toList(); // 답변완료
+
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
+            model.addAttribute("answeredList", answeredList); // 답변완료
+
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int answeredCount = answeredList.size();
+            int total = pendingCount + answeredCount;
+
+            int pendingStart = total;
+            int answeredStart = total - answeredCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("answeredStart", answeredStart);
+
+        }
+        // 페이징 정보 전달
+        model.addAttribute("inquiryP", inquiryP);
         return "admin/inquiry/inquiry-list";
+    }
+
+    // 일반 문의 답변 완료
+    @PostMapping("/inquiry/updateAnswer")
+    @ResponseBody
+    public boolean ajaxUpdateAnswer(@RequestParam(name = "inquiryNo") long inquiryNo,
+            @RequestParam(name = "answer") String answer) {
+        boolean result = false;
+        result = adminService.updateAnswer(inquiryNo, answer);
+
+        return result;
     }
 
     // 신고문의 내역 페이지

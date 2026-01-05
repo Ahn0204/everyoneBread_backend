@@ -8,9 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eob.admin.model.data.InquiryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.data.SettleHistoryEntity;
 import com.eob.admin.model.repository.FeeHistoryRepository;
+import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.repository.SettleHistoryRepository;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
@@ -34,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminService {
 
+    private final InquiryRepository inquiryRepository;
+
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -45,6 +49,7 @@ public class AdminService {
     private final FeeHistoryRepository feeHistoryRpository;
 
     private final SettleHistoryRepository settleHistoryRepository;
+    // private final InquiryRepository inquiryRepository;
 
     public boolean insertAdmin(InsertAdminForm form) {
 
@@ -277,4 +282,45 @@ public class AdminService {
     /**
      * 카테고리 변경
      */
+
+    /**
+     * 일반 문의 답변 완료 처리
+     */
+    public boolean updateAnswer(long inquiryNo, String answer) {
+        try {
+            // 문의 조회
+            Optional<InquiryEntity> _i = inquiryRepository.findById(inquiryNo);
+            InquiryEntity i = _i.get();
+            // 답변 update
+            i.setAnswer(answer); // 답변
+            i.setAnsweredAt(LocalDateTime.now()); // 답변 작성일시
+            i.setStatus("y");
+            inquiryRepository.save(i);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 일반 문의 작성 처리
+     */
+    public boolean insertInquiry(long memberNo, String question) {
+        try {
+            // member엔티티 조회
+            MemberEntity member = memberRepository.findByMemberNo(memberNo);
+            // 문의 객체 생성
+            InquiryEntity i = new InquiryEntity();
+            i.setMember(member); // 작성자 member 엔티티
+            i.setRole(member.getMemberRole()); // 작성자 role
+            i.setQuestion(question); // 문의
+            i.setCreatedAt(LocalDateTime.now()); // 문의 작성일시
+            inquiryRepository.save(i);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
