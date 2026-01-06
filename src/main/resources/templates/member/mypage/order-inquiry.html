@@ -1,0 +1,87 @@
+<!--모달 출력 시 뒷배경-->
+<div class="dimmed" aria-hidden="true" id="dimmed" style="display: none"></div>
+<!--문의 작성 모달-->
+<div class="modal-layer" id="modal-writeForm" style="display: none">
+    <div class="modal">
+        <div class="modal-top justyfy-content-between">
+            <!--모달 제목-->
+            <div id="modal-title">관리자에 문의하기</div>
+            <!--닫기버튼-->
+            <div class="closeBtn">&times;</div>
+        </div>
+        <!--내용 입력-->
+        <div class="modal-content">
+            <div class="d-flex flex-column gap-2">
+                <div class="inquiry-object">
+                    <h4>참조 대상</h4>
+                    <div class="border rounded p-2 object-box">
+                        <div class="border-bottom d-flex flex-row">
+                            <div class="p-1 pe-2 me-2 gap-1 d-flex flex-row">
+                                <div><b>상점명</b></div>
+                                <div th:text="${order.shop.shopName}"></div>
+                            </div>
+                            <div class="p-1 mb-2 gap-1 d-flex flex-row">
+                                <div><b>주문자명</b></div>
+                                <div th:text="${order.member.memberName}"></div>
+                            </div>
+                        </div>
+                        <div class="border-bottom p-1 mb-2">
+                            <div><b>상품 내역</b></div>
+                            <div th:each=" o : ${order.orderDetail}">
+                                <div class="p-1" th:text="${o.productNo.productName}+' | '+${o.quantity}+'개 &times;'+${o.price}+'원'"></div>
+                            </div>
+                            <div class="p-1 gap-1 d-flex flex-row">
+                                <div><b>배송비</b></div>
+                                <div th:text="${order.deliveryFee}"></div>
+                            </div>
+                        </div>
+                        <div class="border-bottom p-1 mb-2 gap-1 d-flex flex-row">
+                            <b>총 결제 금액</b>
+                            <b th:text="${order.orderPrice}"></b>
+                        </div>
+                    </div>
+                </div>
+                <div class="writeQuestion mb-3 d-flex flex-column">
+                    <h4>내용을 작성해주세요.</h4>
+                    <textarea name="question" class="border rounded" id="question" style="width: 100%; height: 150px; resize: none"></textarea>
+                </div>
+                <button type="button" class="btn btn-primary insertInquiry" th:data-memberno="${#authentication.principal.member.memberNo}">문의하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    //문의하기 버튼 클릭 시
+    // $('.insertInquiry').on('click', function () {
+    $(document).on('click', '.insertInquiry', function () {
+        const memberNo = $(this).data('memberno');
+        const question = $('#question').val();
+        showConfirmAlert(
+            '관리자에게 문의가 작성됩니다.',
+            //예
+            () => {
+                $.ajax({
+                    url: '/customerCenter/insertInquiry',
+                    type: 'POST',
+                    data: { memberNo: memberNo, question: question },
+                    success: function (success) {
+                        if (success == true) {
+                            closeModal();
+                            showToast('문의가 작성되었습니다.', 'success');
+                        } else {
+                            showToast('다시 시도해주세요.', 'error');
+                        }
+                    },
+                    error: function (error) {
+                        showToast('다시 시도해주세요.', 'error');
+                    },
+                });
+            },
+            //아니오
+            () => {
+                showToast('작성이 취소되었습니다.', 'warning');
+            }
+        );
+    });
+</script>

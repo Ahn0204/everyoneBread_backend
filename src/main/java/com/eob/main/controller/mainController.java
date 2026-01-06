@@ -30,6 +30,8 @@ import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.service.AdminService;
 import com.eob.common.security.CustomSecurityDetail;
 import com.eob.main.model.service.MainService;
+import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.shop.model.data.ProductEntity;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ProductService;
@@ -41,6 +43,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/")
 @RequiredArgsConstructor
 public class mainController {
+
     /*
      * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
      * return redirect:/도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
@@ -53,6 +56,7 @@ public class mainController {
     private final DistanceFeeRepository distanceFeeRepository;
     private final InquiryRepository inquiryRepository;
     private final AdminService adminService;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     // 메인 페이지
     @GetMapping("")
@@ -242,4 +246,19 @@ public class mainController {
             return false;
         }
     }
+
+    /**
+     * 마이페이지 - 주문내역 - 관리자에 문의
+     */
+    @GetMapping("customerCenter/orderInquiry")
+    public String getOrderInquiry(@RequestParam("orderNo") Long orderNo, Model model) {
+        // 참조 대상(주문 엔티티) 조회
+        Optional<OrderHistoryEntity> _order = orderHistoryRepository.findById(orderNo);
+        if (_order.isPresent()) {
+            OrderHistoryEntity order = _order.get();
+            model.addAttribute("order", order);
+        }
+        return "member/mypage/order-inquiry";
+    }
+
 }
