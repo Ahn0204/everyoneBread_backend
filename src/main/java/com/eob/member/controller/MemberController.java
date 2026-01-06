@@ -32,36 +32,36 @@ public class MemberController {
     private final WishlistService wishlistService;
 
     /*
-        로그인 페이지
-    */
+     * 로그인 페이지
+     */
     @GetMapping("login")
     public String loginPage() {
         return "member/member-login";
     }
 
     /*
-        회원가입 유형 선택
-    */
+     * 회원가입 유형 선택
+     */
     @GetMapping("select")
     public String selectAccount() {
         return "member/member-select";
     }
 
     /*
-        회원가입 페이지
-        ?role=USER 기본
-    */
-    @GetMapping("register") //예솔: 파라미터 이름을 명시했습니다. name=role
-    public String registerPage(@RequestParam(name="role",defaultValue = "USER") String role, Model model) {
+     * 회원가입 페이지
+     * ?role=USER 기본
+     */
+    @GetMapping("register") // 예솔: 파라미터 이름을 명시했습니다. name=role
+    public String registerPage(@RequestParam(name = "role", defaultValue = "USER") String role, Model model) {
         RegisterRequest dto = new RegisterRequest();
-        dto.setMemberRole(role);  // 기본 USER
+        dto.setMemberRole(role); // 기본 USER
         model.addAttribute("registerRequest", dto);
         return "member/member-register";
     }
 
     /*
-        회원가입 처리 (일반회원)
-    */
+     * 회원가입 처리 (일반회원)
+     */
     @PostMapping("register")
     public String register(
             @Valid @ModelAttribute("registerRequest") RegisterRequest dto,
@@ -73,8 +73,8 @@ public class MemberController {
         }
 
         // SMS 인증 체크
-        if(!smsService.isVerified(session)){
-            bindingResult.reject("sms.notVerified","휴대폰 인증을 완료해주세요.");
+        if (!smsService.isVerified(session)) {
+            bindingResult.reject("sms.notVerified", "휴대폰 인증을 완료해주세요.");
             return "member/member-register";
         }
 
@@ -95,32 +95,31 @@ public class MemberController {
     }
 
     /*
-        아이디 중복 확인
-    */
+     * 아이디 중복 확인
+     */
     @GetMapping("check-id")
     @ResponseBody
-    public boolean checkId(@RequestParam("memberId") String memberId){
+    public boolean checkId(@RequestParam("memberId") String memberId) {
         return memberService.isMemberIdAvailable(memberId);
     }
 
     /*
-        이메일 중복 확인
-    */
+     * 이메일 중복 확인
+     */
     @GetMapping("check-email")
     @ResponseBody
-    public boolean checkEmail(@RequestParam("memberEmail") String memberEmail){
+    public boolean checkEmail(@RequestParam("memberEmail") String memberEmail) {
         return memberService.isMemberEmailAvailable(memberEmail);
     }
 
     /*
-       아이디 찾기 - 휴대폰 인증번호 요청 (회원 존재 여부 체크)
-    */
+     * 아이디 찾기 - 휴대폰 인증번호 요청 (회원 존재 여부 체크)
+     */
     @PostMapping("find/phone/send")
     @ResponseBody
     public ResponseEntity<?> findIdPhoneSend(
             @RequestBody SmsSendRequest request,
-            HttpSession session
-    ) {
+            HttpSession session) {
         // 이름 + 휴대폰으로 회원 존재 여부 확인
         if (!memberService.existsByNameAndPhone(request.getName(), request.getPhone())) {
             return ResponseEntity
@@ -138,19 +137,17 @@ public class MemberController {
     }
 
     /*
-       아이디 찾기 - 휴대폰 인증번호 확인
-    */
+     * 아이디 찾기 - 휴대폰 인증번호 확인
+     */
     @PostMapping("find/phone/check")
     @ResponseBody
     public ResponseEntity<?> findIdPhoneCheck(
             @RequestBody SmsVerifyRequest request,
-            HttpSession session
-    ) {
+            HttpSession session) {
         String result = smsService.verifyAuthCode(
                 request.getPhone(),
                 request.getAuthCode(),
-                session
-        );
+                session);
 
         if (!"SUCCESS".equals(result)) {
             return ResponseEntity
@@ -167,9 +164,9 @@ public class MemberController {
     }
 
     /*
-       아이디 찾기 결과 페이지
-       - 인증 완료된 사용자만 접근 가능
-    */
+     * 아이디 찾기 결과 페이지
+     * - 인증 완료된 사용자만 접근 가능
+     */
     @GetMapping("find/id/result")
     public String findIdResult(HttpSession session, Model model) {
 
@@ -194,7 +191,7 @@ public class MemberController {
         session.removeAttribute("authType");
         session.removeAttribute("authValue");
         session.removeAttribute("FIND_PURPOSE");
-        
+
         return "member/find-id-result";
     }
 
@@ -270,7 +267,7 @@ public class MemberController {
      * 마이페이지
      */
     @GetMapping("mypage")
-    public String mypage(){
+    public String mypage() {
         return "redirect:/member/mypage/orderList";
     }
 
@@ -278,16 +275,16 @@ public class MemberController {
      * 마이페이지 - 주문 내역
      */
     @GetMapping("mypage/orderList")
-    public String orderList(Model model){
-        
+    public String orderList(Model model) {
+
         // Security 인증 객체
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         // 로그인 사용자 정보
         CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();
         // 회원 번호
         Long memberNo = user.getMember().getMemberNo();
-        
-        model.addAttribute("menu","orderList");
+
+        model.addAttribute("menu", "orderList");
         model.addAttribute("orders", mypageService.getMyOrders(memberNo));
 
         return "member/mypage/orderList";
@@ -302,10 +299,10 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 로그인 사용자 정보
-        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();     
+        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();
 
         // 회원 번호
-        Long memberNo = user.getMember().getMemberNo();           
+        Long memberNo = user.getMember().getMemberNo();
 
         // 즐겨찾기 목록 조회
         model.addAttribute("wishlist", wishlistService.getMyActiveWishlist(memberNo));
@@ -320,15 +317,13 @@ public class MemberController {
      * 마이페이지 - 후기
      */
     @GetMapping("mypage/reviewList")
-    public String reviewList(@RequestParam(defaultValue="0")int page, Model model) {
+    public String reviewList(@RequestParam(defaultValue = "0") int page, Model model) {
 
         // 1️. Spring Security 인증 객체 가져오기
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 2️. 로그인 사용자 정보 꺼내기
-        CustomSecurityDetail user =
-                (CustomSecurityDetail) authentication.getPrincipal();
+        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();
 
         // 3️. 로그인 회원 번호 추출
         Long memberNo = user.getMember().getMemberNo();
@@ -337,7 +332,7 @@ public class MemberController {
         var reviewPage = mypageService.getMyReviews(memberNo, page);
 
         // 서비스 호출 → 후기 리스트 조회
-        model.addAttribute("reviewList", mypageService.getMyReviews(memberNo) );
+        model.addAttribute("reviewList", mypageService.getMyReviews(memberNo));
         // 페이징 정보
         model.addAttribute("page", reviewPage);
         // 마이페이지 메뉴 활성화용
@@ -359,12 +354,10 @@ public class MemberController {
     public ResponseEntity<String> deleteReview(@RequestParam Long reviewNo) {
 
         // 1️. Spring Security 인증 객체
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // 2️. 로그인 사용자 정보
-        CustomSecurityDetail user =
-                (CustomSecurityDetail) authentication.getPrincipal();
+        CustomSecurityDetail user = (CustomSecurityDetail) authentication.getPrincipal();
 
         // 3️. 로그인 회원 번호
         Long memberNo = user.getMember().getMemberNo();
