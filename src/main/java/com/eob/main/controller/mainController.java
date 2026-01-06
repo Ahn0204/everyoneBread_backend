@@ -261,4 +261,18 @@ public class mainController {
         return "member/mypage/order-inquiry";
     }
 
+    /**
+     * 주문내역 - 관리자에 문의 작성 처리
+     */
+    @PostMapping("customerCenter/insertBanInquiry")
+    @ResponseBody
+    public boolean insertBanInquiry(@RequestParam(name = "memberNo") long memberNo,
+            @RequestParam(name = "orderNo") long orderNo,
+            @RequestParam(name = "question") String question) {
+        boolean result = false;
+        result = adminService.insertBanInquiry(memberNo, orderNo, question);
+
+        return result;
+    }
+
 }

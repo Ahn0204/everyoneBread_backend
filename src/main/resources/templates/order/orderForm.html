@@ -106,8 +106,9 @@
                             <div class="deliveryFee-box d-flex justify-content-between border-bottom border-2 mb-3">
                                 <h6 class="heading">배송비</h6>
                                 <div class="pe-2">
-                                    <span class="deliveryFee" name="deliveryFee" id="deliveryFee" th:text="${orderForm.deliveryFee}"></span>
+                                    <span class="deliveryFee" id="deliveryFee" th:text="${orderForm.deliveryFee}"></span>
                                     <span>원</span>
+                                    <input type="hidden" name="deliveryFee" th:value="${orderForm.deliveryFee}" />
                                 </div>
                             </div>
                             <div class="orderPrice-box d-flex justify-content-between">
@@ -115,6 +116,7 @@
                                 <div class="orderPrice-btn d-flex flex-row">
                                     <h4 class="orderPrice" id="orderPrice" name="orderPrice"></h4>
                                     <h4>원</h4>
+                                    <input type="hidden" name="orderPrice" class="orderPrice" />
                                 </div>
                             </div>
                             <div class="d-flex">
@@ -159,6 +161,7 @@
                     });
                     //총 결제 금액 출력
                     $('#orderPrice').text(orderPrice);
+                    $('.orderPrice').val(orderPrice);
                     //상점 번호 출력
                     if (shopNo) {
                         $('.cart-product').append(`<input type="hidden" class="shopNo" id="shopNo" name="shopNo" value="` + shopNo + `"/>`);
@@ -202,7 +205,7 @@
                     //주소 합치기
                     const address = address2 ? address1 + ' ' + address2 : address1;
                     $('#orderAddress').val(address);
-                    const orderPrice = $('.orderPrice').text(); //총 결제 금액 가져오기
+                    const orderPrice = $('#orderPrice').text(); //총 결제 금액 가져오기
                     checkout(orderPrice); //결제 API를 호출하는 함수 호출 & DB에 기록 insert
                 }
 

@@ -55,13 +55,11 @@
 
                         <button class="order-btn" th:if="${order.canReorder}">재구매하기</button>
                         <button class="order-btn orderInquiry" th:data-orderno="${order.orderNo}">관리자 문의</button>
-                        <!-- th:data-shopname="${order.shopName}" th:data-buyername="${order.member.memberName}" th:data-orderprice="${order.orderPrice}" -->
                     </div>
                 </div>
             </div>
 
             <!--관리자 문의 모달-->
-            <!-- <div th:replace="~{member/mypage/order-inquiry}"></div> -->
             <div id="modal-order-inquiry"></div>
         </div>
     </body>

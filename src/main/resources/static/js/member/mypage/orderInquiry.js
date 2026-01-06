@@ -5,10 +5,10 @@
 
 //관리자에 문의 버튼 클릭
 $(document).on('click', '.orderInquiry', function () {
-    //배경, 모달 보이기
-    $('#dimmed, #modal-writeForm').show();
     //btn의 data-orderno 가져오기
     const orderNo = $(this).data('orderno');
+    $('#modal-writeForm').data('orderno', orderNo); //모달에 data로 저장
+
     //모달에 data 가져오기
     $.ajax({
         url: '/customerCenter/orderInquiry',
@@ -17,13 +17,49 @@ $(document).on('click', '.orderInquiry', function () {
         success: function (order) {
             //order객체를 받은 order-inquiry.html이 리턴됨
             //modal 출력부를 ajax응답으로 replace
-            $('#modal-order-inquiry').replaceWith(order);
+            $('#modal-order-inquiry').html(order);
+            //배경, 모달 보이기
+            $('#dimmed, #modal-writeForm').show();
         },
         error: function (error) {
             closeModal();
             showToast('다시 시도해주세요.', 'error');
         },
     });
+});
+
+//모달 내 문의하기 버튼 클릭 시
+// $('.insertInquiry').on('click', function () {
+$(document).on('click', '.insertInquiry', function () {
+    const memberNo = $(this).data('memberno');
+    const question = $('#question').val();
+    const orderNo = $('#modal-writeForm').data('orderno');
+    showConfirmAlert(
+        '관리자에게 문의가 작성됩니다.',
+        //예
+        () => {
+            $.ajax({
+                url: '/customerCenter/insertBanInquiry',
+                type: 'POST',
+                data: { memberNo: memberNo, question: question, orderNo: orderNo },
+                success: function (success) {
+                    if (success == true) {
+                        closeModal();
+                        showToast('문의가 작성되었습니다.', 'success');
+                    } else {
+                        showToast('다시 시도해주세요.', 'error');
+                    }
+                },
+                error: function (error) {
+                    showToast('다시 시도해주세요.', 'error');
+                },
+            });
+        },
+        //아니오
+        () => {
+            showToast('작성이 취소되었습니다.', 'warning');
+        }
+    );
 });
 
 //모달 - 닫기 버튼, dimmed 클릭

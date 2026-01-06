@@ -8,9 +8,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eob.admin.model.data.BanInquiryEntity;
 import com.eob.admin.model.data.InquiryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
 import com.eob.admin.model.data.SettleHistoryEntity;
+import com.eob.admin.model.repository.BanInquiryRepository;
 import com.eob.admin.model.repository.FeeHistoryRepository;
 import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.repository.SettleHistoryRepository;
@@ -18,6 +20,8 @@ import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.member.repository.MemberRepository;
+import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.DeliveryFeeEntity;
 import com.eob.rider.model.data.RiderEntity;
@@ -36,8 +40,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final InquiryRepository inquiryRepository;
-
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -49,7 +51,9 @@ public class AdminService {
     private final FeeHistoryRepository feeHistoryRpository;
 
     private final SettleHistoryRepository settleHistoryRepository;
-    // private final InquiryRepository inquiryRepository;
+    private final InquiryRepository inquiryRepository;
+    private final BanInquiryRepository baninquiryRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     public boolean insertAdmin(InsertAdminForm form) {
 
@@ -317,6 +321,35 @@ public class AdminService {
             i.setQuestion(question); // 문의
             i.setCreatedAt(LocalDateTime.now()); // 문의 작성일시
             inquiryRepository.save(i);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 주문 문의 작성 처리
+     */
+    public boolean insertBanInquiry(long memberNo, long orderNo, String question) {
+        try {
+            // member엔티티 조회
+            MemberEntity member = memberRepository.findByMemberNo(memberNo);
+            // orderNo엔티티 조회
+            Optional<OrderHistoryEntity> _order = orderHistoryRepository.findById(orderNo);
+            if (!_order.isPresent()) {
+                return false;
+            }
+            OrderHistoryEntity order = _order.get();
+            // 주문 문의 객체 생성
+            BanInquiryEntity i = new BanInquiryEntity();
+            i.setMember(member); // 작성자 member 엔티티
+            i.setRole(member.getMemberRole()); // 작성자 role
+            i.setQuestion(question); // 문의 내용
+            i.setOrder(order); // 제재 주문
+            // i.setBanMember(order.get); 제재 대상.. 특정하기 번거로워서 주석해놓은거 아님ㅎ
+            i.setCreatedAt(LocalDateTime.now()); // 문의 작성일시
+            baninquiryRepository.save(i);
 
             return true;
         } catch (Exception e) {

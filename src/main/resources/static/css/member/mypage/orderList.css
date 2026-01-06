@@ -185,3 +185,7 @@
     box-sizing: border-box; /* 패딩 포함한 안정적 레이아웃 */
     border-radius: 0;
 }
+
+.btn-primary {
+    background-color: cornflowerblue;
+}
