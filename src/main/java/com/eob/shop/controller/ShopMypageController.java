@@ -1,5 +1,6 @@
 package com.eob.shop.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -92,5 +93,38 @@ public class ShopMypageController {
         model.addAttribute("menu", "apply");
 
         return "shop/mypage/shop-apply";
+    }
+    /**
+     * 정산 관리 페이지
+     * URL : /shop/mypage/settlement
+     */
+    @GetMapping("/settlement")
+    public String shopSettlement(
+            @AuthenticationPrincipal CustomSecurityDetail principal,
+            Model model
+    ) {
+        Long memberNo = principal.getMember().getMemberNo();
+
+        // 1. 상점 조회
+        ShopEntity shop = shopService.findByMemberNo(memberNo);
+
+        // 2. 정산 요약 금액 계산
+        // ※ 아직 정산 엔티티가 없으므로 Order 기준으로 계산
+        long totalSales = shopService.calculateTotalSales(shop.getShopNo());
+        long settledAmount = shopService.calculateSettledAmount(shop.getShopNo());
+        long expectedAmount = totalSales - settledAmount;
+
+        // 3. 모델 전달
+        model.addAttribute("shop", shop);
+        model.addAttribute("menu", "settlement");
+
+        model.addAttribute("totalSales", totalSales);
+        model.addAttribute("settledAmount", settledAmount);
+        model.addAttribute("expectedAmount", expectedAmount);
+
+        // 4. 정산 내역 (추후 SettlementEntity로 교체)
+        model.addAttribute("settlementList", List.of());
+
+        return "shop/mypage/shop-settlement";
     }
 }

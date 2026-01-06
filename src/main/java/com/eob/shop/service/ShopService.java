@@ -7,7 +7,7 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ShopRepository;
 
@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ShopService {
 
+    private final OrderHistoryRepository orderHistoryRepository;
     private final ShopRepository shopRepository;
+
 
     /**
      * 상점 저장
@@ -117,6 +119,22 @@ public class ShopService {
         if ("영업종료".equals(status)) {
             throw new IllegalStateException("현재 영업 시간이 아닙니다.");
         }
+
+    }
+
+    /**
+     * 누적 매출
+     */
+    public long calculateTotalSales(Long shopNo) {
+        return orderHistoryRepository.sumOrderPriceByShop(shopNo);
+    }
+
+    /**
+     * 정산 완료 금액
+     * (관리자 정산 완료 상태 기준 – 임시 0)
+     */
+    public long calculateSettledAmount(Long shopNo) {
+        return 0L; // 관리자 정산 로직 붙일 예정
     }
 
 }
