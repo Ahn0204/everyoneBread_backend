@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/member/mypage/wishList.css}">
+    <title>즐겨찾기</title>
+</head>
+
+<body>
+
+<section layout:fragment="mypage-content" id="wishlist-container">
+
+    <h2 class="wish-title">즐겨찾기</h2>
+
+    <!-- 즐겨찾기 목록이 비어 있을 때 -->
+    <div th:if="${#lists.isEmpty(wishlist)}" class="empty-text">
+        아직 즐겨찾기한 빵집이 없어요 🍞<br>
+        마음에 드는 빵집을 찜해보세요!
+    </div>
+
+    <!-- 즐겨찾기 목록 출력 -->
+    <th:block th:each="wish : ${wishlist}">
+        <div class="wish-item">
+
+            <!-- 상점 이미지 -->
+            <div class="wish-img-box">
+                <img th:src="@{${wish.shopImg}}" alt="가게 사진">
+            </div>
+
+            <!-- 상점 정보 -->
+            <div class="wish-info">
+                <div class="wish-name" th:text="${wish.shopName}">
+                    가게이름
+                </div>
+                <div class="wish-desc" th:text="${wish.description}">
+                    가게 설명
+                </div>
+            </div>
+
+            <!-- 찜 해제 버튼 -->
+            <img class="wish-heart"
+                 src="/images/icon/heart-fill.png"
+                 alt="즐겨찾기 해제"
+                 th:attr="data-shopNo=${wish.shopNo}"
+                 onclick="toggleWish(this)">
+        </div>
+    </th:block>
+</section>
+<script th:src="@{/js/member/mypage/wishList.js}"></script>
+</body>
+</html>

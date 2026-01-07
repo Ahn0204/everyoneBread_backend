@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/member/mypage/deliveryList.css}">
+    <title>배송지 관리</title>
+</head>
+
+<body>
+
+<div layout:fragment="mypage-content">
+
+    <h2 class="delivery-title">배송지 관리</h2>
+
+    <!-- 샘플 1개  -->
+    <div class="delivery-item">
+
+        <div class="delivery-info">
+            <div class="delivery-nickname">우리집</div>
+            <div class="delivery-default">기본배송지 O</div>
+            <div class="delivery-address">서울특별시 광진구 중곡동 123-45</div>
+        </div>
+
+        <div class="delivery-buttons">
+            <button class="delivery-btn">수정</button>
+            <button class="delivery-btn">삭제</button>
+        </div>
+
+    </div>
+
+    <!-- 실제 데이터 반복 -->
+    <th:block th:each="addr : ${addressList}">
+        <div class="delivery-item">
+
+            <div class="delivery-info">
+                <div class="delivery-nickname" th:text="${addr.nickname}"></div>
+
+                <div class="delivery-default"
+                     th:text="${addr.isDefault} ? '기본배송지 O' : ''"></div>
+
+                <div class="delivery-address" th:text="${addr.fullAddress}"></div>
+            </div>
+
+            <div class="delivery-buttons">
+                <button class="delivery-btn"
+                        th:onclick="|location.href='/member/mypage/delivery/edit/${addr.id}'|">
+                    수정
+                </button>
+
+                <button class="delivery-btn btn-delete"
+                        th:onclick="|deleteAddress(${addr.id})|">
+                    삭제
+                </button>
+            </div>
+        </div>
+    </th:block>
+</div>
+<script th:src="@{/js/member/mypage/deliveryList.js}"></script>
+</body>
+</html>

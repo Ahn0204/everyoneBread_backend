@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/member/select.css}">
+    <title>회원가입 유형 선택</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>회원가입 유형 선택</h1>
+        <p>가입할 계정 유형을 선택해주세요.</p>
+
+        <!-- 일반 계정 -->
+        <a href="/member/register?role=USER">
+            <button class="btn">일반 계정</button>
+        </a>
+
+        <div class="spacer"></div>
+
+        <!-- 비즈니스 계정(dropdown) -->
+        <!-- 비즈니스 계정(dropdown) -->
+        <div class="business-wrapper">
+            <button class="btn" id="businessBtn">비즈니스 계정</button>
+
+            <div class="dropdown-box" id="dropdownBox">
+                <a href="/shop/register/start?role=SHOP" class="dropdown-item">판매자 회원가입</a>
+                <a href="/rider/register/start?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/member/select.js}"></script>
+</body>
+</html>

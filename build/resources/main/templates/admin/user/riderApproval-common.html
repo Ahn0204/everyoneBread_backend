@@ -1,0 +1,71 @@
+<!--아코디언 헤더 : collapse기능용 버튼 > 항목 제목-->
+<div class="accordion-header" th:id="heading-+${rider.riderNo}">
+    <!--collapse용 버튼 : -->
+    <button class="d-flex flex-row border-bottom text-center accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#body-'+${rider.riderNo}" aria-expanded="false" th:aria-controls="'body-'+${rider.riderNo}">
+        <!--항목 제목-->
+        <div class="div-col-1" th:text="${start - loop.index}"></div>
+        <div class="div-col-2" th:text="${rider.aStatus.label}"></div>
+        <div class="div-col-3" th:text="${rider.member.memberId}"></div>
+        <div class="div-col-4" th:text="${rider.member.memberName}"></div>
+        <div class="div-col-5" th:text="${#temporals.format(rider.createdAt, 'YY-MM-dd HH:mm')}"></div>
+        <div class="div-col-6" th:text="${#temporals.format(rider.approvedAt, 'YY-MM-dd HH:mm')}"></div>
+    </button>
+</div>
+<!--바디 : collapse기능용 div > 실제 내용이 담긴 아코디언 바디-->
+<!--collapse기능용 div : -->
+<div th:id="body-+${rider.riderNo}" class="accordion-collapse collapse" th:aria-labelledby="'heading-'+${rider.riderNo}" data-bs-parent="#riderApproval-List">
+    <!--아코디언 바디-->
+    <div class="accordion-body">
+        <table class="mb-3">
+            <tr>
+                <th width="120px" class="text-center p-2">이름</th>
+                <td width="180px" class="p-2" th:text="${rider.member.memberName}"></td>
+                <th width="120px" class="text-center p-2">연락처</th>
+                <td width="180px" class="p-2" th:text="${rider.member.memberPhone}"></td>
+                <th width="120px" class="text-center p-2">메일</th>
+                <td width="180px" class="p-2" th:text="${rider.member.memberEmail}"></td>
+            </tr>
+            <tr>
+                <th class="text-center p-2">
+                    운전면허
+                    <br />
+                    번호
+                </th>
+                <td colspan="3">
+                    <span class="p-2" th:text="${rider.riderLicense}"></span>
+                    <button type="button" class="check-license btn btn-secondary">면허 인증</button>
+                    <button type="button" class="show-license btn btn-secondary" th:data-file="${rider.licenseFile}" th:data-license="${rider.riderLicense}" th:data-date="${rider.licenseCreatedAt}">사진 보기</button>
+                </td>
+                <th class="text-center p-2">
+                    운전면허
+                    <br />
+                    발급일자
+                </th>
+                <td class="p-2" th:text="${rider.licenseCreatedAt}"></td>
+            </tr>
+            <!--보완요청인 내역만 출력-->
+            <tr th:if="${rider.aStatus.label == '보완요청'}">
+                <th class="text-center p-2">
+                    보완 요청
+                    <br />
+                    사유
+                </th>
+                <td class="p-2" colspan="5"></td>
+            </tr>
+        </table>
+        <!--승인완료된 내역은 출력X-->
+        <form th:unless="${rider.aStatus.label == '승인'}">
+            <input type="hidden" name="riderNo" class="riderNo" th:value="${rider.riderNo}" />
+            <div class="d-flex flex-row gap-3 justify-content-end">
+                <select name="reject-reason" class="reject-reason">
+                    <option value="" selected hidden>보완 사유</option>
+                    <option value="photo">사진 식별 불가</option>
+                    <option value="license">면허 번호 인증불가</option>
+                    <option value="info">올바르지 못한 정보</option>
+                </select>
+                <button type="button" class="btn btn-secondary revision">보완</button>
+                <button type="button" class="btn btn-primary approval">승인</button>
+            </div>
+        </form>
+    </div>
+</div>

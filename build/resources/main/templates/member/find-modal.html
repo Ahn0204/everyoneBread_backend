@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<th:block th:fragment="findAuthModal">
+<link rel="stylesheet" th:href="@{/css/member/find-modal.css}">
+
+<!-- 인증 모달 -->
+<div id="authModal" class="modal-overlay">
+    <div class="modal-window">
+        <div class="close-btn" onclick="$('#authModal').hide()">&times;</div>
+
+        <!-- 인증 방식 탭 -->
+        <div class="sub-tabs">
+            <span class="sub-tab-item active">휴대폰 인증</span>
+            <span class="sub-tab-item">이메일 인증</span>
+        </div>
+
+        <!-- 휴대폰 인증 -->
+        <form id="formPhoneAuth">
+            <div class="form-row">
+                <label class="form-label">이름</label>
+                <input type="text" class="input-text" name="userName" required>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">휴대폰 번호</label>
+                <div class="input-with-btn">
+                    <input type="text" class="input-text" name="userPhone" required>
+                    <button type="button" class="btn-small" id="phoneSendBtn">인증</button>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">인증번호</label>
+                <div class="input-with-btn">
+                    <input type="text" class="input-text" name="authCode" required>
+                    <button type="button" class="btn-small">확인</button>
+                </div>
+            </div>
+
+            <div class="confirm-btn-area">
+                <button type="submit" class="btn-confirm">확인</button>
+            </div>
+        </form>
+
+        <!-- 이메일 인증 -->
+        <form id="formEmailAuth" class="hidden">
+            <div class="form-row">
+                <label class="form-label">이름</label>
+                <input type="text" class="input-text" name="userName" required>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">이메일</label>
+                <div class="input-with-btn">
+                    <input type="text" class="input-text" name="userEmail" required>
+                    <button type="button" class="btn-small" id="emailSendBtn">인증</button>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">인증번호</label>
+                <div class="input-with-btn">
+                    <input type="text" class="input-text" name="authCode" required>
+                    <button type="button" class="btn-small">확인</button>
+                </div>
+            </div>
+
+            <div class="confirm-btn-area">
+                <button type="submit" class="btn-confirm">확인</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+$(function () {
+
+    /* ===============================
+     * CSRF 토큰 (login.html head에 있어야 함)
+     * =============================== */
+    const csrfToken  = $('meta[name="_csrf"]').attr('content');
+    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+    /* ===============================
+     * 탭 전환
+     * =============================== */
+    $('.sub-tabs').on('click', '.sub-tab-item', function () {
+        $('.sub-tab-item').removeClass('active');
+        $(this).addClass('active');
+
+        $('#formPhoneAuth, #formEmailAuth').addClass('hidden');
+
+        if ($(this).text().trim() === '휴대폰 인증') {
+            $('#formPhoneAuth').removeClass('hidden');
+        } else {
+            $('#formEmailAuth').removeClass('hidden');
+        }
+    });
+
+    /* ===============================
+     * 휴대폰 인증번호 발송
+     * =============================== */
+    $('#phoneSendBtn').on('click', function () {
+
+        const name    = $('#formPhoneAuth input[name="userName"]').val();
+        const phone   = $('#formPhoneAuth input[name="userPhone"]').val();
+        const purpose = $('#authModal').data('purpose');
+
+        if (!name || !phone) {
+            alert('이름과 휴대폰 번호를 입력해주세요.');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/auth/phone/send',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                name: name,
+                phone: phone,
+                purpose: purpose
+            }),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            success: function () {
+                showConfirmAlert('인증번호가 발송되었습니다.');
+            },
+            error: function () {
+                showErrorAlert('일치하는 회원 정보가 없습니다.');
+            }
+        });
+    });
+
+    /* ===============================
+     * 이메일 인증번호 발송
+     * =============================== */
+    $('#emailSendBtn').on('click', function () {
+
+        const name    = $('#formEmailAuth input[name="userName"]').val();
+        const email   = $('#formEmailAuth input[name="userEmail"]').val();
+        const purpose = $('#authModal').data('purpose');
+
+        if (!name || !email) {
+            showConfirmAlert('이름과 이메일을 입력해주세요.');
+            return;
+        }
+
+        $.ajax({
+            url: '/api/auth/email/send',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                name: name,
+                email: email,
+                purpose: purpose
+            }),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            success: function () {
+                showConfirmAlert('인증번호가 이메일로 발송되었습니다.');
+            },
+            error: function () {
+                showErrorAlert('일치하는 회원 정보가 없습니다.');
+            }
+        });
+    });
+
+    /* ===============================
+     * 인증번호 확인
+     * =============================== */
+    $('#formPhoneAuth, #formEmailAuth').on('submit', function (e) {
+        e.preventDefault();
+
+        const isPhone = $(this).attr('id') === 'formPhoneAuth';
+        const purpose = $('#authModal').data('purpose');
+
+        const data = isPhone ? {
+            phone: $('#formPhoneAuth input[name="userPhone"]').val(),
+            authCode: $('#formPhoneAuth input[name="authCode"]').val()
+        } : {
+            email: $('#formEmailAuth input[name="userEmail"]').val(),
+            authCode: $('#formEmailAuth input[name="authCode"]').val()
+        };
+
+        $.ajax({
+            url: isPhone ? '/api/auth/phone/verify' : '/api/auth/email/verify',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            success: function () {
+                showSuccessAlert('인증이 완료되었습니다.');
+                $('#authModal').hide();
+
+                if (purpose === 'FIND_ID') {
+                    location.href = '/member/find/id/result';
+                } else if (purpose === 'RESET_PW') {
+                    location.href = '/member/find/password/reset';
+                }
+            },
+            error: function () {
+                showErrorAlert('인증번호가 올바르지 않습니다.');
+            }
+        });
+    });
+
+});
+</script>
+</th:block>
+</body>
+</html>

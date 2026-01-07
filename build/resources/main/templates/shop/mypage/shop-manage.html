@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/mypage/shop-mypage-layout}">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert 공통 래퍼 -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <!-- Kakao Postcode API -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- 상점 관리 CSS -->
+    <link rel="stylesheet" th:href="@{/css/shop/mypage/manage.css}">
+    <title>상점 관리</title>
+</head>
+
+<body>
+<section layout:fragment="content">
+    <div class="page-title">상점관리</div>
+
+    <!-- 상점명 -->
+    <div class="info-row">
+        <label>상점명</label>
+        <input id="shopName" th:value="${shop.shopName}" readonly>
+        <button type="button" onclick="toggleEdit(this, 'shopName','name')">변경</button>
+    </div>
+
+    <!-- 소개글 -->
+    <div class="info-row">
+        <label>소개글</label>
+        <input id="shopIntro" th:value="${shop.shopIntro}" readonly>
+        <button type="button" onclick="toggleEdit(this, 'shopIntro','intro')">변경</button>
+    </div>
+
+    <!-- 주소 -->
+    <div class="info-row">
+        <label>주소</label>
+        <input id="shopAddress" th:value="${shop.shopAddress}" readonly>
+        <button type="button" onclick="openAddress()">변경</button>
+    </div>
+
+    <!-- 휴무일 -->
+    <div class="info-row">
+        <label>휴무일</label>
+
+        <div id="holidayButtons">
+            <button type="button" class="day-btn" data-day="월">월</button>
+            <button type="button" class="day-btn" data-day="화">화</button>
+            <button type="button" class="day-btn" data-day="수">수</button>
+            <button type="button" class="day-btn" data-day="목">목</button>
+            <button type="button" class="day-btn" data-day="금">금</button>
+            <button type="button" class="day-btn" data-day="토">토</button>
+            <button type="button" class="day-btn" data-day="일">일</button>
+        </div>
+        <!-- 기존 휴무일 값 전달용 -->
+        <input type="hidden" id="savedHoliday" th:value="${shop.holiday}">
+        <button type="button" onclick="saveHoliday()">저장</button>
+    </div>
+
+    <!-- 영업시간 -->
+    <div class="info-row">
+        <label>영업시간</label>
+        <input type="time" id="openTime" th:value="${shop.openTime}" disabled>
+        <span>~</span>
+        <input type="time" id="closeTime" th:value="${shop.closeTime}" disabled>
+        <button type="button" onclick="toggleTimeEdit()">변경</button>
+    </div>
+
+    <!-- 현재 영업 상태 -->
+    <div style="margin-top:20px;">
+        <strong>현재 상태 :</strong>
+        <span th:text="${openStatus}" th:style="${openStatus == '영업중'} ? 'color:green;' : (${openStatus == '휴무'} ? 'color:red;' : 'color:gray;')"> </span>
+    </div>
+</section>
+<script th:src="@{/js/shop/mypage/manage.js}"></script>
+</body>
+</html>

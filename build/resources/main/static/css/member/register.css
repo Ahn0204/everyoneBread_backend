@@ -1,0 +1,157 @@
+/* 1. 기본 초기화 및 폰트 */
+* {
+    box-sizing: border-box;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 40px 0;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* 2. 전체 컨테이너 (박스 형태) */
+.signup-container {
+    width: 100%;
+    max-width: 550px; /* 로그인보다 조금 더 넓게 */
+    padding: 40px;
+    border: 2px solid #000; /* 외곽 테두리 (와이어프레임 느낌) */
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+/* 3. 헤더 스타일 */
+.signup-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.signup-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0 0 20px 0;
+}
+.signup-header hr {
+    border: 0;
+    height: 2px;
+}
+
+/* 4. 입력 폼 행(Row) 스타일 */
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* 왼쪽 라벨 (아이디, 비밀번호 등) */
+.form-label {
+    width: 120px; /* 고정 너비로 정렬 */
+    font-weight: 700;
+    font-size: 15px;
+    color: #333;
+    flex-shrink: 0; /* 줄어들지 않음 */
+}
+
+/* 입력창 공통 스타일 */
+.input-text {
+    flex: 1; /* 남은 공간 채움 */
+    height: 45px;
+    padding: 0 10px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+}
+.input-text:focus {
+    background-color: #f9f9f9;
+    border-width: 2px;
+}
+
+/* 5. 특수 입력 영역 (주민번호, 버튼 포함) */
+
+/* 버튼이 옆에 붙는 경우 */
+.input-with-btn {
+    display: flex;
+    flex: 1;
+    gap: 8px; /* 입력창과 버튼 사이 간격 */
+}
+
+/* 중복확인, 인증 버튼 등 작은 버튼 */
+.btn-small {
+    height: 45px;
+    padding: 0 15px;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap; /* 줄바꿈 방지 */
+    transition: all 0.2s;
+}
+.btn-small:hover {
+    background-color: #f0f0f0;
+}
+
+/* 주민번호 영역 */
+.jumin-area {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+}
+.input-jumin {
+    width: 100%;
+    height: 45px;
+    padding: 0 10px;
+    border: 1px solid #000;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* 6. 하단 버튼 영역 (가입, 다음) */
+.action-buttons {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-large {
+    width: 200px;
+    height: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+/* 가입 버튼 (메인) */
+.btn-submit {
+    background-color: #fff;
+    border: 2px solid #000;
+    color: #000;
+}
+.btn-submit:hover {
+    background-color: #000;
+    color: #fff;
+}
+
+/* 다음 버튼 (판매자용) */
+.btn-next {
+    background-color: #000;
+    border: 2px solid #000;
+    color: #fff;
+}
+.btn-next:hover {
+    opacity: 0.8;
+}
+
+/* 인증번호 입력 행 (라벨 없음) */
+.auth-code-row {
+    padding-left: 120px; /* 라벨 너비만큼 들여쓰기 */
+}

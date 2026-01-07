@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{member/mypage/mypage-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/member/mypage/qnaList.css}">
+    <title>문의내역</title>
+</head>
+
+<body>
+
+<section layout:fragment="mypage-content">
+
+    <h2 class="qna-title">문의내역</h2>
+
+    <!-- 탭 -->
+    <div class="qna-tabs">
+        <div class="qna-tab active" id="tabSeller">판매자 문의</div>
+        <div class="qna-tab" id="tabAdmin">관리자 문의</div>
+    </div>
+
+    <!-- ======================== 판매자 문의 리스트 ======================== -->
+    <div id="sellerQnaList">
+
+        <!-- 샘플 -->
+        <div class="qna-item">
+            <div class="qna-top">
+                <div class="qna-date">2025-12-03</div>
+                <div class="qna-shop">성진이 빵집</div>
+            </div>
+
+            <div class="qna-body">
+                <div class="qna-img-box">
+                    <img src="/images/sample/bread.png">
+                </div>
+
+                <div class="qna-info">
+                    <div class="qna-product">소금빵 외 2개</div>
+                    <div class="qna-content">
+                        문의드립니다. 배송이 언제쯤 도착하나요?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 동적 반복 -->
+        <th:block th:each="q : ${sellerQna}">
+            <div class="qna-item">
+                <div class="qna-top">
+                    <div class="qna-date" th:text="${q.regDate}"></div>
+                    <div class="qna-shop" th:text="${q.shopName}"></div>
+                </div>
+
+                <div class="qna-body">
+                    <div class="qna-img-box">
+                        <img th:src="@{${q.productImg}}" />
+                    </div>
+
+                    <div class="qna-info">
+                        <div class="qna-product" th:text="${q.productName}"></div>
+                        <div class="qna-content" th:text="${q.content}"></div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+    <!-- ======================== 관리자 문의 리스트 ======================== -->
+    <div id="adminQnaList" style="display: none;">
+
+        <th:block th:each="q : ${adminQna}">
+            <div class="qna-item">
+                <div class="qna-top">
+                    <div class="qna-date" th:text="${q.regDate}"></div>
+                    <div class="qna-shop">관리자 문의</div>
+                </div>
+
+                <div class="qna-body">
+                    <div class="qna-img-box">
+                        <img th:src="@{${q.productImg}}" />
+                    </div>
+
+                    <div class="qna-info">
+                        <div class="qna-product" th:text="${q.title}"></div>
+                        <div class="qna-content" th:text="${q.content}"></div>
+                    </div>
+                </div>
+            </div>
+        </th:block>
+
+    </div>
+
+</section>
+<script th:src="@{/js/member/mypage/qnaList.js}"></script>
+</body>
+</html>
