@@ -11,18 +11,14 @@
     <!-- CSRF 토큰 -->
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
-
     <!-- JQuery CDN -->
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- SweetAlert 공통 래퍼 -->
     <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
-
     <!-- Kakao Postcode API -->
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-
     <!-- 개인정보 CSS -->
     <link rel="stylesheet" th:href="@{/css/shop/mypage/info.css}">
 
@@ -30,7 +26,7 @@
 </head>
 
 <body>
-<section layout:fragment="content">
+<section layout:fragment="mypage-content">
 
     <div class="page-title">개인정보</div>
 
@@ -66,7 +62,7 @@
 
         <div class="info-row">
             <label>생일</label>
-            <input th:value="${member.memberBirth}" readonly>
+            <input th:value="${member.memberJumin}" readonly>
         </div>
 
     </div>
@@ -95,7 +91,7 @@
 
     <button class="withdraw" onclick="openWithdrawModal()">회원탈퇴</button>
 
+    <script th:src="@{/js/shop/mypage/info.js}"></script>
 </section>
-<script th:src="@{/js/shop/mypage/info.js}"></script>
 </body>
 </html>

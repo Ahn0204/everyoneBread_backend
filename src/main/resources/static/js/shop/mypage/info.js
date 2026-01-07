@@ -1,10 +1,7 @@
-// CSRF 토큰 설정
 const token = document.querySelector('meta[name="_csrf"]').content;
 const header = document.querySelector('meta[name="_csrf_header"]').content;
 
-/* =========================
-   탭 전환
-========================= */
+/* 탭 전환 */
 $('.tab-btn').click(function () {
     $('.tab-btn').removeClass('active');
     $(this).addClass('active');
@@ -13,12 +10,9 @@ $('.tab-btn').click(function () {
     $('#tab-' + $(this).data('tab')).addClass('active');
 });
 
-/* =========================
-   개인정보 수정
-========================= */
+/* 정보 수정 */
 function toggleEdit(btn, inputId, type) {
     const input = document.getElementById(inputId);
-    const value = input.value.trim();
 
     if (input.readOnly) {
         input.readOnly = false;
@@ -27,77 +21,41 @@ function toggleEdit(btn, inputId, type) {
         return;
     }
 
-    /* ===== 유효성 검사 ===== */
-    if (type === 'phone' && !/^010\d{8}$/.test(value)) {
-        showErrorAlert('휴대폰 번호 형식이 올바르지 않습니다.');
-        return;
-    }
-
-    if (type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        showErrorAlert('이메일 형식이 올바르지 않습니다.');
-        return;
-    }
-
-    fetch(`/shop/mypage/info/update/${type}`, {
+    fetch(`/member/mypage/info/update/${type}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', [header]: token },
-        body: JSON.stringify({ value })
+        body: JSON.stringify({ value: input.value })
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.result === 'OK') {
+    .then(r => r.json())
+    .then(res => {
+        if (res.result === 'OK') {
             showSuccessAlert('변경되었습니다.');
             input.readOnly = true;
             btn.textContent = '변경';
         } else {
-            showErrorAlert(data.message || '변경 실패');
+            showErrorAlert(res.message);
         }
-    })
-    .catch(() => showErrorAlert('서버 오류'));
+    });
 }
 
-/* =========================
-   비밀번호 변경
-========================= */
+/* 비밀번호 변경 */
 function changePassword() {
-    const currentPw = $('#currentPw').val().trim();
-    const newPw = $('#newPw').val().trim();
-    const confirmPw = $('#confirmPw').val().trim();
-
-    if (!currentPw || !newPw || !confirmPw) {
-        showErrorAlert('모든 항목을 입력해주세요.');
-        return;
-    }
-
-    if (newPw.length < 8) {
-        showErrorAlert('비밀번호는 8자 이상이어야 합니다.');
-        return;
-    }
-
-    if (newPw !== confirmPw) {
-        showErrorAlert('새 비밀번호가 일치하지 않습니다.');
-        return;
-    }
-
-    fetch('/shop/mypage/password/change', {
+    fetch('/member/mypage/password/change', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', [header]: token },
         body: JSON.stringify({
-            currentPw,
-            newPw
+            currentPw: $('#currentPw').val(),
+            newPw: $('#newPw').val()
         })
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.result === 'OK') {
-            showSuccessAlert('비밀번호가 변경되었습니다.');
-            $('#currentPw,#newPw,#confirmPw').val('');
-        } else {
-            showErrorAlert(data.message || '비밀번호 변경 실패');
-        }
-    })
-    .catch(() => showErrorAlert('서버 오류'));
+    .then(r => r.json())
+    .then(res => {
+        res.result === 'OK'
+            ? showSuccessAlert('비밀번호 변경 완료')
+            : showErrorAlert(res.message);
+    });
 }
+
 
 /* =========================
    회원탈퇴
@@ -153,9 +111,7 @@ function openWithdrawModal() {
         fetch('/member/mypage/withdraw', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                [document.querySelector('meta[name="_csrf_header"]').content]:
-                document.querySelector('meta[name="_csrf"]').content
+                'Content-Type': 'application/json', [header]: token
             },
             body: JSON.stringify(result.value)
         })

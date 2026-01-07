@@ -1,3 +1,6 @@
+const token = document.querySelector('meta[name="_csrf"]').content;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+
 /* =========================
    정산 계좌 정보 수정 (유효성 포함)
 ========================= */
@@ -55,7 +58,7 @@ function toggleEdit(btn, inputId, type) {
     ===================== */
     fetch(`/shop/mypage/update/${type}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', [header]: token },
         body: JSON.stringify({
             // 계좌번호는 하이픈 제거 후 저장
             value: (type === 'accountNo')

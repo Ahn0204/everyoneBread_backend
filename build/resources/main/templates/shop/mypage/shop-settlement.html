@@ -6,6 +6,10 @@
 
 <head>
     <meta charset="UTF-8"/>
+    <!-- CSRF 토큰 설정 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <!-- JQuery -->
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
@@ -18,7 +22,7 @@
 </head>
 
 <body>
-<section layout:fragment="content">
+<section layout:fragment="mypage-content">
 
     <div class="page-title">정산 관리</div>
 
@@ -93,7 +97,7 @@
             </tbody>
         </table>
     </div>
+    <script th:src="@{/js/shop/mypage/settlement.js}"></script>
 </section>
-<script th:src="@{/js/shop/mypage/settlement.js}"></script>
 </body>
 </html>

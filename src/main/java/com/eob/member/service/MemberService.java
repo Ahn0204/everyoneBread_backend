@@ -238,7 +238,6 @@ public class MemberService {
     /**
      * 회원 비밀번호 확인
      */
-    @Autowired
     public boolean checkPassword(MemberEntity member, String rawPw) {
         return passwordEncoder.matches(rawPw, member.getMemberPw());
     }

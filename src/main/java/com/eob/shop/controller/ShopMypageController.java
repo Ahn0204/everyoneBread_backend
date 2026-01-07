@@ -59,11 +59,8 @@ public class ShopMypageController {
      */
     @PostMapping("/update/{type}")
     @ResponseBody
-    public Map<String, String> updateShopInfo(
-            @PathVariable String type,
-            @RequestBody Map<String, String> body,
-            @AuthenticationPrincipal CustomSecurityDetail principal
-    ) {
+    public Map<String, String> updateShopInfo( @PathVariable String type, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
+        // 상점 본인 확인
         Long memberNo = principal.getMember().getMemberNo();
         shopService.updateShopInfo(memberNo, type, body.get("value"));
         return Map.of("result", "OK");
@@ -78,6 +75,7 @@ public class ShopMypageController {
         Long memberNo = principal.getMember().getMemberNo();
         ShopEntity shop = shopService.findByMemberNo(memberNo);
 
+        model.addAttribute("member", principal.getMember());
         model.addAttribute("shop", shop);
         model.addAttribute("menu", "info");
 

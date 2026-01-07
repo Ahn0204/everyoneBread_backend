@@ -1,3 +1,6 @@
+const token = document.querySelector('meta[name="_csrf"]').content;
+const header = document.querySelector('meta[name="_csrf_header"]').content;
+
 /* =========================
    공통 수정 (상점명/소개글/주소)
 ========================= */
@@ -15,7 +18,7 @@ function toggleEdit(btn, inputId, type) {
     // 저장 모드
     fetch(`/shop/mypage/update/${type}`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', [header]: token},
         body: JSON.stringify({ value: input.value })
     })
     .then(res => res.json())
@@ -46,7 +49,7 @@ function openAddress() {
             // 3️. 서버 저장
             fetch('/shop/mypage/update/address', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/json', [header]: token},
                 body: JSON.stringify({
                     value: address
                 })
@@ -94,7 +97,7 @@ document.querySelectorAll('.day-btn').forEach(btn => {
 function saveHoliday() {
     fetch('/shop/mypage/update/holiday', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', [header]: token},
         body: JSON.stringify({
             // 아무것도 선택 안 하면 "" 저장
             value: Array.from(selectedDays).join(',')
@@ -144,7 +147,7 @@ function toggleTimeEdit() {
     // 저장 모드
     fetch('/shop/mypage/update/time', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', [header]: token},
         body: JSON.stringify({
             value: open.value + " ~ " + close.value
         })

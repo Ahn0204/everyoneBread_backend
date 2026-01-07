@@ -1,42 +1,38 @@
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/common/shop-layout}">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- SweetAlert 공통 래퍼 -->
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
     <!-- 공통 CSS -->
     <link rel="stylesheet" th:href="@{/css/shop/mypage/layout.css}">
     <title>모두의빵 판매자 마이페이지</title>
 </head>
 
 <body>
-<div class="mypage-wrapper">
+    <div layout:fragment="content">
+        <div class="mypage-wrapper">
 
-    <!-- 사이드바 -->
-    <aside class="mypage-sidebar">
-        <div class="sidebar-title">정보 관리</div>
+            <!-- 사이드바 -->
+            <aside class="mypage-sidebar">
+                <div class="sidebar-title">정보 관리</div>
 
-        <nav class="sidebar-menu">
-            <a th:href="@{/shop/mypage}" th:classappend="${menu == 'manage'} ? 'active'">상점관리</a>
-            <a th:href="@{/shop/mypage/settlement}" th:classappend="${menu == 'settlement'} ? 'active'">정산관리</a>
-            <a th:href="@{/shop/mypage/info}" th:classappend="${menu == 'info'} ? 'active'">개인정보</a>
-            <a th:href="@{/shop/mypage/apply}" th:classappend="${menu == 'apply'} ? 'active'">폐점신청</a>
-        </nav>
-    </aside>
+                <nav class="sidebar-menu">
+                    <a th:href="@{/shop/mypage}" th:classappend="${menu == 'manage'} ? 'active'">상점관리</a>
+                    <a th:href="@{/shop/mypage/settlement}" th:classappend="${menu == 'settlement'} ? 'active'">정산관리</a>
+                    <a th:href="@{/shop/mypage/info}" th:classappend="${menu == 'info'} ? 'active'">개인정보</a>
+                    <a th:href="@{/shop/mypage/apply}" th:classappend="${menu == 'apply'} ? 'active'">폐점신청</a>
+                </nav>
+            </aside>
 
-    <!-- 콘텐츠 영역 -->
-    <main class="mypage-content" layout:fragment="content">
-        <!-- 각 페이지 내용이 여기로 들어옴 -->
-    </main>
+            <!-- 실제 페이지 영역 -->
+            <main class="mypage-content">
+                <div layout:fragment="mypage-content"></div>
+            </main>
 
-</div>
+        </div>
+    </div>
 </body>
 </html>

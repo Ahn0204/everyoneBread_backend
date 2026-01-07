@@ -6,6 +6,10 @@
 
 <head>
     <meta charset="UTF-8" />
+    <!-- CSRF 토큰 설정 -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- JQuery CDN -->
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
@@ -21,7 +25,7 @@
 </head>
 
 <body>
-<section layout:fragment="content">
+<section layout:fragment="mypage-content">
     <div class="page-title">상점관리</div>
 
     <!-- 상점명 -->
@@ -77,7 +81,7 @@
         <strong>현재 상태 :</strong>
         <span th:text="${openStatus}" th:style="${openStatus == '영업중'} ? 'color:green;' : (${openStatus == '휴무'} ? 'color:red;' : 'color:gray;')"> </span>
     </div>
+    <script th:src="@{/js/shop/mypage/manage.js}"></script>
 </section>
-<script th:src="@{/js/shop/mypage/manage.js}"></script>
 </body>
 </html>
