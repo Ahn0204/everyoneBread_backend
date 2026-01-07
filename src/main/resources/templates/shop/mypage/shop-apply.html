@@ -25,20 +25,21 @@
 
     <div class="form-row">
         <label>사유</label>
-        <select>
-            <option>선택</option>
-            <option>운영 종료</option>
-            <option>매출 부진</option>
-            <option>기타</option>
+        <select id="closeReasonSelect">
+            <option value="">선택</option>
+            <option value="운영 종료">운영 종료</option>
+            <option value="매출 부진">매출 부진</option>
+            <option value="기타">기타</option>
         </select>
     </div>
 
-    <div class="form-row">
-        <textarea placeholder="기타 내용 입력란"></textarea>
+    <div class="form-row" id="etcReasonBox" style="display:none;">
+        <textarea id="etcReason" placeholder="기타 사유를 입력해주세요"></textarea>
     </div>
 
-    <button class="confirm-btn">확인</button>
+    <button class="confirm-btn" id="closeRequestBtn">확인</button>
 
 </section>
+<script th:src="@{/js/shop/mypage/apply.js}"></script>
 </body>
 </html>

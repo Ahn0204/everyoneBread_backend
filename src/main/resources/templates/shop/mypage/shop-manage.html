@@ -38,7 +38,7 @@
         <button type="button" onclick="toggleEdit(this, 'shopIntro','intro')">변경</button>
     </div>
 
-    <!-- 주소 (Kakao API 연결 예정) -->
+    <!-- 주소 -->
     <div class="info-row">
         <label>주소</label>
         <input id="shopAddress" th:value="${shop.shopAddress}" readonly>
@@ -75,10 +75,7 @@
     <!-- 현재 영업 상태 -->
     <div style="margin-top:20px;">
         <strong>현재 상태 :</strong>
-        <span th:text="${openStatus}"
-              th:style="${openStatus == '영업중'} ? 'color:green;' :
-                        (${openStatus == '휴무'} ? 'color:red;' : 'color:gray;')">
-        </span>
+        <span th:text="${openStatus}" th:style="${openStatus == '영업중'} ? 'color:green;' : (${openStatus == '휴무'} ? 'color:red;' : 'color:gray;')"> </span>
     </div>
 </section>
 <script th:src="@{/js/shop/mypage/manage.js}"></script>

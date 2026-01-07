@@ -1,6 +1,7 @@
 package com.eob.shop.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -8,6 +9,7 @@ import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.eob.order.model.repository.OrderHistoryRepository;
+import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ShopRepository;
 
@@ -20,7 +22,6 @@ public class ShopService {
 
     private final OrderHistoryRepository orderHistoryRepository;
     private final ShopRepository shopRepository;
-
 
     /**
      * 상점 저장
@@ -135,6 +136,25 @@ public class ShopService {
      */
     public long calculateSettledAmount(Long shopNo) {
         return 0L; // 관리자 정산 로직 붙일 예정
+    }
+    
+    /**
+     * 폐점 신청 처리
+     */
+    @Transactional
+    public void requestClose(Long memberNo, String reason) {
+
+        ShopEntity shop = shopRepository.findByMember_MemberNo(memberNo)
+            .orElseThrow(() -> new IllegalArgumentException("상점 정보 없음"));
+
+        // 상태 제한
+        if (shop.getStatus() != ShopApprovalStatus.APPLY_APPROVED) {
+            throw new IllegalStateException("현재 폐점 신청이 불가능한 상태입니다.");
+        }
+
+        shop.setClosedReason(reason);
+        shop.setClosedRequestAt(LocalDateTime.now());
+        shop.setStatus(ShopApprovalStatus.CLOSE_REVIEW);
     }
 
 }

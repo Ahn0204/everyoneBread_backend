@@ -1,5 +1,6 @@
 package com.eob.member.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,8 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
+import com.eob.member.model.data.WithdrawHistoryEntity;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.repository.MemberRepository;
+import com.eob.member.repository.WithdrawHistoryRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.validation.BindingResult;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final WithdrawHistoryRepository withdrawHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     /*
@@ -211,4 +215,62 @@ public class MemberService {
         return memberRepository.save(entity);
     }
 
+    /**
+     * 회원 휴대폰 번호 수정
+     */
+    @Transactional
+    public void updatePhone(Long memberNo, String phone) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberPhone(phone);
+    }
+
+    /**
+     * 회원 이메일 수정
+     */
+    @Transactional
+    public void updateEmail(Long memberNo, String email) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberEmail(email);
+    }
+
+    /**
+     * 회원 비밀번호 확인
+     */
+    @Autowired
+    public boolean checkPassword(MemberEntity member, String rawPw) {
+        return passwordEncoder.matches(rawPw, member.getMemberPw());
+    }
+
+    /**
+     * 회원 비밀번호 변경
+     */
+    @Transactional
+    public void changePassword(Long memberNo, String newPw) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberPw(passwordEncoder.encode(newPw));
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @Transactional
+    public void withdrawMember(MemberEntity member, String reason) {
+
+        // 1. 탈퇴 이력 저장
+        WithdrawHistoryEntity history = new WithdrawHistoryEntity();
+        history.setMember(member);
+        history.setReason(reason);
+        history.setRole(member.getMemberRole().name());
+
+        withdrawHistoryRepository.save(history);
+
+        // 2. 회원 상태 변경 (soft delete)
+        member.setStatus(MemberApprovalStatus.WITHDRAW);
+
+        // 3. 민감 정보 마스킹 (선택)
+        member.setMemberPw("WITHDRAWN");
+    }
 }
