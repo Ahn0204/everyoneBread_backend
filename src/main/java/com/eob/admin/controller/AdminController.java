@@ -80,6 +80,17 @@ public class AdminController {
         return "admin/comm/admin-login";
     }
 
+    // 관리자 계정 추가(작업용)
+    @GetMapping("/register")
+    public String registerAdmin(Model model) {
+        // 필드 에러로 redirect되지 않은 새 페이지라면
+        if (!model.containsAttribute("insertAdminForm")) {
+            // insertAdminForm객체 생성
+            model.addAttribute("insertAdminForm", new InsertAdminForm());
+        }
+        return "admin/comm/register";
+    }
+
     // 메인 페이지
     @GetMapping("/")
     public String getAdminMain() {

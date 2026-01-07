@@ -43,12 +43,12 @@ public class BanInquiryEntity {
     @Column(nullable = false)
     private String question; // 문의 내용
 
-    @Column(nullable = true)
-    private String file; // 파일명
+    @Column(name="FILE_PATH" ,nullable = true)
+    private String filePath; // 파일명
 
-    @ManyToOne
-    @JoinColumn(name = "BAN_MEMBER_NO", nullable = true)
-    private MemberEntity banMember; // 제재 대상 (소비자 -> 제재될 상점, 상점 -> 제재될 소비자)
+    // @ManyToOne
+    // @JoinColumn(name = "BAN_MEMBER_NO", nullable = true)
+    // private MemberEntity banMember; // 제재 대상 (소비자 -> 제재될 상점, 상점 -> 제재될 소비자)
 
     @ManyToOne
     @JoinColumn(name = "ORDER_NO", nullable = false)
