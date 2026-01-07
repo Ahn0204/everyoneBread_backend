@@ -45,27 +45,25 @@ public class ShopOrderController {
      */
     @GetMapping
     public String orderList(
-            @RequestParam(required = false) OrderStatus status,     // 주문 상태 필터
-            @RequestParam(required = false) String startDate,   // 시작 날짜 필터
-            @RequestParam(required = false) String endDate,     // 종료 날짜 필터
+            @RequestParam(name = "status", required = false) OrderStatus status, // 주문 상태 필터
+            @RequestParam(name = "startDate", required = false) String startDate, // 시작 날짜 필터
+            @RequestParam(name = "endDate", required = false) String endDate, // 종료 날짜 필터
             @AuthenticationPrincipal CustomSecurityDetail principal,
-            Model model
-    ) {
+            Model model) {
 
-        MemberEntity member = principal.getMember();                        // 현재 로그인한 회원 정보 조회
+        MemberEntity member = principal.getMember(); // 현재 로그인한 회원 정보 조회
         ShopEntity shop = shopService.findByMemberNo(member.getMemberNo()); // 상점 정보 조회
 
         // 상점 기준 주문 전체 조회
         List<OrderHistoryEntity> orders;
 
-        if(status == null){
+        if (status == null) {
             // 전체 + 기간 필터
             orders = orderService.findByShopNo(shop.getShopNo());
         } else {
             // 상태 + 기간 필터
             orders = orderService.findByShopNoAndStatus(shop.getShopNo(), status);
         }
-
 
         // 4. 화면 전달 (기간은 화면 상태 유지용)
         model.addAttribute("orders", orders);
@@ -82,7 +80,8 @@ public class ShopOrderController {
      * - WAIT -> PREPARE
      */
     @PostMapping("/{orderNo}/accept")
-        public String acceptOrder(@PathVariable Long orderNo, @RequestParam(required = false) OrderStatus status) {
+    public String acceptOrder(@PathVariable(name = "orderNo") Long orderNo,
+            @RequestParam(name = "status", required = false) OrderStatus status) {
         orderService.acceptOrder(orderNo);
         return "redirect:/shop/orders" + (status != null ? "?status=" + status.name() : "");
     }
@@ -92,7 +91,9 @@ public class ShopOrderController {
      * - WAIT -> REJECT
      */
     @PostMapping("/{orderNo}/reject")
-        public String rejectOrder(@PathVariable Long orderNo, @RequestParam String reason, @RequestParam(required = false) OrderStatus status) {
+    public String rejectOrder(@PathVariable(name = "orderNo") Long orderNo,
+            @RequestParam(name = "reason") String reason,
+            @RequestParam(name = "status", required = false) OrderStatus status) {
         orderService.rejectOrder(orderNo, reason);
         return "redirect:/shop/orders" + (status != null ? "?status=" + status.name() : "");
     }
@@ -110,13 +111,13 @@ public class ShopOrderController {
         ShopEntity shop = shopService.findByMemberNo(member.getMemberNo());
         // 3. 결과 맵으로 반환
         Long shopNo = shop.getShopNo();
-        
+
         // 4. 결과 맵 생성
         Map<String, Long> result = new HashMap<>();
-        result.put("today", orderService.countTodayOrders(shopNo));                             // 오늘 주문 수
-        result.put("wait", orderService.countByStatus(shopNo, OrderStatus.WAIT));               // 대기 주문 수
-        result.put("delivering", orderService.countByStatus(shopNo, OrderStatus.DELIVERING));   // 배송중 주문 수
-        result.put("complete", orderService.countByStatus(shopNo, OrderStatus.COMPLETE));       // 완료 주문 수
+        result.put("today", orderService.countTodayOrders(shopNo)); // 오늘 주문 수
+        result.put("wait", orderService.countByStatus(shopNo, OrderStatus.WAIT)); // 대기 주문 수
+        result.put("delivering", orderService.countByStatus(shopNo, OrderStatus.DELIVERING)); // 배송중 주문 수
+        result.put("complete", orderService.countByStatus(shopNo, OrderStatus.COMPLETE)); // 완료 주문 수
 
         return result;
     }
@@ -127,13 +128,11 @@ public class ShopOrderController {
      */
     @GetMapping("/{orderNo}")
     public String orderDetail(
-            @PathVariable Long orderNo,
-            Model model
-    ) {
+            @PathVariable(name = "orderNo") Long orderNo,
+            Model model) {
         OrderHistoryEntity order = orderService.findById(orderNo);
         model.addAttribute("order", order);
         return "shop/shop-order-detail";
     }
-
 
 }

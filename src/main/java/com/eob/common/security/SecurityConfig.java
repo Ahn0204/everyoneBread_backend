@@ -240,7 +240,8 @@ public class SecurityConfig {
                                                                 "/shop/check-name",
                                                                 "/shop/orders/dashboard", // 주문 대시보드 AJAX
                                                                 "/css/**", "/js/**", "/image/**", "/fonts/**",
-                                                                "/lib/**")
+                                                                "/lib/**",
+                                                                "/shop/insertBanInquiry")
                                                 .permitAll()
 
                                                 /*
