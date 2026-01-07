@@ -1,80 +1,77 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{shop/common/shop-layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{shop/common/shop-layout}">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" th:href="@{/css/shop/reviews.css}" />
+        <title>후기 관리 - 모두의빵 판매자센터</title>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" th:href="@{/css/shop/reviews.css}">
-    <title>후기 관리 - 모두의빵 판매자센터</title>
-</head>
+    <body>
+        <div layout:fragment="content">
+            <div class="reviews-container">
+                <!-- 제목 -->
+                <div class="page-title">후기 관리</div>
 
-<body>
+                <!-- 상단 탭 -->
+                <div class="top-tabs">
+                    <div class="tab active">후기</div>
+                    <div class="tab">문의</div>
+                </div>
 
-<div layout:fragment="content">
+                <!-- 후기 카드 (반복 예정) -->
+                <div class="review-card">
+                    <div class="review-row">
+                        <!-- 좌측 정보 -->
+                        <div class="review-left">
+                            <div class="review-img">
+                                상품
+                                <br />
+                                사진
+                            </div>
 
-    <div class="reviews-container">
+                            <div class="review-info">
+                                <div class="review-date">2025-12-14</div>
+                                <div>상품명 + 수량</div>
+                                <div>별점</div>
+                                <div>아이디</div>
+                                <div>제목</div>
+                                <div>후기 내용</div>
+                            </div>
+                        </div>
 
-        <!-- 제목 -->
-        <div class="page-title">후기 관리</div>
-
-        <!-- 상단 탭 -->
-        <div class="top-tabs">
-            <div class="tab active">후기</div>
-            <div class="tab">문의</div>
-        </div>
-
-        <!-- 후기 카드 (반복 예정) -->
-        <div class="review-card">
-            <div class="review-row">
-
-                <!-- 좌측 정보 -->
-                <div class="review-left">
-                    <div class="review-img">상품<br>사진</div>
-
-                    <div class="review-info">
-                        <div class="review-date">2025-12-14</div>
-                        <div>상품명 + 수량</div>
-                        <div>별점</div>
-                        <div>아이디</div>
-                        <div>제목</div>
-                        <div>후기 내용</div>
+                        <!-- 우측 버튼 -->
+                        <div class="review-actions">
+                            <button class="btn">답변하기</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 우측 버튼 -->
-                <div class="review-actions">
-                    <button class="btn">답변하기</button>
-                </div>
+                <!-- 답변 완료 상태 예시 -->
+                <div class="review-card">
+                    <div class="review-row">
+                        <div class="review-left">
+                            <div class="review-img">
+                                상품
+                                <br />
+                                사진
+                            </div>
 
-            </div>
-        </div>
+                            <div class="review-info">
+                                <div class="review-date">2025-12-13</div>
+                                <div>상품명 + 수량</div>
+                                <div>별점</div>
+                                <div>아이디</div>
+                                <div>제목</div>
+                                <div>후기 내용</div>
+                            </div>
+                        </div>
 
-        <!-- 답변 완료 상태 예시 -->
-        <div class="review-card">
-            <div class="review-row">
-
-                <div class="review-left">
-                    <div class="review-img">상품<br>사진</div>
-
-                    <div class="review-info">
-                        <div class="review-date">2025-12-13</div>
-                        <div>상품명 + 수량</div>
-                        <div>별점</div>
-                        <div>아이디</div>
-                        <div>제목</div>
-                        <div>후기 내용</div>
+                        <div class="review-actions">
+                            <span class="done">답변완료</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class="review-actions">
-                    <span class="done">답변완료</span>
-                </div>
-
             </div>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>
