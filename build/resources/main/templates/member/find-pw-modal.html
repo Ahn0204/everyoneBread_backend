@@ -1,0 +1,28 @@
+<!-- 비밀번호 재설정 모달 -->
+<div id="resetPwModal" class="modal-overlay" style="display:none;">
+    <link rel="stylesheet" th:href="@{/css/member/find-pw-modal.css}">
+    <div class="modal-window">
+
+        <div class="modal-title">비밀번호 재설정</div>
+        <div class="close-btn" onclick="$('#resetPwModal').hide()">&times;</div>
+
+        <form id="resetPwForm">
+
+            <div class="form-row">
+                <label class="form-label">새 비밀번호</label>
+                <input type="password" class="input-text" id="newPassword">
+            </div>
+
+            <div class="form-row">
+                <label class="form-label">새 비밀번호 확인</label>
+                <input type="password" class="input-text" id="confirmPassword">
+            </div>
+
+            <div class="confirm-btn-area">
+                <button type="submit" class="btn-confirm">확인</button>
+            </div>
+
+        </form>
+    </div>
+    <script th:src="@{/js/member/find-pw-modal.js}"></script>
+</div>

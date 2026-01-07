@@ -170,10 +170,14 @@ public class MemberController {
     @GetMapping("find/id/result")
     public String findIdResult(HttpSession session, Model model) {
 
-        // 인증 여부 확인
-        if (session.getAttribute("authVerified") == null) {
+        Boolean authVerified = (Boolean) session.getAttribute("authVerified");
+        String purpose = (String) session.getAttribute("FIND_PURPOSE");
+
+        // 인증 여부 + 목적 체크 (보안)
+        if (authVerified == null || !"FIND_ID".equals(purpose)) {
             return "redirect:/member/login";
         }
+
 
         String phone = (String) session.getAttribute("authValue");
 
@@ -189,6 +193,74 @@ public class MemberController {
         session.removeAttribute("FIND_PURPOSE");
 
         return "member/find-id-result";
+    }
+
+    /*
+        비밀번호 찾기 - 휴대폰 인증번호 요청
+    */
+    @PostMapping("find/password/phone/send")
+    @ResponseBody
+    public ResponseEntity<?> findPwPhoneSend(
+            @RequestBody SmsSendRequest request,
+            HttpSession session
+    ) {
+        if (!memberService.existsByNameAndPhone(request.getName(), request.getPhone())) {
+            return ResponseEntity.badRequest().body("일치하는 회원이 없습니다.");
+        }
+
+        smsService.sendAuthCode(request.getPhone(), session);
+
+        // 비밀번호 재설정 목적 저장
+        session.setAttribute("FIND_PURPOSE", "RESET_PW");
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+        비밀번호 재설정 페이지
+        - 인증 + RESET_PW 목적일 때만 접근 가능
+    */
+    @GetMapping("find/password/reset")
+    public String resetPasswordPage(HttpSession session) {
+
+        Boolean authVerified = (Boolean) session.getAttribute("authVerified");
+        String purpose = (String) session.getAttribute("FIND_PURPOSE");
+
+        if (authVerified == null || !"RESET_PW".equals(purpose)) {
+            return "redirect:/member/login";
+        }
+
+        return "member/reset-password";
+    }
+
+    /*
+        비밀번호 재설정 처리
+    */
+    @PostMapping("find/password/reset")
+    @ResponseBody
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String newPassword,
+            HttpSession session
+    ) {
+        Boolean authVerified = (Boolean) session.getAttribute("authVerified");
+        String purpose = (String) session.getAttribute("FIND_PURPOSE");
+
+        // 인증 + 목적 체크
+        if (authVerified == null || !"RESET_PW".equals(purpose)) {
+            return ResponseEntity.status(403).body("인증이 필요합니다.");
+        }
+
+        String phone = (String) session.getAttribute("authValue");
+
+        memberService.resetPasswordByPhone(phone, newPassword);
+
+        // 인증 정보 완전 제거
+        session.removeAttribute("authVerified");
+        session.removeAttribute("authType");
+        session.removeAttribute("authValue");
+        session.removeAttribute("FIND_PURPOSE");
+
+        return ResponseEntity.ok().build();
     }
 
     /**

@@ -5,14 +5,25 @@
       layout:decorate="~{shop/common/shop-layout}">
 
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- SweetAlert 공통 래퍼 -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+
     <link rel="stylesheet" th:href="@{/css/shop/products.css}">
     <title>상품 관리 - 모두의빵 판매자센터</title>
 </head>
 
 <body>
-
-<!-- 공통 레이아웃 content 영역 -->
 <div layout:fragment="content">
 
     <div class="products-container">
@@ -22,95 +33,59 @@
 
         <!-- 상품 등록 -->
         <div class="top-bar">
-            <button class="btn-add-product"
-                    th:onclick="|location.href='@{/shop/products/add}'|">
-                상품 등록
-            </button>
+            <button class="btn-add-product" th:onclick="|location.href='@{/shop/products/add}'|">상품 등록</button>
         </div>
 
         <!-- 상품 목록 -->
-        <div class="product-card" th:each="p : ${productList}">
+        <div class="product-card"
+             th:each="p : ${productList}"
+             th:data-id="${p.productNo}"
+             th:classappend="' status-' + ${p.status.name()}">
+
             <div class="product-row">
 
                 <!-- 상품 정보 -->
                 <div class="product-info">
-                    <div class="product-time"
-                         th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">
-                        등록일
-                    </div>
-
-                    <div class="product-name"
-                         th:text="${p.productName}">
-                        상품명
-                    </div>
-
-                    <div class="product-price">
-                        <span th:text="${p.price}"></span>원
-                    </div>
+                    <div class="product-time" th:text="${#temporals.format(p.createdAt, 'yyyy-MM-dd')}">등록일</div>
+                    <div class="product-name open-product-detail" th:text="${p.productName}" th:data-id="${p.productNo}">상품명</div>
+                    <div class="product-price"><span th:text="${p.price}"></span>원</div>
                 </div>
 
                 <!-- 상태 / 수정 / 삭제 -->
                 <div class="product-actions">
 
-                    <!-- 상태 변경 (Enum name 기준) -->
-                    <select class="status-select"
-                            th:data-id="${p.productNo}">
-
-                        <option value="ON_SALE"
-                                th:selected="${p.status.name() == 'ON_SALE'}">
-                            판매중
-                        </option>
-
-                        <option value="SOLD_OUT"
-                                th:selected="${p.status.name() == 'SOLD_OUT'}">
-                            품절
-                        </option>
-
-                        <option value="DELETED"
-                                th:selected="${p.status.name() == 'DELETED'}">
-                            삭제
-                        </option>
+                    <!-- 상태 변경 -->
+                    <select class="status-select" th:data-id="${p.productNo}">
+                        <option value="ON_SALE" th:selected="${p.status.name() == 'ON_SALE'}">판매중</option>
+                        <option value="SOLD_OUT" th:selected="${p.status.name() == 'SOLD_OUT'}">품절</option>
                     </select>
 
-                    <button class="btn-small"
-                            th:onclick="|location.href='@{/shop/products/edit/{id}(id=${p.productNo})}'|">
-                        수정
-                    </button>
+                    <!-- 수정 버튼 -->
+                    <!-- <button class="btn-small btn-edit-product" th:data-id="${p.productNo}">수정</button> -->
 
-                    <button class="btn-small"
-                            th:onclick="|if(confirm('정말 삭제하시겠습니까?')) location.href='@{/shop/products/delete/{id}(id=${p.productNo})}'|">
-                        삭제
-                    </button>
+                    <!-- 삭제 버튼 -->
+                    <button type="button" class="btn-small btn-delete-product" th:data-id="${p.productNo}">삭제</button>
                 </div>
             </div>
         </div>
 
         <!-- 상품 없을 때 -->
-        <div th:if="${productList.size() == 0}"
-             style="text-align:center; margin-top:40px; color:#777;">
-            아직 등록된 상품이 없습니다.
+        <div id="emptyProductMessage" th:if="${productList.size() == 0}" style="text-align:center; margin-top:40px; color:#777;">
+            등록된 상품이 없습니다.
         </div>
 
-        <!-- 페이징 (1~10 묶음) -->
+        <!-- 페이징 -->
         <div class="pagination">
-            <a th:if="${startPage > 0}"
-               th:href="@{/shop/products(page=${startPage - 1})}">
-                ◀
-            </a>
-
+            <a th:if="${startPage > 0}" th:href="@{/shop/products(page=${startPage - 1})}">◀</a>
             <span th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                <a th:href="@{/shop/products(page=${i})}"
-                   th:text="${i + 1}"
-                   th:classappend="${i == currentPage} ? 'current' : ''">
-                </a>
+                <a th:href="@{/shop/products(page=${i})}" th:text="${i + 1}" th:classappend="${i == currentPage} ? 'current' : ''"> </a>
             </span>
-
-            <a th:if="${endPage + 1 < productPage.totalPages}"
-               th:href="@{/shop/products(page=${endPage + 1})}">
-                ▶
-            </a>
+            <a th:if="${endPage + 1 < productPage.totalPages}" th:href="@{/shop/products(page=${endPage + 1})}">▶</a>
         </div>
     </div>
+
+    <th:block th:replace="shop/product-detail-modal :: productDetailModal"></th:block>
+    <script th:src="@{/js/shop/products.js}"></script>
 </div>
 </body>
 </html>

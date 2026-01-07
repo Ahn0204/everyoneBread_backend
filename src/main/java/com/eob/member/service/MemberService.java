@@ -70,6 +70,7 @@ public class MemberService {
     /*
         아이디 찾기
         - 휴대폰 번호 기준으로 회원 아이디 조회
+        - 컨트롤러에서 목적(FIND_ID) 검증 후 호출됨
     */
     public String findMemberIdByPhone(String phone) {
 
@@ -84,9 +85,23 @@ public class MemberService {
 
     /*
         아이디 찾기용 회원 존재 여부 체크
+        - 이름 + 휴대폰 기준 회원 존재 여부 체크
     */
     public boolean existsByNameAndPhone(String name, String phone) {
         return memberRepository.existsByMemberPhoneAndMemberName(phone, name);
+    }
+
+    /*
+        비밀번호 재설정
+        - 인증 + RESET_PW 목적 검증은 Controller에서 수행
+        - 실제 비밀번호 변경만 담당
+    */
+   @Transactional // 비밀번호 변경은 트랜잭션 보장 (중요)
+    public void resetPasswordByPhone(String phone, String rawPassword) {
+        MemberEntity member = memberRepository.findByMemberPhone(phone)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
+
+        member.changePassword(passwordEncoder.encode(rawPassword));
     }
 
     /*

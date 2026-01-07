@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/mypage/shop-mypage-layout}">
+
+<head>
+    <title>개인정보</title>
+
+    <style>
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab-buttons button {
+            padding: 8px 14px;
+            border: 1px solid #000;
+            background: #fff;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-row label {
+            width: 120px;
+            font-weight: 600;
+        }
+
+        .info-row input {
+            width: 300px;
+            padding: 6px;
+            border: 1px solid #000;
+            border-radius: 4px;
+        }
+
+        .confirm-btn {
+            margin-top: 30px;
+            padding: 10px 30px;
+            border: 2px solid #000;
+            background: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .withdraw {
+            position: absolute;
+            right: 40px;
+            bottom: 40px;
+            border: 1px solid #000;
+            padding: 8px 12px;
+            background: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+<section layout:fragment="content">
+
+    <div class="page-title">개인정보</div>
+
+    <!-- 탭 -->
+    <div class="tab-buttons">
+        <button>정보 변경</button>
+        <button>비밀번호 변경</button>
+    </div>
+
+    <!-- 정보 변경 -->
+    <div>
+        <div class="info-row">
+            <label>아이디</label>
+            <input type="text" value="회원 아이디 띄워줌" readonly>
+        </div>
+
+        <div class="info-row">
+            <label>이름</label>
+            <input type="text" value="회원 이름 띄워줌">
+            <button>변경</button>
+        </div>
+
+        <div class="info-row">
+            <label>휴대폰 번호</label>
+            <input type="text" value="회원 휴대폰 번호 띄워줌">
+            <button>변경</button>
+        </div>
+
+        <div class="info-row">
+            <label>이메일</label>
+            <input type="text" value="회원 이메일 띄워줌">
+            <button>변경</button>
+        </div>
+
+        <div class="info-row">
+            <label>생일</label>
+            <input type="text" value="회원 생일 띄워줌" readonly>
+        </div>
+    </div>
+
+    <button class="confirm-btn">확인</button>
+
+    <button class="withdraw">회원탈퇴</button>
+
+</section>
+</body>
+</html>
