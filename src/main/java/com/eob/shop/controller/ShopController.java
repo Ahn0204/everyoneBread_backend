@@ -1,6 +1,5 @@
 package com.eob.shop.controller;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eob.admin.model.service.AdminService;
 import com.eob.common.security.CustomSecurityDetail;
 import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.data.MemberApprovalStatus;
@@ -46,8 +46,10 @@ public class ShopController {
     private final ShopService shopService;
     private final ProductService productService;
     private final SmsService smsService;
+    private final AdminService adminService;
     // location저장용 - Point객체 생성 객체
-    // private final static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+    // private final static GeometryFactory geometryFactory = new
+    // GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * 판매자 로그인 페이지
@@ -70,7 +72,7 @@ public class ShopController {
     @GetMapping("register/start")
     public String registerStartForm(HttpSession session, Model model) {
         // 이미 start를 완료한 상태면 step으로 이동
-        if(session.getAttribute("tempShopMember") != null){
+        if (session.getAttribute("tempShopMember") != null) {
             return "redirect:/shop/register/step";
         }
 
@@ -88,10 +90,11 @@ public class ShopController {
      * - DB 저장은 하지 않고 세션에 임시 저장
      */
     @PostMapping("register/start")
-    public String registerStart(@Valid @ModelAttribute("registerRequest") RegisterRequest dto, BindingResult bindingResult, HttpSession session) {
+    public String registerStart(@Valid @ModelAttribute("registerRequest") RegisterRequest dto,
+            BindingResult bindingResult, HttpSession session) {
 
         // 이미 세션에 tempShopMember 있으면 중복 접근 차단
-        if(session.getAttribute("tempShopMember") != null){
+        if (session.getAttribute("tempShopMember") != null) {
             return "redirect:/shop/register/step";
         }
 
@@ -101,13 +104,13 @@ public class ShopController {
         }
 
         // 휴대폰 번호 서버 검증
-        if(dto.getMemberPhone() == null || !dto.getMemberPhone().matches("^010\\d{8}$")){
+        if (dto.getMemberPhone() == null || !dto.getMemberPhone().matches("^010\\d{8}$")) {
             bindingResult.rejectValue("memberPhone", "invalid", "올바른 휴대폰 번호가 아닙니다.");
             return "shop/shop-register-start";
         }
 
         // SMS 휴대폰 인증 서버 검증
-        if(!smsService.isVerified(session)){
+        if (!smsService.isVerified(session)) {
             bindingResult.reject("phoneAuth", "휴대폰 인증을 완료해주세요.");
             return "shop/shop-register-start";
         }
@@ -115,20 +118,18 @@ public class ShopController {
         // memberId 최종 중복 검증
         if (!memberService.isMemberIdAvailable(dto.getMemberId())) {
             bindingResult.rejectValue(
-                "memberId",
-                "duplicate",
-                "이미 사용 중인 아이디입니다."
-            );
+                    "memberId",
+                    "duplicate",
+                    "이미 사용 중인 아이디입니다.");
             return "shop/shop-register-start";
         }
 
         // email 최종 중복 검증
         if (!memberService.isMemberEmailAvailable(dto.getMemberEmail())) {
             bindingResult.rejectValue(
-                "memberEmail",
-                "duplicate",
-                "이미 사용 중인 이메일입니다."
-            );
+                    "memberEmail",
+                    "duplicate",
+                    "이미 사용 중인 이메일입니다.");
             return "shop/shop-register-start";
         }
 
@@ -158,7 +159,7 @@ public class ShopController {
             return "redirect:/shop/register/start";
         }
 
-        if(session.getAttribute("shopRegisterCompleted") != null){
+        if (session.getAttribute("shopRegisterCompleted") != null) {
             return "redirect:/shop/login";
         }
 
@@ -180,15 +181,16 @@ public class ShopController {
     @Transactional
     @PostMapping("register/step")
     @ResponseBody
-    public ResponseEntity<?> registerStep(ShopEntity shop, BindingResult bindingResult, HttpSession session, @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
-        // @RequestParam(name = "longitude") String longitude, @RequestParam(name = "latitude") String latitude
+    public ResponseEntity<?> registerStep(ShopEntity shop, BindingResult bindingResult, HttpSession session,
+            @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
+        // @RequestParam(name = "longitude") String longitude, @RequestParam(name =
+        // "latitude") String latitude
 
         // 상점 정보 유효성 검증
         // if(bindingResult.hasErrors()){
-        //     return ResponseEntity.badRequest()
-        //         .body(Map.of("result","FAIL", "message", "INVALID_SHOP_DATA"));
+        // return ResponseEntity.badRequest()
+        // .body(Map.of("result","FAIL", "message", "INVALID_SHOP_DATA"));
         // }
-        
 
         if (shop.getShopName() == null || shop.getShopName().isBlank()) {
             return ResponseEntity.badRequest()
@@ -228,9 +230,8 @@ public class ShopController {
 
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors()
-                .forEach(e -> System.out.println(e.toString()));
+                    .forEach(e -> System.out.println(e.toString()));
         }
-
 
         // 회원 저장 (MemberEntity 생성)
         MemberEntity member = memberService.createShopMember(temp);
@@ -239,7 +240,7 @@ public class ShopController {
         member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
 
         System.out.println("저장된 MemberNo =" + member.getMemberNo());
-        
+
         // ShopEntity 값 설정
         shop.setMember(member); // FK 연결
         shop.setSellerName(member.getMemberName()); // 대표자명
@@ -275,8 +276,7 @@ public class ShopController {
         session.removeAttribute("tempShopMember");
 
         return ResponseEntity.ok(
-                Map.of("result", "OK")
-        );
+                Map.of("result", "OK"));
     }
 
     /**
@@ -331,4 +331,20 @@ public class ShopController {
 
         return "shop/shop-main";
     }
+
+    /**
+     * 판매자 - 주문화면에서 관리자에 문의
+     * (예솔 추가)
+     */
+    @PostMapping("insertBanInquiry")
+    @ResponseBody
+    public boolean insertBanInquiry(@RequestParam(name = "memberNo") long memberNo,
+            @RequestParam(name = "orderNo") long orderNo,
+            @RequestParam(name = "question") String question) {
+        boolean result = false;
+        result = adminService.insertBanInquiry(memberNo, orderNo, question);
+
+        return result;
+    }
+
 }

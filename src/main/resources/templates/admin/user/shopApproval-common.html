@@ -20,18 +20,24 @@
         <table class="mb-3">
             <tr>
                 <th width="120px" class="text-center p-2">이름</th>
-                <td width="180px" class="p-2" th:text="${shop.member.memberName}"></td>
+                <td width="180px" class="p-2" th:text="${shop.sellerName}"></td>
                 <th width="120px" class="text-center p-2">연락처</th>
                 <td width="180px" class="p-2" th:text="${shop.member.memberPhone}"></td>
                 <th width="120px" class="text-center p-2">메일</th>
                 <td width="180px" class="p-2" th:text="${shop.member.memberEmail}"></td>
             </tr>
             <tr>
+                <th width="120px" class="text-center p-2">상점명</th>
+                <td width="180px" class="p-2" th:text="${shop.shopName}"></td>
+                <th width="120px" class="text-center p-2">주소</th>
+                <td width="180px" class="p-2" th:text="${shop.shopAddress}" colspan="3"></td>
+            </tr>
+            <tr>
                 <th class="text-center p-2">사업자 번호</th>
                 <td colspan="3">
-                    <!-- <span class="p-2" th:text="${shop.shopLicense}"></span> -->
-                    <button type="button" class="check-license btn btn-secondary">면허 인증</button>
-                    <!-- <button type="button" class="show-license btn btn-secondary" th:data-file="${shop.licenseFile}" th:data-license="${shop.shopLicense}" th:data-date="${shop.licenseCreatedAt}">사진 보기</button> -->
+                    <span class="p-2" th:text="${shop.bizNo}"></span>
+                    <button type="button" class="check-license btn btn-secondary">사업자 번호 인증</button>
+                    <button type="button" class="show-license btn btn-secondary" th:data-file="${shop.bizImg}">사진 보기</button>
                 </td>
                 <th class="text-center p-2">
                     사업자 등록증
@@ -39,6 +45,14 @@
                     발급일자
                 </th>
                 <!-- <td class="p-2" th:text="${shop.licenseCreatedAt}"></td> -->
+            </tr>
+            <tr>
+                <th width="120px" class="text-center p-2">예금주명</th>
+                <td width="180px" class="p-2" th:text="${shop.accountName}"></td>
+                <th width="120px" class="text-center p-2">은행명</th>
+                <td width="180px" class="p-2" th:text="${shop.bankName}"></td>
+                <th width="120px" class="text-center p-2">계좌</th>
+                <td width="180px" class="p-2" th:text="${shop.accountNo}"></td>
             </tr>
             <!--보완요청인 내역만 출력-->
             <tr th:if="${shop.status.description == '입점 반려'}">
@@ -57,7 +71,7 @@
                 <select name="reject-reason" class="reject-reason">
                     <option value="" selected hidden>보완 사유</option>
                     <option value="photo">사진 식별 불가</option>
-                    <option value="license">면허 번호 인증불가</option>
+                    <option value="license">사업자 번호 인증불가</option>
                     <option value="info">올바르지 못한 정보</option>
                 </select>
                 <button type="button" class="btn btn-secondary revision">보완</button>

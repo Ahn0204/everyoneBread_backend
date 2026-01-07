@@ -1,4 +1,3 @@
-
 <!--
 ******************************************
 *  File : shop-layout.html
@@ -7,29 +6,27 @@
 -->
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="UTF-8" />
+    <head>
+        <meta charset="UTF-8" />
 
-    <!-- jQuery / SweetAlert -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- jQuery / SweetAlert -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- 판매자 공통 CSS (파일 만들면 활성화) -->
-    <!-- <link rel="stylesheet" th:href="@{/css/shop/shop-common.css}"> -->
+        <!-- 판매자 공통 CSS (파일 만들면 활성화) -->
+        <!-- <link rel="stylesheet" th:href="@{/css/shop/shop-common.css}"> -->
 
-    <title>모두의 빵 - 판매자</title>
-</head>
+        <title>모두의 빵 - 판매자</title>
+    </head>
 
-<body>
+    <body>
+        <!-- 판매자 공통 헤더 -->
+        <div th:insert="shop/common/shop-header :: shop-header"></div>
 
-    <!-- 판매자 공통 헤더 -->
-    <div th:insert="shop/common/shop-header :: shop-header"></div>
+        <!-- 개별 페이지에서 채우는 영역 -->
+        <div layout:fragment="content"></div>
 
-    <!-- 개별 페이지에서 채우는 영역 -->
-    <div layout:fragment="content"></div>
-
-    <!-- 판매자 공통 푸터 -->
-    <div th:insert="shop/common/shop-footer :: shop-footer"></div>
-
-</body>
+        <!-- 판매자 공통 푸터 -->
+        <div th:insert="shop/common/shop-footer :: shop-footer"></div>
+    </body>
 </html>

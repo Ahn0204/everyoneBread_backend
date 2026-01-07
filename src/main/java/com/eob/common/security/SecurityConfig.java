@@ -240,7 +240,8 @@ public class SecurityConfig {
                                                                 "/shop/check-name",
                                                                 "/shop/orders/dashboard", // 주문 대시보드 AJAX
                                                                 "/css/**", "/js/**", "/image/**", "/fonts/**",
-                                                                "/lib/**")
+                                                                "/lib/**",
+                                                                "/shop/insertBanInquiry")
                                                 .permitAll()
 
                                                 /*
@@ -270,7 +271,7 @@ public class SecurityConfig {
                                                 .deleteCookies("JSESSIONID"))
 
                                 /* CSRF 활성화 */
-                                .csrf(csrf -> csrf .csrfTokenRepository(new HttpSessionCsrfTokenRepository()) );
+                                .csrf(csrf -> csrf.csrfTokenRepository(new HttpSessionCsrfTokenRepository()));
 
                 return http.build();
         }
@@ -287,7 +288,8 @@ public class SecurityConfig {
                                                 // 관리자 로그인 페이지의 모든 사용자 접근 허용
                                                 .requestMatchers("/admin/login", "/admin/logout", "/css/**", "/js/**",
                                                                 "/image/**",
-                                                                "/fonts/**", "/lib/**")
+                                                                "/fonts/**", "/lib/**", "/admin/register",
+                                                                "/admin/user/insertAdmin")
                                                 .permitAll()
                                                 // .anyRequest().permitAll())
                                                 // 이외 모든 경로 관리자만 접근 허용

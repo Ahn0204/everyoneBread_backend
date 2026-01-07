@@ -1,36 +1,37 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>입점신청</title>
-    <!-- JQuery CDN -->
-    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
-    <!-- SweetAlert2 CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
-    <!-- 공통 폰트 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
-    <!-- Daum 주소 API -->
-    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-    <!-- CSRF 토큰 -->
-    <meta name="_csrf" th:content="${_csrf.token}" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
-    <link rel="stylesheet" th:href="@{/css/shop/register-step.css}">
-</head>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>입점신청</title>
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+        <!-- 공통 폰트 -->
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet" />
+        <!-- Daum 주소 API -->
+        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <!-- 카카오맵 API-->
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4fd57268b42b0698df77c27d1c4e78c&libraries=services"></script>
+        <!-- CSRF 토큰 -->
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <link rel="stylesheet" th:href="@{/css/shop/register-step.css}" />
+    </head>
 
-<div class="signup-container">
-    <div class="signup-header">
-        <h1>입점신청</h1>
-        <hr>
-    </div>
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1>입점신청</h1>
+            <hr />
+        </div>
         <form method="post" action="/shop/register/step" enctype="multipart/form-data">
-
             <!-- 상점명 -->
             <div class="form-row">
                 <label class="form-label">상점명</label>
                 <div class="input-with-btn">
-                    <input type="text" name="shopName" class="input-text" required>
+                    <input type="text" name="shopName" class="input-text" required />
                     <button type="button" class="btn-small" id="shopNameChkBtn">중복확인</button>
                 </div>
             </div>
@@ -39,7 +40,9 @@
             <div class="form-row">
                 <label class="form-label">사업장 주소</label>
                 <div class="input-with-btn">
-                    <input type="text" name="shopAddress" id="shopAddress" class="input-text" placeholder="주소 검색" required readonly>
+                    <input type="text" name="shopAddress" id="shopAddress" class="input-text" placeholder="주소 검색" required readonly />
+                    <input type="hidden" name="longitude" id="longitude" />
+                    <input type="hidden" name="latitude" id="latitude" />
                     <button type="button" class="btn-small" onclick="execDaumPostcode()">검색</button>
                 </div>
             </div>
@@ -48,9 +51,9 @@
             <div class="form-row">
                 <label class="form-label">사업자 등록번호</label>
                 <div class="input-with-btn">
-                    <input type="text" name="bizNo" class="input-text" required>
+                    <input type="text" name="bizNo" class="input-text" required />
                     <!-- 숨겨진 파일 업로드 input -->
-                    <input type="file" id="bizFile" name="bizFile" accept="image/*" style="display:none;">
+                    <input type="file" id="bizFile" name="bizFile" accept="image/*" style="display: none" />
 
                     <!-- <button type="button" class="btn-small" id="bizFileBtn">사진첨부</button> -->
                 </div>
@@ -65,6 +68,8 @@
             </div>
         </form>
     </div>
+
+    <script th:src="@{/js/comm/getLngLat.js}"></script>
     <script th:src="@{/js/shop/register-step.js}"></script>
-</body>
+    <!-- </body> -->
 </html>

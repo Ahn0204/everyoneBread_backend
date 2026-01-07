@@ -1,4 +1,4 @@
-<div class="cartListBox border d-flex flex-column p-2" style="width: 30vw">
+<div class="cartListBox border d-flex flex-column p-2" style="min-width: 200px; width: 30vw">
     <form th:action="@{/order/orderForm}" method="POST" name="cartForm">
         <div class="shopNameBox d-flex justify-content-between border-bottom border-3 pt-1 ps-2 pe-2">
             <h4>주문표</h4>
@@ -18,6 +18,7 @@
                 <div>
                     <span class="deliveryFee" th:text="${deliveryFee}"></span>
                     <span>원</span>
+                    <input type="hidden" name="deliveryFee" class="deliveryFee" />
                 </div>
             </div>
             <div class="d-flex justify-content-between mt-2">
@@ -69,7 +70,8 @@
                 '주문 페이지로 이동합니다.',
                 () => {
                     const form = $('form[name = "cartForm"]');
-                    form.append($('<input>').attr('type', 'hidden').attr('name', 'deliveryFee').val(deliveryFee));
+                    $('.deliveryFee').val(deliveryFee);
+                    // form.append($('<input>').attr('type', 'hidden').attr('name', 'deliveryFee').val(deliveryFee));
                     form.submit();
                 },
                 () => {}

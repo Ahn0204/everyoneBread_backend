@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -153,7 +154,11 @@ public class mainController {
 
         // shopNo에 해당하는 productList 조회
         List<ProductEntity> productList = productService.getProductList(shopNo);
-        model.addAttribute("productList", productList);
+        // 카테고리와 리스트 Map타입으로 묶기
+        Map<String, List<ProductEntity>> productMap = productList.stream()
+                .collect(Collectors.groupingBy(ProductEntity::getCatName));
+
+        model.addAttribute("productList", productMap);
         return "main/productList";
     }
 

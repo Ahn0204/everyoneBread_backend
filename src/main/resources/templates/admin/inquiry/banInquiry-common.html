@@ -1,0 +1,76 @@
+<!--아코디언 헤더 : collapse기능용 버튼 > 항목 제목-->
+<div class="accordion-header" th:id="heading-+${i.banInquiryNo}">
+    <!--collapse용 버튼 : -->
+    <button class="d-flex flex-row border-bottom text-center accordion-button collapsed" type="button" data-bs-toggle="collapse" th:data-bs-target="'#body-'+${i.banInquiryNo}" aria-expanded="false" th:aria-controls="'body-'+${i.banInquiryNo}">
+        <!--항목 제목-->
+        <div class="div-col-1" th:text="${start - loop.index}"></div>
+        <div class="div-col-2" th:text="${i.role.description}+' | '+${i.member.memberId}"></div>
+        <div class="div-col-2" th:text="${#strings.abbreviate(i.question, 10)}"></div>
+        <div class="div-col-3" th:if="${i.status=='n'}" th:text="미답변"></div>
+        <div class="div-col-3" th:if="${i.status=='y'}" th:text="답변완료"></div>
+        <div class="div-col-4" th:text="${#temporals.format(i.createdAt, 'YY-MM-dd HH:mm')}"></div>
+        <div class="div-col-4" th:text="${#temporals.format(i.answeredAt, 'YY-MM-dd HH:mm')}"></div>
+    </button>
+</div>
+<!--바디 : collapse기능용 div > 실제 내용이 담긴 아코디언 바디-->
+<!--collapse기능용 div : -->
+<div th:id="body-+${i.banInquiryNo}" class="accordion-collapse collapse" th:aria-labelledby="'heading-'+${i.banInquiryNo}" data-bs-parent="#inquiry-List">
+    <!--아코디언 바디-->
+    <div class="accordion-body">
+        <div class="inquiry-question border">
+            <div class="d-flex flex-row border-bottom">
+                <div class="text-center p-2">작성자</div>
+                <div class="p-2" th:text="${i.role.description}+' | '+${i.member.memberId}"></div>
+            </div>
+            <div class="inquiry-object m-1 p-2 bg-body-secondary">
+                <h5>참조 대상</h5>
+                <div class="border rounded p-2 object-box">
+                    <div class="border-bottom d-flex flex-row">
+                        <div class="p-1 pe-2 me-2 gap-1 d-flex flex-row" th:if="${i.role.description=='일반 회원'}">
+                            <div><b>상점명</b></div>
+                            <div th:text="${i.order.shop.shopName}"></div>
+                        </div>
+                        <div class="p-1 mb-2 gap-1 d-flex flex-row" th:if="${i.role.description=='상점'}">
+                            <div><b>주문자명</b></div>
+                            <div th:text="${i.order.member.memberName}"></div>
+                        </div>
+                    </div>
+                    <div class="border-bottom p-1 mb-2">
+                        <div><b>상품 내역</b></div>
+                        <div th:each=" o : ${i.order.orderDetail}">
+                            <div class="p-1" th:text="${o.productNo.productName}+' | '+${o.quantity}+'개 &times;'+${o.price}+'원'"></div>
+                        </div>
+                        <div class="p-1 gap-1 d-flex flex-row">
+                            <div><b>배송비</b></div>
+                            <div th:text="${i.order.deliveryFee}"></div>
+                        </div>
+                    </div>
+                    <div class="p-1 gap-1 d-flex flex-row">
+                        <b>총 결제 금액</b>
+                        <b th:text="${i.order.orderPrice}"></b>
+                    </div>
+                </div>
+            </div>
+            <div class="border-bottom">
+                <h5 class="p-2">내용</h5>
+                <div class="p-2" th:text="${i.question}"></div>
+            </div>
+        </div>
+
+        <div class="inquiry-answer mt-3">
+            <h5>답변</h5>
+            <!--미답변인 내역만 출력-->
+            <form th:if="${i.status == 'n'}">
+                <div class="d-flex flex-row">
+                    <textarea name="answer" class="border p-2 me-2 rounded" id="answer" style="width: 80vw; min-width: 50vw; resize: none" placeholder="4000자 이내 작성 가능합니다."></textarea>
+                    <button type="button" class="btn btn-secondary updateAnswer" style="width: 15vw; min-width: 100px" th:data-baninquiryno="${i.banInquiryNo}">답변 완료</button>
+                </div>
+            </form>
+            <!--답변 완료인 내역만 출력-->
+            <div class="border rounded p-2" th:if="${i.status == 'y'}">
+                <div th:text="${#temporals.format(i.answeredAt, 'YY-MM-dd HH:mm')}"></div>
+                <div th:text="${i.answer}"></div>
+            </div>
+        </div>
+    </div>
+</div>

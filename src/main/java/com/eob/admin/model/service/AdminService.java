@@ -54,6 +54,7 @@ public class AdminService {
     private final InquiryRepository inquiryRepository;
     private final BanInquiryRepository baninquiryRepository;
     private final OrderHistoryRepository orderHistoryRepository;
+    private final BanInquiryRepository banInquiryRepository;
 
     public boolean insertAdmin(InsertAdminForm form) {
 
@@ -350,6 +351,26 @@ public class AdminService {
             // i.setBanMember(order.get); 제재 대상.. 특정하기 번거로워서 주석해놓은거 아님ㅎ
             i.setCreatedAt(LocalDateTime.now()); // 문의 작성일시
             baninquiryRepository.save(i);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 주문 답변 작성 처리
+     */
+    public boolean UpdateBanInquiryAnswer(long banInquiryNo, String answer) {
+        try {
+            // 문의 조회
+            Optional<BanInquiryEntity> _i = banInquiryRepository.findById(banInquiryNo);
+            BanInquiryEntity i = _i.get();
+            // 답변 update
+            i.setAnswer(answer); // 답변
+            i.setAnsweredAt(LocalDateTime.now()); // 답변 작성일시
+            i.setStatus("y");
+            banInquiryRepository.save(i);
 
             return true;
         } catch (Exception e) {

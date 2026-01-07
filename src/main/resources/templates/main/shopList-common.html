@@ -12,8 +12,8 @@
                     <!-- d-flex flex-row -->
                     <!--상점 이미지-->
                     <div class="col-4 border rounded">
-                        <img th:if="${shop.shopImg}" th:src="|@{upload/shop/shopImg/${shop.shopImg}}|" class="shopImg img-fluid rounded-start h-100" alt="상점 이미지" />
-                        <img th:unless="${shop.shopImg}" th:src="@{image/common/everyoneBread_default_Img.png}" class="shopImg img-fluid rounded h-100" alt="이미지 없음" />
+                        <img th:if="${shop.shopImg}" th:src="|@{/upload/shop/shopImg/${shop.shopImg}}|" class="shopImg img-fluid rounded-start h-100" alt="상점 이미지" />
+                        <img th:unless="${shop.shopImg}" th:src="@{/image/common/everyoneBread_default_Img.png}" class="shopImg img-fluid rounded h-100" alt="이미지 없음" />
                     </div>
                     <div class="shopInfo-box col-8">
                         <div class="card-body py-2">

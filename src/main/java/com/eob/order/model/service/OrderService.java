@@ -167,7 +167,8 @@ public class OrderService {
         }
 
         // 영업 가능 여부 체크 (휴무 / 영업 종료 시 예외 발생)
-        shopService.validateShopOrderable(shop);
+        // 영업일 입력 가능해지면 주석해제
+        // shopService.validateShopOrderable(shop);
 
         // orderForm에서 값 꺼내 order에 set
         order.setMember(member); // 구매자 정보
