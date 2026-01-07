@@ -5,48 +5,17 @@
       layout:decorate="~{shop/mypage/shop-mypage-layout}">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert 공통 래퍼 -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <!-- 폐점신청 CSS -->
+    <link rel="stylesheet" th:href="@{/css/shop/mypage/apply.css}">
     <title>폐점신청</title>
-
-    <style>
-        .page-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 30px;
-        }
-
-        .form-row {
-            margin-bottom: 20px;
-        }
-
-        .form-row label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .form-row select,
-        .form-row textarea {
-            width: 400px;
-            padding: 8px;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
-
-        textarea {
-            height: 200px;
-            resize: none;
-        }
-
-        .confirm-btn {
-            margin-top: 30px;
-            padding: 10px 40px;
-            border: 2px solid #000;
-            background: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-    </style>
 </head>
 
 <body>

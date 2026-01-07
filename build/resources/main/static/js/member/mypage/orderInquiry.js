@@ -7,7 +7,6 @@
 $(document).on('click', '.orderInquiry', function () {
     //btn의 data-orderno 가져오기
     const orderNo = $(this).data('orderno');
-    $('#modal-writeForm').data('orderno', orderNo); //모달에 data로 저장
 
     //모달에 data 가져오기
     $.ajax({
@@ -18,6 +17,8 @@ $(document).on('click', '.orderInquiry', function () {
             //order객체를 받은 order-inquiry.html이 리턴됨
             //modal 출력부를 ajax응답으로 replace
             $('#modal-order-inquiry').html(order);
+            //불러온 모달에 orderno 저장
+            $('#modal-writeForm').data('orderno', orderNo);
             //배경, 모달 보이기
             $('#dimmed, #modal-writeForm').show();
         },
@@ -34,6 +35,7 @@ $(document).on('click', '.insertInquiry', function () {
     const memberNo = $(this).data('memberno');
     const question = $('#question').val();
     const orderNo = $('#modal-writeForm').data('orderno');
+    console.log(orderNo);
     showConfirmAlert(
         '관리자에게 문의가 작성됩니다.',
         //예

@@ -5,58 +5,16 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert 공통 래퍼 -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/shop/mypage/layout.css}">
     <title>모두의빵 판매자 마이페이지</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-
-        .mypage-wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== 왼쪽 사이드바 ===== */
-        .mypage-sidebar {
-            width: 220px;
-            border-right: 2px solid #000;
-            padding: 20px;
-        }
-
-        .sidebar-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .sidebar-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .sidebar-menu a {
-            text-decoration: none;
-            color: #000;
-            font-weight: 600;
-            padding: 8px;
-            border-radius: 6px;
-        }
-
-        .sidebar-menu a:hover,
-        .sidebar-menu a.active {
-            background: #79C3FF;
-            color: #fff;
-        }
-
-        /* ===== 오른쪽 콘텐츠 ===== */
-        .mypage-content {
-            flex: 1;
-            padding: 40px;
-        }
-    </style>
 </head>
 
 <body>
@@ -67,22 +25,10 @@
         <div class="sidebar-title">정보 관리</div>
 
         <nav class="sidebar-menu">
-            <a th:href="@{/shop/mypage}" 
-               th:classappend="${menu == 'manage'} ? 'active'">
-                상점관리
-            </a>
-            <a th:href="@{/shop/mypage/info}"
-               th:classappend="${menu == 'info'} ? 'active'">
-                개인정보
-            </a>
-            <a th:href="@{/shop/mypage/image}"
-               th:classappend="${menu == 'image'} ? 'active'">
-                상점 이미지
-            </a>
-            <a th:href="@{/shop/mypage/apply}"
-               th:classappend="${menu == 'apply'} ? 'active'">
-                폐점신청
-            </a>
+            <a th:href="@{/shop/mypage}" th:classappend="${menu == 'manage'} ? 'active'">상점관리</a>
+            <a th:href="@{/shop/mypage/settlement}" th:classappend="${menu == 'settlement'} ? 'active'">정산관리</a>
+            <a th:href="@{/shop/mypage/info}" th:classappend="${menu == 'info'} ? 'active'">개인정보</a>
+            <a th:href="@{/shop/mypage/apply}" th:classappend="${menu == 'apply'} ? 'active'">폐점신청</a>
         </nav>
     </aside>
 

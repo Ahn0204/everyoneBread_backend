@@ -5,69 +5,19 @@
       layout:decorate="~{shop/mypage/shop-mypage-layout}">
 
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- SweetAlert 공통 래퍼 -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <!-- Kakao Postcode API -->
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <!-- 개인정보 CSS -->
+    <link rel="stylesheet" th:href="@{/css/shop/mypage/info.css}">
     <title>개인정보</title>
-
-    <style>
-        .page-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .tab-buttons button {
-            padding: 8px 14px;
-            border: 1px solid #000;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .info-row label {
-            width: 120px;
-            font-weight: 600;
-        }
-
-        .info-row input {
-            width: 300px;
-            padding: 6px;
-            border: 1px solid #000;
-            border-radius: 4px;
-        }
-
-        .confirm-btn {
-            margin-top: 30px;
-            padding: 10px 30px;
-            border: 2px solid #000;
-            background: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-
-        .withdraw {
-            position: absolute;
-            right: 40px;
-            bottom: 40px;
-            border: 1px solid #000;
-            padding: 8px 12px;
-            background: #fff;
-            cursor: pointer;
-        }
-    </style>
 </head>
 
 <body>
