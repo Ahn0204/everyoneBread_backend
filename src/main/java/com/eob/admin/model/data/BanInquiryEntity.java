@@ -25,7 +25,7 @@ import lombok.Data;
 @Data
 public class BanInquiryEntity {
     /**
-     * 일반 문의 고유번호
+     * 신고 문의 고유번호
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ban_inquiry_seq")
@@ -43,7 +43,7 @@ public class BanInquiryEntity {
     @Column(nullable = false)
     private String question; // 문의 내용
 
-    @Column(name="FILE_PATH" ,nullable = true)
+    @Column(name = "FILE_PATH", nullable = true)
     private String filePath; // 파일명
 
     // @ManyToOne
