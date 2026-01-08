@@ -2,7 +2,7 @@
 <!-- 사용할 곳에서 th:replace= "~{페이지위치+페이지명 :: th:fragment명}" -->
 <!-- <th:block th:replace="~{rider/orderFragment(페이지위치+페이지명) :: orderList(th:fragment명)}"></th:block> -->
 <th:block id="orderList" th:fragment="orderList">
-    <th:block th:if="${#lists.isEmpty(list)}">
+    <th:block th:if="${list == null or #lists.isEmpty(list)}">
         <div class="end-text">불러올 게시글이 없습니다.</div>
     </th:block>
     <!-- 리스트가 비어있지 않을때-->
@@ -13,23 +13,24 @@
             <div class="order-header">
                 <span class="order-no" th:text="'#'+${item.orderNo}">#100</span>
                 <!-- 해당 주문의 상태에 따라 출력값과 주문에 해당하는 시간의 띄워주기 위함.-->
-                <th:block th:switch="${item.status}">
-                    <th:block th:case="2">
+                <!-- 해당 status는 ENUM이므로 name 으로 값 비교 -->
+                <th:block th:switch="${item.status.name}">
+                    <th:block th:case="'REQUEST'">
                         <span class="order-time" th:text="${#temporals.format(item.orderTime.requestedAt,'yyyy-MM-dd hh:mm:ss')}">2025-08-18 12:12:11</span>
                         <span class="order-status 대기">대기</span>
                     </th:block>
 
-                    <th:block th:case="3">
+                    <th:block th:case="'ASSIGN'">
                         <span class="order-time" th:text="${#temporals.format(item.orderTime.assignedAt,'yyyy-MM-dd hh:mm:ss')}">2025-08-18 12:12:11</span>
                         <span class="order-status 수락">수락</span>
                     </th:block>
 
-                    <th:block th:case="4">
+                    <th:block th:case="'PICKUP'">
                         <span class="order-time" th:text="${#temporals.format(item.orderTime.pickupAt,'yyyy-MM-dd hh:mm:ss')}">2025-08-18 12:12:11</span>
                         <span class="order-status 배송중">배송중</span>
                     </th:block>
 
-                    <th:block th:case="5">
+                    <th:block th:case="'COMPLETE'">
                         <span class="order-time" th:text="${#temporals.format(item.orderTime.completedAt,'yyyy-MM-dd hh:mm:ss')}">2025-08-18 12:12:11</span>
                         <span class="order-status 배송완료">배송완료</span>
                     </th:block>
@@ -65,14 +66,14 @@
                         <div class="orderAddress" th:text="${item.orderAddress}">서울특별시 관악구 남부순환로 1820 6층 글로벌아이티 6B</div>
                     </th:block>
                 </div>
-                <th:block th:if="${item.status == 2}">
+                <th:block th:if="${item.status.name == 'REQUEST'}">
                     <button class="accept-btn">접수 →</button>
                 </th:block>
-                <th:block th:if="${item.status == 3 && item.rider.memberNo == #authentication.principal.member.memberNo}">
+                <th:block th:if="${item.status.name == 'ASSIGN' && item.rider.memberNo == #authentication.principal.member.memberNo}">
                     <button class="shop-btn">매장 위치</button>
                     <button type="button" class="pickup-btn">픽업 완료</button>
                 </th:block>
-                <th:block th:if="${item.status == 4 && item.rider.memberNo == #authentication.principal.member.memberNo}">
+                <th:block th:if="${item.status.name == 'PICKUP' && item.rider.memberNo == #authentication.principal.member.memberNo}">
                     <button class="delivery-btn">목적지 위치</button>
                     <button type="button" class="complete-btn">배송 완료</button>
                 </th:block>

@@ -25,6 +25,9 @@ public class MainService {
     public Page<ShopEntity> getShopList(String category, Map<String, Object> data, Pageable pageable) {
         Page<ShopEntity> shopList = null;
 
+        System.out.println(category);
+        System.out.println(data);
+        System.out.println(pageable);
         // center좌표 값 data에서 꺼내기
         double lat = (double) data.get("lat"); // 위도
         double lng = (double) data.get("lng"); // 경도

@@ -1,9 +1,13 @@
 package com.eob.common.util;
 
+import org.springframework.stereotype.Component;
+
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.rider.model.data.RiderEntity;
 
+// 주소 마스킹을 위한 유틸 클래스
+@Component("stringUtil")
 public class StringUtil {
 
     /**
@@ -135,4 +139,5 @@ public class StringUtil {
         }
         return result;
     }
+
 }

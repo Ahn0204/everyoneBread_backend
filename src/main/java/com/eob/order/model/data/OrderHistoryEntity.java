@@ -22,6 +22,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -58,6 +59,7 @@ public class OrderHistoryEntity {
      */
     @OneToMany(mappedBy = "orderNo", fetch = FetchType.LAZY, cascade = CascadeType.ALL) // mappedBy에는 클래스명이 아니라, 자식 엔티티의
                                                                                         // 필드명을 써야 합니다.
+    @ToString.Exclude
     // @JoinColumn(name = "order_detail_no", nullable = false)
     private List<OrderDetailEntity> orderDetail;
 
@@ -109,7 +111,7 @@ public class OrderHistoryEntity {
     @Enumerated(EnumType.STRING)
 
     @Column(nullable = true)
-    private OrderStatus status = OrderStatus.WAIT; // 기본값 지정
+    private OrderStatus status = OrderStatus.ORDER; // 기본값 지정
 
     /**
      * 거절 사유

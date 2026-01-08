@@ -14,7 +14,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -35,6 +37,7 @@ public class OrderDetailEntity {
      */
     @ManyToOne
     @JoinColumn(name = "order_no", nullable = false)
+    @ToString.Exclude
     private OrderHistoryEntity orderNo;
 
     // 여기 아래부터 성진 추가 12/17 00:24 AM
@@ -62,4 +65,7 @@ public class OrderDetailEntity {
      */
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    @Transient
+    private ProductEntity product;
 }

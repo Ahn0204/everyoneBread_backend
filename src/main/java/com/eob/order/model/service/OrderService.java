@@ -66,7 +66,7 @@ public class OrderService {
     /**
      * [판매자]
      * 주문 수락 처리 메서드
-     * - WAIT -> PREPARE 상태로 변경
+     * - ORDER -> ASSIGN 상태로 변경
      */
     @Transactional
     public void acceptOrder(Long orderNo) {
@@ -74,19 +74,19 @@ public class OrderService {
         OrderHistoryEntity order = orderHistoryRepository.findById(orderNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다.: "));
 
-        // 현재 상태가 WAIT인 경우에만 PREPARE로 변경
-        if (order.getStatus() != OrderStatus.WAIT) {
+        // 현재 상태가 ORDER인 경우에만 PREPARE로 변경
+        if (order.getStatus() != OrderStatus.ORDER) {
             throw new IllegalStateException("대기 상태의 주문만 수락할 수 있습니다.");
         }
 
         // 상태 변경
-        order.setStatus(OrderStatus.PREPARE);
+        order.setStatus(OrderStatus.ASSIGN);
     }
 
     /**
      * [판매자]
      * 주문 거절 처리 메서드
-     * - WAIT -> REJECT 상태로 변경
+     * - ORDER -> REJECT 상태로 변경
      * - 거절 사유 저장
      */
     @Transactional
@@ -97,7 +97,7 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 
         // 2. 상태 검증 (WAIT만 가능)
-        if (order.getStatus() != OrderStatus.WAIT) {
+        if (order.getStatus() != OrderStatus.ORDER) {
             throw new IllegalStateException("대기 상태의 주문만 거절할 수 있습니다.");
         }
 

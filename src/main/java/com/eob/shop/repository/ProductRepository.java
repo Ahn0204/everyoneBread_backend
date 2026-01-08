@@ -16,4 +16,6 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     // 특정 상점(shopNo)의 상품 목록 리스트 조회
     List<ProductEntity> findByShop_ShopNo(long shopNo);
 
+    ProductEntity findByProductNo(ProductEntity productNo);
+
 }
