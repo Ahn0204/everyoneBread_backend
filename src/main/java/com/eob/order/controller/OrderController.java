@@ -30,8 +30,12 @@ public class OrderController {
 
     // 주문 페이지 접속
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/orderForm")
-    public String getOrderForm(OrderForm orderForm) {
+    @PostMapping("/orderForm")
+    public String getOrderForm(OrderForm orderForm, @RequestParam(name = "deliveryFee") String deliveryFee,
+            Model model) {
+        // 배송비 미리 저장
+        orderForm.setDeliveryFee(Integer.parseInt(deliveryFee));
+        model.addAttribute("orderForm", orderForm);
         return "order/orderForm";
     }
 
@@ -53,6 +57,7 @@ public class OrderController {
         // 결제완료 후 주문 내역 CRUD
         // 토큰발급받기
         String token = portOneService.getToken();
+        System.out.println("배달:" + orderForm.getDeliveryFee());
         try {
             // 결제 성공 시 DB에 주문내역 insert
             this.orderService.insertOrder(orderForm);

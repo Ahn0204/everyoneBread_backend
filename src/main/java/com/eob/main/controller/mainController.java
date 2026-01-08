@@ -4,13 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,31 +24,40 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eob.admin.model.data.InquiryEntity;
 import com.eob.admin.model.repository.CategoryRepository;
 import com.eob.admin.model.repository.DistanceFeeRepository;
+import com.eob.admin.model.repository.InquiryRepository;
+import com.eob.admin.model.service.AdminService;
+import com.eob.common.security.CustomSecurityDetail;
 import com.eob.main.model.service.MainService;
+import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.shop.model.data.ProductEntity;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequestMapping("/")
 @RequiredArgsConstructor
 public class mainController {
+
     /*
      * return html페이지의 경로 => 맨 앞에 /가 안붙어야함
      * return redirect:/도메인(localhost:8080)뒤의 url => 맨 앞에 /가 붙어야함
      */
 
-    public final CategoryRepository categoryRepository;
-    public final MainService mainService;
-    public final ProductService productService;
-    public final ShopService shopService;
-    public final DistanceFeeRepository distanceFeeRepository;
+    private final CategoryRepository categoryRepository;
+    private final MainService mainService;
+    private final ProductService productService;
+    private final ShopService shopService;
+    private final DistanceFeeRepository distanceFeeRepository;
+    private final InquiryRepository inquiryRepository;
+    private final AdminService adminService;
+    private final OrderHistoryRepository orderHistoryRepository;
 
     // 메인 페이지
     @GetMapping("")
@@ -65,7 +79,6 @@ public class mainController {
         if (_category.isPresent() && !_category.get().isEmpty()) {
             // category에 Optional의 값 모두 add
             category.addAll(_category.get());
-            System.out.println("카테고리 불러오기 실행:" + category);
             // 카테고리 List보내기
             return ResponseEntity.ok(category);
         } else {
@@ -90,13 +103,12 @@ public class mainController {
      */
     @PostMapping("getShopList")
     public String ajaxGetShopList(@RequestBody Map<String, Object> data,
-            @RequestParam(name = "page", defaultValue = "0") int page, Model model, HttpSession httpSession) {
+            @RequestParam(name = "page", defaultValue = "0") int page, Model model) {
 
+        String category = (String) data.get("category");
         // 반경 내 상점목록 조회
         // pageable객체 생성-> distance 오름차순
         Pageable pageable = PageRequest.of(page, 8);
-        // 상품에 카테고리 테이블 연결 시 삭제
-        String category = "BREAD";
         // 상점내역 조회, 페이징 객체로 리턴
         Page<ShopEntity> shopList = mainService.getShopList(category, data, pageable);
         if (shopList != null && shopList.getTotalElements() > 0) {
@@ -123,7 +135,6 @@ public class mainController {
 
         // 위치좌표와 shop 간의 거리 계산
         double distance = mainService.haversine(lat, lng, shop.getLatitude(), shop.getLongitude());
-        distance = Math.floor(distance * 10) / 10; // km로 환산
         String d = null;
         // 배달비 계산
         int deliveryFee = 0;
@@ -143,20 +154,130 @@ public class mainController {
 
         // shopNo에 해당하는 productList 조회
         List<ProductEntity> productList = productService.getProductList(shopNo);
-        model.addAttribute("productList", productList);
+        // 카테고리와 리스트 Map타입으로 묶기
+        Map<String, List<ProductEntity>> productMap = productList.stream()
+                .collect(Collectors.groupingBy(ProductEntity::getCatName));
+
+        model.addAttribute("productList", productMap);
         return "main/productList";
     }
 
     // 고객센터
     @GetMapping("customerCenter")
     public String getCenterP() {
-        return "redirect:/customerCenter/notice";
+        return "redirect:/customerCenter/inquiry";
     }
 
     // 공지페이지
-    @GetMapping("/customerCenter/notice")
+    @GetMapping("customerCenter/notice")
     public String getNoticeP() {
         return "customerCenter/notice";
+    }
+
+    // 일반 문의 - 내역 출력 / 문의하기 버튼
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("customerCenter/inquiry")
+    public String getInquiryP(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
+            @AuthenticationPrincipal CustomSecurityDetail userDetails) {
+        // 로그인 정보 가져오기
+        long memberNo = userDetails.getMember().getMemberNo();
+        // 페이지 정보 뷰에 전달
+        model.addAttribute("page", page);
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 문의 내역 - 페이징 객체로 리턴
+        Page<InquiryEntity> inquiryP = inquiryRepository.findByMember_MemberNo(memberNo, pageable);
+
+        // 문의 내역이 존재 하지 않을 때
+        if (inquiryP.getTotalElements() == 0) { // adminP 요소의 총 갯수가 0이면
+            model.addAttribute("noList", "조회된 내역이 없습니다.");
+        } else {
+            // 글번호 시작값 계산
+            int start = inquiryP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("inquiryP", inquiryP);
+
+        return "customerCenter/inquiry";
+    }
+
+    /**
+     * 일반 문의 작성 처리
+     */
+    @PostMapping("customerCenter/insertInquiry")
+    @ResponseBody
+    public boolean ajaxinsertInquiry(@RequestParam(name = "memberNo") long memberNo,
+            @RequestParam(name = "question") String question) {
+        boolean result = false;
+        result = adminService.insertInquiry(memberNo, question);
+
+        return result;
+    }
+
+    /**
+     * 일반 문의 - 상세보기
+     */
+    @GetMapping("customerCenter/inquiry/{page}/{inquiryNo}")
+    public String getInquiryDetails(@PathVariable(name = "page", required = false) String page,
+            @PathVariable("inquiryNo") long inquiryNo,
+            Model model) {
+        if (page == null) {
+            page = "0";
+        }
+        model.addAttribute("page", page);
+
+        Optional<InquiryEntity> _i = inquiryRepository.findById(inquiryNo);
+        if (_i.isPresent()) {
+            InquiryEntity i = _i.get();
+            model.addAttribute("i", i);
+        } else {
+            model.addAttribute("noI", "조회 가능한 문의가 없습니다.");
+        }
+        return "customerCenter/inquiry-detail";
+    }
+
+    // 일반 문의 삭제
+    @DeleteMapping("customerCenter/inquiry/delete")
+    @ResponseBody
+    public boolean deleteInquiry(@RequestParam("inquiryNo") Long inquiryNo) {
+        try {
+            inquiryRepository.deleteById(inquiryNo);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 마이페이지 - 주문내역 - 관리자에 문의
+     */
+    @GetMapping("customerCenter/orderInquiry")
+    public String getOrderInquiry(@RequestParam("orderNo") Long orderNo, Model model) {
+        // 참조 대상(주문 엔티티) 조회
+        Optional<OrderHistoryEntity> _order = orderHistoryRepository.findById(orderNo);
+        if (_order.isPresent()) {
+            OrderHistoryEntity order = _order.get();
+            model.addAttribute("order", order);
+        }
+        return "member/mypage/order-inquiry";
+    }
+
+    /**
+     * 주문내역 - 관리자에 문의 작성 처리
+     */
+    @PostMapping("customerCenter/insertBanInquiry")
+    @ResponseBody
+    public boolean insertBanInquiry(@RequestParam(name = "memberNo") long memberNo,
+            @RequestParam(name = "orderNo") long orderNo,
+            @RequestParam(name = "question") String question) {
+        boolean result = false;
+        result = adminService.insertBanInquiry(memberNo, orderNo, question);
+
+        return result;
     }
 
 }

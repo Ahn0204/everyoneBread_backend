@@ -1,8 +1,13 @@
 package com.eob.shop.controller;
 
-import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Map;
 
+// import org.locationtech.jts.geom.Coordinate;
+// import org.locationtech.jts.geom.GeometryFactory;
+// import org.locationtech.jts.geom.Point;
+// import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.eob.admin.model.service.AdminService;
 import com.eob.common.security.CustomSecurityDetail;
 import com.eob.common.sms.service.SmsService;
 import com.eob.member.model.data.MemberApprovalStatus;
@@ -40,7 +46,10 @@ public class ShopController {
     private final ShopService shopService;
     private final ProductService productService;
     private final SmsService smsService;
+    private final AdminService adminService;
     // location저장용 - Point객체 생성 객체
+    // private final static GeometryFactory geometryFactory = new
+    // GeometryFactory(new PrecisionModel(), 4326);
 
     /**
      * 판매자 로그인 페이지
@@ -172,62 +181,83 @@ public class ShopController {
     @Transactional
     @PostMapping("register/step")
     @ResponseBody
-    public String registerStep(@Valid ShopEntity shop, BindingResult bindingResult, HttpSession session,
+    public ResponseEntity<?> registerStep(ShopEntity shop, BindingResult bindingResult, HttpSession session,
             @RequestParam(name = "bizFile", required = false) MultipartFile bizFile) throws Exception {
         // @RequestParam(name = "longitude") String longitude, @RequestParam(name =
         // "latitude") String latitude
 
         // 상점 정보 유효성 검증
-        if (bindingResult.hasErrors()) {
-            return "INVALID_SHOP_DATA";
-        }
+        // if(bindingResult.hasErrors()){
+        // return ResponseEntity.badRequest()
+        // .body(Map.of("result","FAIL", "message", "INVALID_SHOP_DATA"));
+        // }
+
         if (shop.getShopName() == null || shop.getShopName().isBlank()) {
-            return "SHOP_NAME_REQUIRED";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "SHOP_NAME_REQUIRED"));
         }
 
         if (shop.getShopAddress() == null || shop.getShopAddress().isBlank()) {
-            return "SHOP_ADDRESS_REQUIRED";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "SHOP_ADDRESS_REQUIRED"));
         }
 
+        shop.setBizNo(shop.getBizNo().replaceAll("-", ""));
+
         if (shop.getBizNo() == null || !shop.getBizNo().matches("\\d{10}")) {
-            return "INVALID_BIZ_NO";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "INVALID_BIZ_NO"));
+        }
+
+        // 예금주명 체크
+        if (shop.getAccountName() == null || shop.getAccountName().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "ACCOUNT_NAME_REQUIRED"));
+        }
+
+        // 은행명 체크
+        if (shop.getBankName() == null || shop.getBankName().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "BANK_NAME_REQUIRED"));
+        }
+
+        // 계좌번호 체크
+        if (shop.getAccountNo() == null || shop.getAccountNo().isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "ACCOUNT_NO_REQUIRED"));
         }
 
         // 이미 가입 완료된 경우 중복 실행 방지
         if (session.getAttribute("shopRegisterCompleted") != null) {
-            return "ALREADY_DONE";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "ALREADY_DONE"));
         }
 
         // 정보 불러오기
         RegisterRequest temp = (RegisterRequest) session.getAttribute("tempShopMember");
         if (temp == null) {
-            return "NO_SESSION";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "NO_SESSION"));
         }
 
         // 상점명 최종 중복 검증 (서버)
         if (shopService.existsByShopName(shop.getShopName())) {
-            return "DUPLICATE_SHOP_NAME";
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "DUPLICATE_SHOP_NAME"));
+        }
+
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors()
+                    .forEach(e -> System.out.println(e.toString()));
         }
 
         // 회원 저장 (MemberEntity 생성)
         MemberEntity member = memberService.createShopMember(temp);
-        System.out.println("저장된 MemberNo =" + member.getMemberNo());
-
-        // // 파일 업로드 처리
-        // String fileName = null;
-        // if (!bizFile.isEmpty()) {
-        // fileName = System.currentTimeMillis() + "_" + bizFile.getOriginalFilename();
-        // String savePath = "C:/upload/shop/" + fileName;
-
-        // File folder = new File("C:/upload/shop/");
-        // if (!folder.exists()) {
-        // folder.mkdirs();
-        // }
-        // bizFile.transferTo(new File(fileName + savePath));
-        // }
 
         // member status값 지정
         member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
+
+        System.out.println("저장된 MemberNo =" + member.getMemberNo());
 
         // ShopEntity 값 설정
         shop.setMember(member); // FK 연결
@@ -251,11 +281,15 @@ public class ShopController {
         System.out.println("latitude = " + shop.getLatitude());
         System.out.println("longitude = " + shop.getLongitude());
         // System.out.println("location = " + shop.getLocation());
+        System.out.println("정산 계좌 정보 확인");
+        System.out.println("accountName = " + shop.getAccountName());
+        System.out.println("bankName    = " + shop.getBankName());
+        System.out.println("accountNo   = " + shop.getAccountNo());
 
         // 저장
         shopService.saveShop(shop);
-        ShopEntity saved = shopService.findByMemberNo(member.getMemberNo());
-        System.out.println("저장된 Shop No =" + saved.getShopNo());
+        ShopEntity savedShop = shopService.findByMemberNo(member.getMemberNo());
+        System.out.println("저장된 Shop No =" + savedShop.getShopNo());
 
         // 가입 완료 플래그
         session.setAttribute("shopRegisterCompleted", true);
@@ -263,7 +297,8 @@ public class ShopController {
         // 세션 초기화
         session.removeAttribute("tempShopMember");
 
-        return "OK";
+        return ResponseEntity.ok(
+                Map.of("result", "OK"));
     }
 
     /**
@@ -318,4 +353,20 @@ public class ShopController {
 
         return "shop/shop-main";
     }
+
+    /**
+     * 판매자 - 주문화면에서 관리자에 문의
+     * (예솔 추가)
+     */
+    @PostMapping("insertBanInquiry")
+    @ResponseBody
+    public boolean insertBanInquiry(@RequestParam(name = "memberNo") long memberNo,
+            @RequestParam(name = "orderNo") long orderNo,
+            @RequestParam(name = "question") String question) {
+        boolean result = false;
+        result = adminService.insertBanInquiry(memberNo, orderNo, question);
+
+        return result;
+    }
+
 }

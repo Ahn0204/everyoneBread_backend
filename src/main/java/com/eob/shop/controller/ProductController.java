@@ -3,10 +3,13 @@ package com.eob.shop.controller;
 import com.eob.common.security.CustomSecurityDetail;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.shop.model.data.ProductEntity;
+import com.eob.shop.model.data.ProductStatus;
 import com.eob.shop.model.data.ShopEntity;
+import com.eob.shop.model.dto.ProductDetailResponse;
 import com.eob.shop.service.ProductService;
 import com.eob.shop.service.ShopService;
 
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -131,65 +135,69 @@ public class ProductController {
     }
 
     /**
-     * 상품 수정 페이지
-     * URL: GET /shop/products/edit/{id}
-     *
-     * 역할:
-     * - 기존 상품 정보를 조회하여
-     * - 화면에 출력해 수정하고 저장할 수 있게 한다.
+     * 상품 상세 조회 (모달)
+     * URL : GET /shop/products/{id}/detail
      */
-    @GetMapping("/edit/{id}")
-    public String editForm(@PathVariable("id") Long id, Model model) {
-
-        // 수정할 상품 조회
+    @GetMapping("products/{id}/detail")
+    @ResponseBody
+    public ProductDetailResponse productDetail(@PathVariable("id") Long id, @AuthenticationPrincipal CustomSecurityDetail principal ){
         ProductEntity product = productService.findById(id);
 
-        // 모델에 상품 정보 담기
-        model.addAttribute("product", product);
-        return "shop/products/product-edit";
+        // 내 상점 상품만 조회 가능
+        Long memberNo = principal.getMember().getMemberNo();
+        if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+            throw new RuntimeException("접근 권한이 없습니다.");
+        }
+
+        return new ProductDetailResponse(product);
     }
 
     /**
-     * 상품 수정 처리
-     * URL: POST /shop/products/edit/{id}
-     *
-     * 역할:
-     * - 기존 상품 엔티티 가져오기(findById)
-     * - 입력받은 값으로 필드 업데이트
-     * - 이미지 변경 시 파일 저장
+     * 상품 수정 (상품 상세 조회 모달에서 AJAX)
+     * URL : POST /shop/products/{id}
      */
-    @PostMapping("/edit/{id}")
-    public String editProduct(@PathVariable("id") Long id,
-                            @ModelAttribute ProductEntity form,
-                            @RequestParam(value = "imgFile", required = false) MultipartFile imgFile)
-            throws Exception {
-
-        // 기존 상품 가져오기
+    @PostMapping("products/{id}")
+    @ResponseBody
+    public void updateProduct(@PathVariable("id") Long id, @RequestBody ProductEntity form, @AuthenticationPrincipal CustomSecurityDetail principal){
+        // 기존 상품 조회
         ProductEntity product = productService.findById(id);
 
-        // 1) 기본 필드 수정
+        // 판매자 본인의 상품인지 확인
+        Long memberNo = principal.getMember().getMemberNo();
+        if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+        // ===== 필드 업데이트 =====
         product.setProductName(form.getProductName());
+        product.setPrice(form.getPrice());
         product.setSummary(form.getSummary());
         product.setIngredient(form.getIngredient());
         product.setCatName(form.getCatName());
-        product.setPrice(form.getPrice());
         product.setStatus(form.getStatus());
         product.setUpdatedAt(LocalDateTime.now());
 
-        // 2) 이미지 수정
-        if (imgFile != null && !imgFile.isEmpty()) {
-            String fileName = System.currentTimeMillis() + "_" + imgFile.getOriginalFilename();
-            String savePath = "C:/upload/product/" + fileName;
-            imgFile.transferTo(new File(savePath));
+        // 저장
+        productService.save(product);
+    }
 
-            // 엔티티에 파일명 저장
-            product.setImgUrl(fileName);
+    /**
+     * 상품 목록 드롭다운 / 모달 "판매중, 품절" 버튼 전용
+     */
+    @PostMapping("products/{id}/status")
+    @ResponseBody
+    public void updateProductStatus(@PathVariable Long id, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal){
+        ProductEntity product = productService.findById(id);
+
+        Long memberNo = principal.getMember().getMemberNo();
+        if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+            throw new RuntimeException("수정 권한이 없습니다.");
         }
 
-        // 3) 저장
-        productService.save(product);
+        ProductStatus status = ProductStatus.valueOf(body.get("status"));
+        product.setStatus(status);
+        product.setUpdatedAt(LocalDateTime.now());
 
-        return "redirect:/shop/products";
+        productService.save(product);
     }
 
     /**
@@ -199,12 +207,45 @@ public class ProductController {
      * 실제 DB 삭제가 아니라 상태(status)를 DELETED 로 변경
      * → 소프트 삭제 처리
      */
-    @GetMapping("/delete/{id}")
-    public String delete(@PathVariable("id") Long id) {
+    // @GetMapping("products/delete/{id}")
+    // public String delete(@PathVariable("id") Long id, @AuthenticationPrincipal CustomSecurityDetail principal) {
 
-        // 상품 삭제 처리 (soft delete)
-        productService.delete(id);
+    //     // 본인의 상품인지 확인
+    //     ProductEntity product = productService.findById(id);
 
-        return "redirect:/shop/products";
+    //     // 권한 체크
+    //     Long memberNo = principal.getMember().getMemberNo();
+    //     if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+    //         throw new RuntimeException("삭제 권한이 없습니다.");
+    //     }
+
+    //     // 상품 삭제 처리 (soft delete)
+    //     productService.delete(id);
+
+    //     return "redirect:/shop/products";
+    // }
+
+    /**
+     * 상품 삭제 (상품 상세 모달)
+     * URL : POST /shop/products/{id}/delete
+     */
+    @PostMapping("products/{id}/delete")
+    @ResponseBody
+    public void deleteProductAjax(@PathVariable("id") Long id, @AuthenticationPrincipal CustomSecurityDetail principal){
+
+        // 상품 조회
+        ProductEntity product = productService.findById(id);
+
+        // 보안 체크 : 내 상점 상품만 삭제 가능
+        Long memberNo = principal.getMember().getMemberNo();
+        if(!product.getShop().getMember().getMemberNo().equals(memberNo)){
+            throw new RuntimeException("삭제 권한이 없습니다.");
+        }
+
+        // 실제 삭제 X, 상태만 변경
+        product.setStatus(ProductStatus.DELETED);
+        product.setUpdatedAt(LocalDateTime.now());
+
+        productService.save(product);
     }
 }

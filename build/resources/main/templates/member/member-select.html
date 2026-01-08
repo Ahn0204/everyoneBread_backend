@@ -6,174 +6,34 @@
     <script src="https://code.jquery.com/jquery-latest.min.js"></script>
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <script th:src="@{/js/comm/sweetalert.noah.js}"></script> -->
+    <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/member/select.css}">
     <title>회원가입 유형 선택</title>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Noto Sans KR', sans-serif;
-        }
-
-        body {
-            background: #fafafa;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 430px;
-            padding: 40px 35px;
-            background: #fff;
-            border: 2px solid #000;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        p {
-            font-size: 15px;
-            color: #444;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            width: 100%;
-            height: 55px;
-            font-size: 17px;
-            font-weight: 700;
-            border: 2px solid #79C3FF;
-            background: #fff;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: 0.15s;
-        }
-
-        .btn:hover {
-            background: #79C3FF;
-            color: #fff;
-        }
-
-        .business-wrapper {
-            position: relative;
-            width: 100%;
-        }
-
-        .dropdown-box {
-            display: none;
-            position: absolute;
-            top: 60px;
-            left: 0;
-            width: 100%;
-            border: 2px solid #79C3FF;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            z-index: 20;
-        }
-
-        .dropdown-item {
-            padding: 15px 0;
-            text-align: center;
-            font-weight: 700;
-            border-bottom: 1px solid #eee;
-            text-decoration: none;
-            color: #79C3FF;
-            display: block;
-            transition: 0.15s;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: #79C3FF;
-            color: #fff;
-        }
-
-        .spacer {
-            height: 20px;
-        }
-    </style>
 </head>
 
 <body>
+    <div class="container">
+        <h1>회원가입 유형 선택</h1>
+        <p>가입할 계정 유형을 선택해주세요.</p>
 
-<div class="container">
-    <h1>회원가입 유형 선택</h1>
-    <p>가입할 계정 유형을 선택해주세요.</p>
+        <!-- 일반 계정 -->
+        <a href="/member/register?role=USER">
+            <button class="btn">일반 계정</button>
+        </a>
 
-    <!-- 일반 계정 -->
-    <a href="/member/register?role=USER">
-        <button class="btn">일반 계정</button>
-    </a>
+        <div class="spacer"></div>
 
-    <div class="spacer"></div>
+        <!-- 비즈니스 계정(dropdown) -->
+        <!-- 비즈니스 계정(dropdown) -->
+        <div class="business-wrapper">
+            <button class="btn" id="businessBtn">비즈니스 계정</button>
 
-    <!-- 비즈니스 계정(dropdown) -->
-    <!-- 비즈니스 계정(dropdown) -->
-    <div class="business-wrapper">
-        <button class="btn" id="businessBtn">비즈니스 계정</button>
-
-        <div class="dropdown-box" id="dropdownBox">
-            <a href="/shop/register/start?role=SHOP" class="dropdown-item">판매자 회원가입</a>
-            <a href="/rider/register/start?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+            <div class="dropdown-box" id="dropdownBox">
+                <a href="/shop/register/start?role=SHOP" class="dropdown-item">판매자 회원가입</a>
+                <a href="/rider/register/start?role=RIDER" class="dropdown-item">라이더 회원가입</a>
+            </div>
         </div>
     </div>
-</div>
-
-<script>
-    // 비즈니스 계정 버튼 요소 (hover 시 드롭다운 열기)
-    const businessBtn = document.getElementById("businessBtn");
-    // 실제로 펼쳐지는 드롭다운 박스 요소
-    const dropdownBox = document.getElementById("dropdownBox");
-
-    /**
-     * 1. businewssBtn Hover -> 드롭다운 열기
-     *    버튼 위에 마우스를 올리면 드롭다운 박스를 보이도록 변경
-     */
-    businessBtn.addEventListener("mouseover", () => {
-        dropdownBox.style.display = "block";
-    });
-
-    /**
-     * 2. 드롭다운 영역 Hover 유지
-     *    드롭다운 위에 마우스를 올리면 드롭다운이 계속 열린 상태를 유지
-     */
-    dropdownBox.addEventListener("mouseover", () => {
-        dropdownBox.style.display = "block";
-    });
-
-    /**
-     * 3. businewssBtn Hover 해제 -> 드롭다운 닫기
-     *    버튼에서 마우스가 벗어나면 일정 시간 후 드롭다운 박스를 숨김
-     */
-    businessBtn.addEventListener("mouseout", () => {
-        setTimeout(() => {
-            if (!dropdownBox.matches(":hover")) {
-                dropdownBox.style.display = "none";
-            }
-        }, 150);
-    });
-
-    /**
-     * 4. 드롭다운 영역 Hover 해제 -> 드롭다운 닫기
-     *    드롭다운에서 마우스가 벗어나면 드롭다운 박스를 숨김
-     */
-    dropdownBox.addEventListener("mouseout", () => {
-        dropdownBox.style.display = "none";
-    });
-</script>
+    <script th:src="@{/js/member/select.js}"></script>
 </body>
 </html>

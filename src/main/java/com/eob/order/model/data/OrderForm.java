@@ -43,10 +43,6 @@ public class OrderForm { // 주문 유효성 검사&dto 겸용
     @NotNull
     private long merchantUid; // 결제된 주문 식별 번호 => orderNo로 사용
 
-    // @OneToOne(mappedBy = "orderTime", cascade = CascadeType.REMOVE ) //orderTime
-    // 주문시간 테이블 참조
-    // private OrderTimeDTO orderTime; // 주문 시간 테이블
-
     private int deliveryCycle; // 배송주기 >> DB 입력 시 LocalDateTime객체로 입력
 
     private String customerUid; // 정기배송 결제정보 저장용 키

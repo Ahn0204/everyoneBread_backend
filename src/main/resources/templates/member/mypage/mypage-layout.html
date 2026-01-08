@@ -5,24 +5,9 @@
       layout:decorate="~{main/main-layout}">
 
 <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/member/mypage/layout.css}">
     <title>마이페이지</title>
-
-    <style>
-        * { box-sizing: border-box; font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; }
-        body { background: #fafafa; padding: 40px 0; }
-        .mypage-wrapper { width: 1200px; margin: 0 auto; display: flex; gap: 30px; }
-
-        /* ===== 사이드바 ===== */
-        .mypage-sidebar { width: 230px; padding: 25px; background: #fff; border: 2px solid #000; border-radius: 12px; height: fit-content; }
-        .sidebar-title { font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center; }
-        .sidebar-menu { list-style: none; }
-        .sidebar-menu li { margin-bottom: 18px; }
-        .sidebar-menu a { display: block; padding: 7px 5px; font-size: 16px; font-weight: 600; color: #333; text-decoration: none; border-radius: 6px; transition: 0.15s; }
-        .sidebar-menu a:hover { background: #e4f3ff; color: #0077cc; }
-        .sidebar-menu .active { background: #79C3FF; color: #fff !important; }
-        /* ===== 컨텐츠 ===== */
-        .mypage-content { flex: 1; padding: 30px; background: #fff; border: 2px solid #000; border-radius: 12px; min-height: 600px; }
-    </style>
 </head>
 
 <body>
@@ -50,6 +35,5 @@
 
     </div>
 </div>
-
 </body>
 </html>

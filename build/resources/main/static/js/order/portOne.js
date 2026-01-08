@@ -35,7 +35,6 @@ function checkout(orderPrice) {
                 let merchantInput = '<input type="hidden" name="merchantUid" value="' + response.merchant_uid + '"/>';
                 //장바구니 객체 -> json문자열이라 html태그에 문자열로 결합 안됨
                 const cart = JSON.parse(sessionStorage.getItem('cart'));
-                // let cartInput = '<input type="hidden" name="cart" value="' + cartJson + '"/>';
                 $('#cart').val(JSON.stringify(cart));
                 $('#orderForm').append(merchantInput);
                 $('#orderForm').submit(); // form 제출

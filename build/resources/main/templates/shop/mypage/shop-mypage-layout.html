@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{shop/common/shop-layout}">
+
+<head>
+    <meta charset="UTF-8">
+    <!-- 공통 CSS -->
+    <link rel="stylesheet" th:href="@{/css/shop/mypage/layout.css}">
+    <title>모두의빵 판매자 마이페이지</title>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="mypage-wrapper">
+
+            <!-- 사이드바 -->
+            <aside class="mypage-sidebar">
+                <div class="sidebar-title">정보 관리</div>
+
+                <nav class="sidebar-menu">
+                    <a th:href="@{/shop/mypage}" th:classappend="${menu == 'manage'} ? 'active'">상점관리</a>
+                    <a th:href="@{/shop/mypage/settlement}" th:classappend="${menu == 'settlement'} ? 'active'">정산관리</a>
+                    <a th:href="@{/shop/mypage/info}" th:classappend="${menu == 'info'} ? 'active'">개인정보</a>
+                    <a th:href="@{/shop/mypage/apply}" th:classappend="${menu == 'apply'} ? 'active'">폐점신청</a>
+                </nav>
+            </aside>
+
+            <!-- 실제 페이지 영역 -->
+            <main class="mypage-content">
+                <div layout:fragment="mypage-content"></div>
+            </main>
+
+        </div>
+    </div>
+</body>
+</html>

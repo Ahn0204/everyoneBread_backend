@@ -6,98 +6,8 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/member/mypage/qnaList.css}">
     <title>문의내역</title>
-
-    <style>
-        .qna-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-        }
-
-        /* 탭 영역 */
-        .qna-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .qna-tab {
-            padding: 10px 20px;
-            border: 2px solid #000;
-            background: #fff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: 0.15s;
-        }
-
-        .qna-tab.active {
-            background: #79C3FF;
-            color: #fff;
-        }
-
-        /* 문의 박스 */
-        .qna-item {
-            border: 2px solid #000;
-            background: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .qna-top {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .qna-date {
-            font-size: 14px;
-            color: #777;
-        }
-
-        .qna-shop {
-            font-size: 17px;
-            font-weight: 700;
-        }
-
-        /* 내부 내용 */
-        .qna-body {
-            display: flex;
-            gap: 20px;
-        }
-
-        .qna-img-box {
-            width: 120px;
-            height: 120px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-
-        .qna-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .qna-info {
-            flex: 1;
-        }
-
-        .qna-product {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .qna-content {
-            font-size: 14px;
-            color: #444;
-            white-space: pre-line;
-        }
-    </style>
 </head>
 
 <body>
@@ -185,29 +95,6 @@
     </div>
 
 </section>
-
-<script>
-    // 탭 전환
-    const tabSeller = document.getElementById("tabSeller");
-    const tabAdmin = document.getElementById("tabAdmin");
-
-    const sellerQnaList = document.getElementById("sellerQnaList");
-    const adminQnaList = document.getElementById("adminQnaList");
-
-    tabSeller.addEventListener("click", () => {
-        tabSeller.classList.add("active");
-        tabAdmin.classList.remove("active");
-        sellerQnaList.style.display = "block";
-        adminQnaList.style.display = "none";
-    });
-
-    tabAdmin.addEventListener("click", () => {
-        tabAdmin.classList.add("active");
-        tabSeller.classList.remove("active");
-        sellerQnaList.style.display = "none";
-        adminQnaList.style.display = "block";
-    });
-</script>
-
+<script th:src="@{/js/member/mypage/qnaList.js}"></script>
 </body>
 </html>

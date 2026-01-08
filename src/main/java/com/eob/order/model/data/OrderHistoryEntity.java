@@ -109,7 +109,6 @@ public class OrderHistoryEntity {
      * 주문 진행 상태
      */
     @Enumerated(EnumType.STRING)
-
     @Column(nullable = true)
     private OrderStatus status = OrderStatus.ORDER; // 기본값 지정
 

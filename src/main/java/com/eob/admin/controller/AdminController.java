@@ -1,5 +1,6 @@
 package com.eob.admin.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -17,10 +18,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.eob.admin.model.data.BanInquiryEntity;
 import com.eob.admin.model.data.DistanceFeeForm;
 import com.eob.admin.model.data.DistanceFeeHistoryEntity;
+import com.eob.admin.model.data.FeeHistoryEntity;
+import com.eob.admin.model.data.InquiryEntity;
 import com.eob.admin.model.data.InsertAdminForm;
+import com.eob.admin.model.data.SettleHistoryEntity;
+import com.eob.admin.model.repository.BanInquiryRepository;
 import com.eob.admin.model.repository.DistanceFeeHistoryRepository;
+import com.eob.admin.model.repository.FeeHistoryRepository;
+import com.eob.admin.model.repository.InquiryRepository;
+import com.eob.admin.model.repository.SettleHistoryRepository;
 import com.eob.admin.model.service.AdminService;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
@@ -37,7 +46,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Slf4j
 @Controller
@@ -45,13 +53,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor
 public class AdminController {
 
-    public final AdminService adminService;
-    public final ShopService shopService;
-    public final ShopRepository shopRepository;
-    public final RiderService riderService;
-    public final RiderRepository riderRepository;
-    public final MemberRepository memberRepository;
-    public final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
+    private final AdminService adminService;
+    private final ShopService shopService;
+    private final ShopRepository shopRepository;
+    private final RiderService riderService;
+    private final RiderRepository riderRepository;
+    private final MemberRepository memberRepository;
+    private final DistanceFeeHistoryRepository distanceFeeHistoryRepository;
+    private final FeeHistoryRepository feeHistoryRepository;
+    private final SettleHistoryRepository settleHistoryRepository;
+    private final InquiryRepository inquiryRepository;
+    private final BanInquiryRepository banInquiryRepository;
 
     // 로그인 페이지
     @GetMapping("/login")
@@ -69,6 +81,17 @@ public class AdminController {
         }
 
         return "admin/comm/admin-login";
+    }
+
+    // 관리자 계정 추가(작업용)
+    @GetMapping("/register")
+    public String registerAdmin(Model model) {
+        // 필드 에러로 redirect되지 않은 새 페이지라면
+        if (!model.containsAttribute("insertAdminForm")) {
+            // insertAdminForm객체 생성
+            model.addAttribute("insertAdminForm", new InsertAdminForm());
+        }
+        return "admin/comm/register";
     }
 
     // 메인 페이지
@@ -94,14 +117,93 @@ public class AdminController {
 
     // 정산내역 페이지
     @GetMapping("/settlement/settlement-list")
-    public String getSettlementList() {
+    public String getSettlementList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 정산 내역 - 페이징 객체로 리턴
+        Page<SettleHistoryEntity> settleP = settleHistoryRepository.findAll(pageable);
+
+        // 정산 내역이 존재 하지 않을 때
+        if (settleP.getTotalElements() == 0) { // settleP 요소의 총 갯수가 0이면
+            model.addAttribute("noList", "조회된 내역이 없습니다.");
+        } else {
+            // Page를 List로 바꾸지 않아 오류가 난다면 다시 변환...
+            // // 정산 내역이 존재한다면, adminList 생성
+            // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("settleP", settleP);
+
+            // 글번호 시작값 계산
+            int start = settleP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        // model.addAttribute("settleP", settleP);
         return "admin/settlement/settlement-list";
     }
 
     // 수수료 변경 페이지
     @GetMapping("/settlement/feeHistory-list")
-    public String getFeeHistoryList() {
+    public String getFeeHistoryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 현재 수수료 비율 출력
+        // model.addAttribute("shopFeeRatio", shopFeeRatio);
+
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 배송비 변경 내역 - 페이징 객체로 리턴
+        Page<FeeHistoryEntity> feeP = feeHistoryRepository.findAll(pageable);
+
+        // 배송비 변경 내역이 존재 하지 않을 때
+        if (feeP.getTotalElements() == 0) { // distanceFeeP 요소의 총 갯수가 0이면
+            model.addAttribute("noUpdate", "조회된 내역이 없습니다.");
+        } else {
+            // Page를 List로 바꾸지 않아 오류가 난다면 다시 변환...
+            // // 배송비 변경 내역이 존재한다면, adminList 생성
+            // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
+
+            // 뷰에 list전달
+            model.addAttribute("feeP", feeP);
+
+            // 글번호 시작값 계산
+            int start = feeP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("feeP", feeP);
         return "admin/settlement/feeHistory-list";
+    }
+
+    // 수수료 비율 변경 처리
+    @PostMapping("/settlement/insertFeeRatio")
+    public String insertFeeRatio(@RequestParam(name = "shopFeeRatio") double shopFeeRatio,
+            @RequestParam(name = "deliveryFeeRatio") double deliveryFeeRatio,
+            @RequestParam(name = "memberNo") int memberNo, RedirectAttributes rttr) {
+
+        try {
+            // 수수료 비율 변경 이력 insert
+            FeeHistoryEntity feeHistory = new FeeHistoryEntity();
+            // 작업자 member객체 꺼내기
+            MemberEntity member = memberRepository.findByMemberNo(memberNo);
+            feeHistory.setOperation("변경");
+            feeHistory.setShopFeeRatio(shopFeeRatio);
+            feeHistory.setRiderFeeRatio(deliveryFeeRatio);
+            feeHistory.setMemberNo(member);
+            feeHistory.setCreatedAt(LocalDateTime.now());
+            feeHistoryRepository.save(feeHistory);
+            // 성공 여부 alert보내기
+            rttr.addFlashAttribute("isSucceeded", true);
+        } catch (Exception e) {
+            // 실패 여부 alert보내기
+            rttr.addFlashAttribute("isSucceeded", false);
+
+        }
+
+        return "redirect:/admin/settlement/feeHistory-list";
     }
 
     // 배송비 변경 페이지
@@ -131,7 +233,7 @@ public class AdminController {
             // List<DistanceFeeHistoryEntity> distanceFeeList = distanceFeeP.getContent();
 
             // 뷰에 list전달
-            model.addAttribute("adminList", distanceFeeP);
+            model.addAttribute("distanceFeeList", distanceFeeP);
 
             // 글번호 시작값 계산
             int start = distanceFeeP.getSize();
@@ -467,14 +569,110 @@ public class AdminController {
 
     // 일반문의 내역 페이지
     @GetMapping("/inquiry/inquiry-list")
-    public String getInquiryList() {
+    public String getInquiryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 문의 내역 - 페이징 객체로 리턴
+        Page<InquiryEntity> inquiryP = inquiryRepository.findAll(pageable);
+
+        // 문의 내역이 존재 하지 않을 때
+        if (inquiryP.getTotalElements() == 0) { // inquiryP의 요소의 총 갯수가 0이면
+            model.addAttribute("noInquiry", "조회된 내역이 없습니다.");
+        } else {
+            // 문의 내역이 존재한다면,
+            // inquiryP 값을 반복하며 status별로 구분하여 출력될 리스트에 대입
+            List<InquiryEntity> pendingList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("n"))
+                    .toList(); // 미답변
+            List<InquiryEntity> answeredList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("y")).toList(); // 답변완료
+
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
+            model.addAttribute("answeredList", answeredList); // 답변완료
+
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int answeredCount = answeredList.size();
+            int total = pendingCount + answeredCount;
+
+            int pendingStart = total;
+            int answeredStart = total - answeredCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("answeredStart", answeredStart);
+
+        }
+        // 페이징 정보 전달
+        model.addAttribute("inquiryP", inquiryP);
         return "admin/inquiry/inquiry-list";
+    }
+
+    // 일반 문의 답변 완료
+    @PostMapping("/inquiry/updateAnswer")
+    @ResponseBody
+    public boolean ajaxUpdateAnswer(@RequestParam(name = "inquiryNo") long inquiryNo,
+            @RequestParam(name = "answer") String answer) {
+        boolean result = false;
+        result = adminService.updateAnswer(inquiryNo, answer);
+
+        return result;
     }
 
     // 신고문의 내역 페이지
     @GetMapping("/inquiry/banInquiry-list")
-    public String getBanInquiryList() {
+    public String getBanInquiryList(Model model, @RequestParam(name = "page", defaultValue = "0") int page) {
+        // 페이징 설정 객체 초기화
+        // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+        // 문의 내역 - 페이징 객체로 리턴
+        Page<BanInquiryEntity> inquiryP = banInquiryRepository.findAll(pageable);
+
+        // 문의 내역이 존재 하지 않을 때
+        if (inquiryP.getTotalElements() == 0) { // inquiryP의 요소의 총 갯수가 0이면
+            model.addAttribute("noInquiry", "조회된 내역이 없습니다.");
+        } else {
+            // 문의 내역이 존재한다면,
+            // inquiryP 값을 반복하며 status별로 구분하여 출력될 리스트에 대입
+            List<BanInquiryEntity> pendingList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("n"))
+                    .toList(); // 미답변
+            List<BanInquiryEntity> answeredList = inquiryP.getContent().stream()
+                    .filter(r -> r.getStatus().equals("y")).toList(); // 답변완료
+
+            // // 뷰에 list전달
+            model.addAttribute("pendingList", pendingList); // 미검토
+            model.addAttribute("answeredList", answeredList); // 답변완료
+
+            // 글번호 시작값 계산
+            int pendingCount = pendingList.size();
+            int answeredCount = answeredList.size();
+            int total = pendingCount + answeredCount;
+
+            int pendingStart = total;
+            int answeredStart = total - answeredCount;
+
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("pendingStart", pendingStart);
+            model.addAttribute("answeredStart", answeredStart);
+
+        }
+        // 페이징 정보 전달
+        model.addAttribute("inquiryP", inquiryP);
         return "admin/inquiry/banInquiry-list";
+    }
+
+    // 신고 문의 답변 완료
+    @PostMapping("/inquiry/updatebanInquiryAnswer")
+    @ResponseBody
+    public boolean ajaxUpdateBanInquiryAnswer(@RequestParam(name = "banInquiryNo") long banInquiryNo,
+            @RequestParam(name = "answer") String answer) {
+        boolean result = false;
+        result = adminService.UpdateBanInquiryAnswer(banInquiryNo, answer);
+
+        return result;
     }
 
     // ============== 홈페이지 관리 /admin/homePage

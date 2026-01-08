@@ -204,7 +204,7 @@ function showConfirmAlert(
             title: msg,
             showCancelButton: true, // 취소 버튼 표시
             confirmButtonText: '예',
-            confirmButtonColor: '#6495ed', // 강조 버튼 (주황)
+            confirmButtonColor: '#6495ed', // 강조 버튼
             cancelButtonText: '아니오',
         }).then((result) => {
             if (result.isConfirmed) {

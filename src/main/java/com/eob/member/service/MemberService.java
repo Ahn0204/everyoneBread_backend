@@ -1,13 +1,17 @@
 package com.eob.member.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
+import com.eob.member.model.data.WithdrawHistoryEntity;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.repository.MemberRepository;
+import com.eob.member.repository.WithdrawHistoryRepository;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +22,7 @@ import org.springframework.validation.BindingResult;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final WithdrawHistoryRepository withdrawHistoryRepository;
     private final PasswordEncoder passwordEncoder;
 
     /*
@@ -67,6 +72,43 @@ public class MemberService {
     }
 
     /*
+        아이디 찾기
+        - 휴대폰 번호 기준으로 회원 아이디 조회
+        - 컨트롤러에서 목적(FIND_ID) 검증 후 호출됨
+    */
+    public String findMemberIdByPhone(String phone) {
+
+        MemberEntity member = memberRepository
+                .findByMemberPhone(phone)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("회원 정보를 찾을 수 없습니다.")
+                );
+
+        return member.getMemberId();
+    }
+
+    /*
+        아이디 찾기용 회원 존재 여부 체크
+        - 이름 + 휴대폰 기준 회원 존재 여부 체크
+    */
+    public boolean existsByNameAndPhone(String name, String phone) {
+        return memberRepository.existsByMemberPhoneAndMemberName(phone, name);
+    }
+
+    /*
+        비밀번호 재설정
+        - 인증 + RESET_PW 목적 검증은 Controller에서 수행
+        - 실제 비밀번호 변경만 담당
+    */
+   @Transactional // 비밀번호 변경은 트랜잭션 보장 (중요)
+    public void resetPasswordByPhone(String phone, String rawPassword) {
+        MemberEntity member = memberRepository.findByMemberPhone(phone)
+                .orElseThrow(() -> new IllegalArgumentException("회원 없음"));
+
+        member.changePassword(passwordEncoder.encode(rawPassword));
+    }
+
+    /*
         일반 회원 가입
     */
     public MemberEntity registerUser(RegisterRequest dto, BindingResult bindingResult, HttpSession session) {
@@ -93,7 +135,7 @@ public class MemberService {
 
         session.removeAttribute("SMS_VERIFIED");
 
-        return memberRepository.save(entity);
+        return saved;
     }
 
     /*
@@ -152,6 +194,7 @@ public class MemberService {
      * - BindingResult 사용하지 않음
      * - 1단계에서 이미 검증이 끝났기 때문에 중복검사 필요 없음
      */
+    @Transactional
     public MemberEntity createShopMember(RegisterRequest dto) {
 
         // 중복검사 (선택) — 세션이 조작되는 경우 방지
@@ -165,9 +208,68 @@ public class MemberService {
         MemberEntity entity = toEntity(dto);
 
         entity.setMemberRole(MemberRoleStatus.SHOP);
-        entity.setStatus(MemberApprovalStatus.ACTIVE);
+        entity.setStatus(MemberApprovalStatus.ACTIVE); // 테스트용
+        // 실제 구동 시 해당 코드 주석 해제 후 위 코드 삭제
+        // entity.setStatus(MemberApprovalStatus.PENDING);
 
         return memberRepository.save(entity);
     }
 
+    /**
+     * 회원 휴대폰 번호 수정
+     */
+    @Transactional
+    public void updatePhone(Long memberNo, String phone) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberPhone(phone);
+    }
+
+    /**
+     * 회원 이메일 수정
+     */
+    @Transactional
+    public void updateEmail(Long memberNo, String email) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberEmail(email);
+    }
+
+    /**
+     * 회원 비밀번호 확인
+     */
+    public boolean checkPassword(MemberEntity member, String rawPw) {
+        return passwordEncoder.matches(rawPw, member.getMemberPw());
+    }
+
+    /**
+     * 회원 비밀번호 변경
+     */
+    @Transactional
+    public void changePassword(Long memberNo, String newPw) {
+        MemberEntity member = memberRepository.findById(memberNo)
+                .orElseThrow();
+        member.setMemberPw(passwordEncoder.encode(newPw));
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @Transactional
+    public void withdrawMember(MemberEntity member, String reason) {
+
+        // 1. 탈퇴 이력 저장
+        WithdrawHistoryEntity history = new WithdrawHistoryEntity();
+        history.setMember(member);
+        history.setReason(reason);
+        history.setRole(member.getMemberRole().name());
+
+        withdrawHistoryRepository.save(history);
+
+        // 2. 회원 상태 변경 (soft delete)
+        member.setStatus(MemberApprovalStatus.WITHDRAW);
+
+        // 3. 민감 정보 마스킹 (선택)
+        member.setMemberPw("WITHDRAWN");
+    }
 }

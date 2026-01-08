@@ -22,6 +22,7 @@ import com.eob.shop.model.data.ProductEntity;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ProductRepository;
 import com.eob.shop.repository.ShopRepository;
+import com.eob.shop.service.ShopService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -39,6 +40,7 @@ public class OrderService {
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final ShopService shopService;
 
     /**
      * [판매자]
@@ -155,8 +157,18 @@ public class OrderService {
         OrderHistoryEntity order = new OrderHistoryEntity();
         // Member엔티티 조회
         MemberEntity member = memberRepository.findByMemberNo(orderForm.getBuyerMemberNo());
+        if (member == null) {
+            throw new IllegalArgumentException("회원 정보가 존재하지 않습니다.");
+        }
         // Shop엔티티 조회
         ShopEntity shop = shopRepository.findByShopNo(orderForm.getShopNo());
+        if (shop == null) {
+            throw new IllegalArgumentException("상점 정보가 존재하지 않습니다.");
+        }
+
+        // 영업 가능 여부 체크 (휴무 / 영업 종료 시 예외 발생)
+        // 영업일 입력 가능해지면 주석해제
+        // shopService.validateShopOrderable(shop);
 
         // orderForm에서 값 꺼내 order에 set
         order.setMember(member); // 구매자 정보
@@ -218,6 +230,7 @@ public class OrderService {
             } // 결제한 장바구니의 상품 1개 꺼내는 반복문 종료
 
         } catch (Exception e) {
+            portOneService.getRefund(token, orderForm.getMerchantUid()); // 결제 취소
             throw new RuntimeException("장바구니 JSON 파싱 실패", e);
             // e.printStackTrace();
         }
