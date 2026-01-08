@@ -84,25 +84,93 @@ function changePassword() {
     });
 }
 
-/* 회원 탈퇴 */
-function withdraw() {
+/* =========================
+   회원탈퇴 모달
+========================= */
+function openWithdrawModal() {
 
-    const reason = prompt('탈퇴 사유를 입력해주세요.');
+    Swal.fire({
+        title: '회원탈퇴',
+        html: `
+            <select id="withdrawReason" class="swal2-select">
+                <option value="">탈퇴 사유를 선택해주세요</option>
+                <option value="이용 빈도 낮음">이용 빈도 낮음</option>
+                <option value="서비스 불만">서비스 불만</option>
+                <option value="다른 서비스 이용">다른 서비스 이용</option>
+                <option value="개인정보 우려">개인정보 우려</option>
+                <option value="기타">기타</option>
+            </select>
 
-    if (!reason) return;
+            <textarea id="etcReason"
+                class="swal2-textarea"
+                placeholder="기타 사유를 입력해주세요 (5자 이상)"
+                style="display:none;"></textarea>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '탈퇴하기',
+        cancelButtonText: '취소',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#999',
 
-    fetch('/member/mypage/withdraw', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', [header]: token },
-        body: JSON.stringify({ reason: reason })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.result === 'OK') {
-            showSuccessAlert('탈퇴가 완료되었습니다.');
-            location.href = '/';
-        } else {
-            showErrorAlert(data.message);
+        didOpen: () => {
+            document
+                .getElementById('withdrawReason')
+                .addEventListener('change', function () {
+                    document.getElementById('etcReason').style.display =
+                        this.value === '기타' ? 'block' : 'none';
+                });
+        },
+
+        preConfirm: () => {
+            const reason = document.getElementById('withdrawReason').value;
+            const etc = document.getElementById('etcReason').value.trim();
+
+            if (!reason) {
+                Swal.showValidationMessage('탈퇴 사유를 선택해주세요.');
+                return false;
+            }
+
+            if (reason === '기타' && etc.length < 5) {
+                Swal.showValidationMessage('기타 사유를 5자 이상 입력해주세요.');
+                return false;
+            }
+
+            return {
+                reason: reason === '기타' ? etc : reason
+            };
         }
+    })
+    .then(result => {
+        if (!result.isConfirmed) return;
+
+        fetch('/member/mypage/withdraw', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            },
+            body: JSON.stringify(result.value)
+        })
+        .then(async res => {
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                throw data.message || '탈퇴 처리 중 오류가 발생했습니다.';
+            }
+            return data;
+        })
+        .then(() => {
+            Swal.fire({
+                icon: 'success',
+                title: '탈퇴 완료',
+                text: '그동안 모두의빵을 이용해주셔서 감사합니다.',
+                confirmButtonText: '확인'
+            }).then(() => {
+                // 로그아웃 → 메인 이동
+                location.href = '/member/logout';
+            });
+        })
+        .catch(err => {
+            showErrorAlert(err);
+        });
     });
 }

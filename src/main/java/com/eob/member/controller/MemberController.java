@@ -20,6 +20,7 @@ import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 import com.eob.member.service.MypageService;
 import com.eob.member.service.WishlistService;
+import com.eob.order.model.data.OrderDetailResponse;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -400,6 +401,40 @@ public class MemberController {
         model.addAttribute("orders", mypageService.getMyOrders(memberNo));
 
         return "member/mypage/orderList";
+    }
+
+    /**
+     * 마이페이지 - 주문 상세 모달
+     */
+    @GetMapping("mypage/order-detail")
+    public String orderDetailModal() {
+        return "member/mypage/order-detail";
+    }
+
+    /**
+     * 마이페이지 - 주문 상세 (AJAX)
+     */
+    @GetMapping("/orders/{orderNo}")
+    @ResponseBody
+    public OrderDetailResponse getOrderDetail(@PathVariable Long orderNo) {
+
+        return mypageService.getOrderDetail(orderNo);
+    }
+
+    /**
+     * 마이페이지 - 주문 취소 (AJAX)
+     */
+    @PostMapping("/orders/{orderNo}/cancel")
+    @ResponseBody
+    public ResponseEntity<?> cancelOrder(
+            @PathVariable Long orderNo,
+            @AuthenticationPrincipal CustomSecurityDetail principal
+    ) {
+        Long memberNo = principal.getMember().getMemberNo();
+
+        mypageService.cancelOrder(orderNo, memberNo);
+
+        return ResponseEntity.ok().build();
     }
 
     /**

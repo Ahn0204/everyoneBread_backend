@@ -13,7 +13,10 @@ import com.eob.member.model.data.ReviewStatus;
 import com.eob.member.model.dto.MyOrderDTO;
 import com.eob.member.model.dto.ReviewListResponse;
 import com.eob.member.repository.ReviewRepository;
+import com.eob.order.model.data.OrderDetailResponse;
 import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.data.OrderItemDTO;
+import com.eob.order.model.data.OrderStatus;
 import com.eob.order.model.repository.OrderHistoryRepository;
 
 import jakarta.transaction.Transactional;
@@ -84,6 +87,63 @@ public class MypageService {
                 return dto;
             }).toList();
     }
+
+    /**
+     * [마이페이지 - 주문 상세 조회]
+     *
+     * 사용 위치
+     * - MemberController → /member/mypage/orderDetail
+     *
+     * 처리 흐름
+     * 1. 주문 번호로 주문 조회
+     * 2. OrderEntity → OrderDetailResponse DTO 변환
+     * 3. Controller로 DTO 반환
+     */
+    public OrderDetailResponse getOrderDetail(Long orderNo) {
+
+        OrderHistoryEntity order =
+            orderHistoryRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
+
+        List<OrderItemDTO> items = order.getOrderDetail().stream()
+            .map(detail -> new OrderItemDTO(
+                detail.getProductNo().getProductName(),
+                detail.getQuantity(),
+                detail.getPrice()
+            ))
+            .toList();
+
+        return new OrderDetailResponse(
+            order.getOrderNo(),
+            order.getStatus(),
+            order.getOrderPrice(),
+            order.getDeliveryFee(),
+            order.getOrderAddress(),
+            items
+        );
+    }
+
+    /**
+     * [마이페이지 - 주문 취소]
+     *
+     * 처리 규칙
+     * - 본인 주문만 취소 가능
+     * - 상태가 WAIT(대기)인 주문만 취소 가능
+     * - 취소 시 상태를 CANCEL 또는 REJECT로 변경
+     */
+    @Transactional
+    public void cancelOrder(Long orderNo, Long memberNo) {
+        OrderHistoryEntity order =
+            orderHistoryRepository.findByOrderNo(orderNo)
+            .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
+
+        if (order.getStatus() != OrderStatus.WAIT) {
+            throw new IllegalStateException("취소 불가 상태");
+        }
+
+        order.cancel(); // status = REJECT or CANCEL
+    }
+
 
     /**
      * [마이페이지 - 내 후기 목록 조회]
