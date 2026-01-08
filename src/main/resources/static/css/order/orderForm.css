@@ -1,0 +1,15 @@
+.heading {
+    font-weight: bold;
+    color: rgb(49, 49, 49);
+}
+textarea {
+    resize: none;
+    min-height: 30px;
+}
+.btn-primary {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: cornflowerblue;
+    --bs-btn-border-color: cornflowerblue;
+    --bs-btn-hover-color: cornflowerblue;
+    --bs-btn-hover-bg: #fff;
+}

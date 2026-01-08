@@ -31,7 +31,7 @@ public class OrderDetailEntity {
     private Long orderDetailNo;
 
     /**
-     * 주문 번호
+     * 주문 번호 => 상세 내역 출력 시 무한재귀해서 빼버릴수도있음 (orderService 208행도 주석)
      */
     @ManyToOne
     @JoinColumn(name = "order_no", nullable = false)
