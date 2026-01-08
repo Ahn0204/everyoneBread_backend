@@ -501,9 +501,42 @@ public class MemberController {
     /**
      * 마이페이지 - 개인정보수정
      */
-    @GetMapping("mypage/info")
-    public String info(Model model) {
+    @GetMapping("mypage/info/check")
+    public String info(Model model, HttpSession session) {
+
+        // 비밀번호 인증 여부 체크
+        if(session.getAttribute("INFO_AUTH") == null) {
+            return "redirect:/member/mypage/info/check";
+        }
+
+        // 메뉴 활성화용
         model.addAttribute("menu", "info");
-        return "member/mypage/info";
+
+        // 개인정보수정 페이지 이동
+        return "member/mypage/info-check";
     }
+
+    /**
+     * 마이페이지 - 개인정보수정 - 비밀번호 확인 (AJAX)
+     */
+    @PostMapping("mypage/info/check")
+    @ResponseBody
+    public ResponseEntity<?> infoCheckConfirm(
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomSecurityDetail principal,
+            HttpSession session
+    ) {
+        String password = body.get("password");
+
+        if (!memberService.checkPassword(principal.getMember(), password)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "비밀번호가 일치하지 않습니다."));
+        }
+
+        // 인증 성공 → 세션 저장
+        session.setAttribute("INFO_AUTH", true);
+
+        return ResponseEntity.ok(Map.of("result", "OK"));
+    }
+
 }
