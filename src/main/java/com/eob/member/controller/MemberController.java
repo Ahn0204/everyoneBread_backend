@@ -145,14 +145,15 @@ public class MemberController {
      */
     @PostMapping("find/phone/check")
     @ResponseBody
-    public ResponseEntity<?> findIdPhoneCheck(
-            @RequestBody SmsVerifyRequest request,
-            HttpSession session) {
+    public ResponseEntity<?> findIdPhoneCheck( @RequestBody SmsVerifyRequest request, HttpSession session) {
+        
+        // 인증번호 검증
         String result = smsService.verifyAuthCode(
-                request.getPhone(),
-                request.getAuthCode(),
-                session);
+            request.getPhone(),
+            request.getAuthCode(),
+            session);
 
+        // 인증 실패
         if (!"SUCCESS".equals(result)) {
             return ResponseEntity
                     .badRequest()
@@ -504,16 +505,22 @@ public class MemberController {
     @GetMapping("mypage/info/check")
     public String info(Model model, HttpSession session) {
 
-        // 비밀번호 인증 여부 체크
-        if(session.getAttribute("INFO_AUTH") == null) {
+        // 개인정보수정 페이지 이동
+        return "member/mypage/info-check";
+    }
+
+    /**
+     * 마이페이지 - 개인정보수정 폼
+     */
+    @GetMapping("mypage/info")
+    public String infoPage(Model model, HttpSession session) {
+
+        if (session.getAttribute("INFO_AUTH") == null) {
             return "redirect:/member/mypage/info/check";
         }
 
-        // 메뉴 활성화용
         model.addAttribute("menu", "info");
-
-        // 개인정보수정 페이지 이동
-        return "member/mypage/info-check";
+        return "member/mypage/info";
     }
 
     /**
