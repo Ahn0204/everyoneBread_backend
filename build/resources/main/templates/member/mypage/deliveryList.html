@@ -16,6 +16,10 @@
 
     <h2 class="delivery-title">배송지 관리</h2>
 
+    <div class="delivery-top">
+        <button class="delivery-add-btn" onclick="openAddModal()"> + 배송지 추가 </button>
+    </div>
+    
     <!-- 샘플 1개  -->
     <div class="delivery-item">
 
@@ -37,12 +41,12 @@
         <div class="delivery-item">
 
             <div class="delivery-info">
-                <div class="delivery-nickname" th:text="${addr.nickname}"></div>
+                <div class="delivery-nickname" th:text="${addr.alias}"></div>
 
                 <div class="delivery-default"
                      th:text="${addr.isDefault} ? '기본배송지 O' : ''"></div>
 
-                <div class="delivery-address" th:text="${addr.fullAddress}"></div>
+                <div class="delivery-address" th:text="${addr.address}"></div>
             </div>
 
             <div class="delivery-buttons">
@@ -58,7 +62,10 @@
             </div>
         </div>
     </th:block>
+
+    <!-- 배송지 추가 모달 -->
+    <div th:replace="member/mypage/delivery-add :: deliveryAddModal"></div>
+    <script th:src="@{/js/member/mypage/deliveryList.js}"></script>
 </div>
-<script th:src="@{/js/member/mypage/deliveryList.js}"></script>
 </body>
 </html>
