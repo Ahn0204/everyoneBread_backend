@@ -38,8 +38,6 @@ public class SecurityConfig {
         @Bean
         @Order(1)
         SecurityFilterChain riderFilterChain(HttpSecurity http) throws Exception {
-                // 성진 : 콘솔로그 확인용 추가
-                System.out.println("[RIDER CHAIN] LOADED");
                 // securityMatcher("/**") : / 경로와 그 하위 경로에만 적용되도록 범위를 지정
                 // authorizeHttpRequests() : 요청 URL에 대한 접근 권한 규칙을 정의
                 // anyRequest().permitAll(s) : 현재 체인의 매칭 범위 안에 포함된 모든 요청을 인증/인가 절차 없이 허용
@@ -201,12 +199,9 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        // 예솔: Order가 default랑 똑같이 4였어서 2로 바꿨습니다.
         @Bean
         @Order(2)
         SecurityFilterChain shopFilterChain(HttpSecurity http) throws Exception {
-                // 성진 : 콘솔로그 확인용
-                System.out.println("[SHOP CHAIN] LOADED");
                 http.addFilterBefore((request, response, chain) -> {
                         System.out.println("🟦 [SHOP CHAIN ACTIVE] → " + request.getRequestId());
                         chain.doFilter(request, response);
@@ -279,8 +274,6 @@ public class SecurityConfig {
         @Bean
         @Order(3)
         SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
-                // 성진 : 콘솔로그 확인용 추가
-                System.out.println("[ADMIN CHAIN] LOADED");
                 http
                                 // url이 /admin/~인 요청에 이 필터체인 적용
                                 .securityMatcher("/admin/**")
@@ -352,8 +345,6 @@ public class SecurityConfig {
         // 여러 체인이 있을 때 우선순위를 지정하는 어노테이션, 숫자가 낮을수록 우선순위가 높음
         @Order(4)
         SecurityFilterChain defaultFilterChain(HttpSecurity http) throws Exception {
-                // 성진 : 콘솔로그 확인용 추가
-                System.out.println("[DEFAULT CHAIN] LOADED");
                 http
                                 /**
                                  * Security가 적용될 URL 범위 지정

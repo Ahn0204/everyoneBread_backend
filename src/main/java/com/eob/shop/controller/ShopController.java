@@ -209,6 +209,24 @@ public class ShopController {
                     .body(Map.of("result", "FAIL", "message", "INVALID_BIZ_NO"));
         }
 
+        // 예금주명 체크
+        if (shop.getAccountName() == null || shop.getAccountName().isBlank()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("result", "FAIL", "message", "ACCOUNT_NAME_REQUIRED"));
+        }
+
+        // 은행명 체크
+        if (shop.getBankName() == null || shop.getBankName().isBlank()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("result", "FAIL", "message", "BANK_NAME_REQUIRED"));
+        }
+
+        // 계좌번호 체크
+        if (shop.getAccountNo() == null || shop.getAccountNo().isBlank()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("result", "FAIL", "message", "ACCOUNT_NO_REQUIRED"));
+        }
+
         // 이미 가입 완료된 경우 중복 실행 방지
         if (session.getAttribute("shopRegisterCompleted") != null) {
             return ResponseEntity.badRequest()
@@ -263,6 +281,11 @@ public class ShopController {
         System.out.println("latitude = " + shop.getLatitude());
         System.out.println("longitude = " + shop.getLongitude());
         // System.out.println("location = " + shop.getLocation());
+        System.out.println("정산 계좌 정보 확인");
+        System.out.println("accountName = " + shop.getAccountName());
+        System.out.println("bankName    = " + shop.getBankName());
+        System.out.println("accountNo   = " + shop.getAccountNo());
+
 
         // 저장
         shopService.saveShop(shop);

@@ -1,10 +1,13 @@
 package com.eob.shop.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.eob.common.security.CustomSecurityDetail;
+import com.eob.shop.model.data.ShopApprovalStatus;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.service.ShopService;
 
@@ -55,11 +59,8 @@ public class ShopMypageController {
      */
     @PostMapping("/update/{type}")
     @ResponseBody
-    public Map<String, String> updateShopInfo(
-            @PathVariable String type,
-            @RequestBody Map<String, String> body,
-            @AuthenticationPrincipal CustomSecurityDetail principal
-    ) {
+    public Map<String, String> updateShopInfo( @PathVariable String type, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
+        // 상점 본인 확인
         Long memberNo = principal.getMember().getMemberNo();
         shopService.updateShopInfo(memberNo, type, body.get("value"));
         return Map.of("result", "OK");
@@ -74,6 +75,7 @@ public class ShopMypageController {
         Long memberNo = principal.getMember().getMemberNo();
         ShopEntity shop = shopService.findByMemberNo(memberNo);
 
+        model.addAttribute("member", principal.getMember());
         model.addAttribute("shop", shop);
         model.addAttribute("menu", "info");
 
@@ -94,6 +96,38 @@ public class ShopMypageController {
 
         return "shop/mypage/shop-apply";
     }
+
+    /**
+     * 폐점 신청 처리
+     * URL : /shop/mypage/apply/close
+     */
+    @PostMapping("/close/request")
+    @ResponseBody
+    @Transactional
+    public Map<String, String> requestClose(
+        @AuthenticationPrincipal CustomSecurityDetail principal,
+        @RequestBody Map<String, String> body
+    ) {
+        Long memberNo = principal.getMember().getMemberNo();
+        String reason = body.get("reason");
+
+        ShopEntity shop = shopService.findByMemberNo(memberNo);
+
+        // 이미 폐점 관련 상태면 차단
+        if (shop.getStatus() == ShopApprovalStatus.CLOSE_REVIEW ||
+            shop.getStatus() == ShopApprovalStatus.CLOSE_APPROVED) {
+            return Map.of("result", "FAIL", "message", "이미 폐점 처리 중입니다.");
+        }
+
+        shop.setStatus(ShopApprovalStatus.CLOSE_REVIEW);
+        shop.setClosedRequestAt(LocalDateTime.now());
+        shop.setClosedReason(reason);
+
+        return Map.of("result", "OK");
+    }
+
+
+    
     /**
      * 정산 관리 페이지
      * URL : /shop/mypage/settlement

@@ -120,7 +120,7 @@
                                     <a class="page-link" th:text="이전" th:href="@{|?page=${distanceFeeP.number-1}|}"></a>
                                 </li>
                                 <!--페이지 숫자 버튼-->
-                                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,distanceFeeP.totalPages-1)}" th:classappend="${pageNum == adminP.number} ? 'active'">
+                                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0,distanceFeeP.totalPages-1)}" th:classappend="${pageNum == distanceFeeP.number} ? 'active'">
                                     <a class="page-link" th:href="@{|?page=${pageNum}|}" th:text="${pageNum}+1"></a>
                                 </li>
                                 <!--다음 버튼-->

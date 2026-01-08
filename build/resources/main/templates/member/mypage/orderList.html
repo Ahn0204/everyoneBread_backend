@@ -1,81 +1,66 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{member/mypage/mypage-layout}">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/member/mypage/orderList.css}">
-    <title>주문내역</title>
-</head>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{member/mypage/mypage-layout}">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" th:href="@{/css/member/mypage/orderList.css}" />
+        <script th:src="@{/js/member/mypage/orderInquiry.js}"></script>
+        <title>주문내역</title>
+    </head>
 
-<body>
-<div layout:fragment="mypage-content">
+    <body>
+        <div layout:fragment="mypage-content">
+            <h2 class="order-title">주문내역</h2>
 
-    <h2 class="order-title">주문내역</h2>
+            <!-- 주문이 없을 때 -->
+            <div th:if="${#lists.isEmpty(orders)}" class="empty-order">주문 내역이 없습니다.</div>
 
-    <!-- 주문이 없을 때 -->
-    <div th:if="${#lists.isEmpty(orders)}" class="empty-order">
-        주문 내역이 없습니다.
-    </div>
-
-    <!-- 주문 목록 -->
-    <div th:each="order : ${orders}" class="order-item">
-
-        <!-- 상품 이미지 -->
-        <div class="order-img-box">
-            <img src="/images/sample/bread.png" alt="상품 사진">
-        </div>
-
-        <div class="order-info">
-            <div>
-                <div class="order-top">
-                    <div class="order-number">
-                        주문번호 #
-                        <span th:text="${order.orderNo}"></span>
-                    </div>
-
-                    <!-- 주문 상태 -->
-                    <div class="order-status"
-                         th:classappend="' status-' + ${order.status.name()}"
-                         th:text="${order.statusLabel}">
-                    </div>
+            <!-- 주문 목록 -->
+            <div th:each="order : ${orders}" class="order-item">
+                <!-- 상품 이미지 -->
+                <div class="order-img-box">
+                    <img th:src="@{/image/common/everyoneBread_default_Img.png}" alt="상품 사진" />
                 </div>
 
-                <!-- 상점명 -->
-                <div class="order-shop"
-                     th:text="${order.shopName}">
-                </div>
+                <div class="order-info">
+                    <div>
+                        <div class="order-top">
+                            <div class="order-number">
+                                주문번호 #
+                                <span th:text="${order.orderNo}"></span>
+                            </div>
 
-                <!-- 주문 정보 -->
-                <div class="order-detail">
-                    총 금액 :
-                    <span th:text="${#numbers.formatInteger(order.orderPrice, 3, 'COMMA')}"></span>원
-                    <br>
-                    주문일 :
-                    <span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></span>
+                            <!-- 주문 상태 -->
+                            <div class="order-status" th:classappend="' status-' + ${order.status}" th:text="${order.status.label}"></div>
+                        </div>
+
+                        <!-- 상점명 -->
+                        <div class="order-shop" th:text="${order.shopName}"></div>
+
+                        <!-- 주문 정보 -->
+                        <div class="order-detail">
+                            총 금액 :
+                            <span th:text="${#numbers.formatInteger(order.orderPrice, 3, 'COMMA')}"></span>
+                            원
+                            <br />
+                            주문일 :
+                            <span th:text="${#temporals.format(order.orderTime, 'yyyy-MM-dd HH:mm')}"></span>
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="order-buttons">
+                        <button class="order-btn" th:attr="data-order-no=${order.orderNo}">주문상세</button>
+
+                        <button class="order-btn" th:if="${order.canWriteReview}">리뷰쓰기</button>
+
+                        <button class="order-btn" th:if="${order.canReorder}">재구매하기</button>
+                        <button class="order-btn orderInquiry" th:data-orderno="${order.orderNo}">관리자 문의</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 버튼 -->
-            <div class="order-buttons">
-                <button class="order-btn"
-                        th:attr="data-order-no=${order.orderNo}">
-                    주문상세
-                </button>
-
-                <button class="order-btn"
-                        th:if="${order.canWriteReview}">
-                    리뷰쓰기
-                </button>
-
-                <button class="order-btn"
-                        th:if="${order.canReorder}">
-                    재구매하기
-                </button>
-            </div>
+            <!--관리자 문의 모달-->
+            <div id="modal-order-inquiry"></div>
         </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>

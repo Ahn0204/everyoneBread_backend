@@ -1,7 +1,10 @@
 package com.eob.member.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +15,7 @@ import com.eob.common.security.CustomSecurityDetail;
 import com.eob.common.sms.dto.SmsSendRequest;
 import com.eob.common.sms.dto.SmsVerifyRequest;
 import com.eob.common.sms.service.SmsService;
+import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 import com.eob.member.service.MypageService;
@@ -261,6 +265,113 @@ public class MemberController {
         session.removeAttribute("FIND_PURPOSE");
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 회원 정보 수정 (AJAX)
+     * @param type
+     * @param body
+     * @param principal
+     * @return
+     */
+    @PostMapping("mypage/info/update/{type}")
+    @ResponseBody
+    public ResponseEntity<?> updateMemberInfo(@PathVariable String type, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
+        // 요청 값 추출
+        String value = body.get("value");
+
+        // 값 비어있는지 체크
+        if (value == null || value.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "값이 비어있습니다."));
+        }
+
+        // 로그인 회원 정보
+        MemberEntity member = principal.getMember();
+
+        // 유형별 처리
+        switch (type) {
+            case "phone":
+                if (!value.matches("^010\\d{8}$")) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("result", "FAIL", "message", "휴대폰 번호 형식 오류"));
+                }
+                memberService.updatePhone(member.getMemberNo(), value);
+                break;
+
+            case "email":
+                if (!value.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("result", "FAIL", "message", "이메일 형식 오류"));
+                }
+                if (!memberService.isMemberEmailAvailable(value)) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("result", "FAIL", "message", "이미 사용 중인 이메일"));
+                }
+                memberService.updateEmail(member.getMemberNo(), value);
+                break;
+
+            default:
+                return ResponseEntity.badRequest()
+                        .body(Map.of("result", "FAIL", "message", "허용되지 않은 항목"));
+        }
+
+        return ResponseEntity.ok(Map.of("result", "OK"));
+    }
+
+    /**
+     * 비밀번호 변경 (AJAX)
+     * @param body
+     * @param principal
+     * @return
+     */
+    @PostMapping("mypage/password/change")
+    @ResponseBody
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
+        // 요청 값 추출
+        String currentPw = body.get("currentPw");
+        String newPw = body.get("newPw");
+
+        // 로그인 회원 정보
+        MemberEntity member = principal.getMember();
+
+        // 현재 비밀번호 확인
+        if (!memberService.checkPassword(member, currentPw)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "현재 비밀번호가 틀렸습니다."));
+        }
+
+        // 비밀번호 변경
+        memberService.changePassword(member.getMemberNo(), newPw);
+
+        return ResponseEntity.ok(Map.of("result", "OK"));
+    }
+
+    /**
+     * 회원 탈퇴
+     */
+    @PostMapping("mypage/withdraw")
+    @ResponseBody
+    public ResponseEntity<?> withdraw(
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomSecurityDetail principal,
+            HttpSession session
+    ) {
+        String reason = body.get("reason");
+
+        if (reason == null || reason.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "탈퇴 사유 누락"));
+        }
+
+        MemberEntity member = principal.getMember();
+
+        memberService.withdrawMember(member, reason);
+
+        // 세션 종료
+        session.invalidate();
+
+        return ResponseEntity.ok(Map.of("result", "OK"));
     }
 
     /**

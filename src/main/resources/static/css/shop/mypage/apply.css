@@ -1,0 +1,38 @@
+.page-title {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.form-row {
+    margin-bottom: 20px;
+}
+
+.form-row label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-row select,
+.form-row textarea {
+    width: 400px;
+    padding: 8px;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+textarea {
+    height: 200px;
+    resize: none;
+}
+
+.confirm-btn {
+    margin-top: 30px;
+    padding: 10px 40px;
+    border: 2px solid #000;
+    background: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 6px;
+}

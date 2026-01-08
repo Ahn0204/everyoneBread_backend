@@ -37,7 +37,7 @@
         <div class="admin-login">
             <a th:href="@{/}">
                 <img th:src="@{/image/common/everyoneBread_main_logo.png}" width="300px" />
-                < 메인 이동
+                &lt; 메인 이동
             </a>
             <br />
             <div class="login-box">
@@ -57,6 +57,7 @@
                         </tr>
                     </table>
                 </form>
+                <a class="btn btn-secondary" th:href="@{/admin/register}">관리자 추가[작업용]</a>
             </div>
         </div>
         <th:block th:if="${error}">

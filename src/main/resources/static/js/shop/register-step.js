@@ -89,78 +89,116 @@ new daum.Postcode({
 //     $("#fileNameDisplay").text("선택된 파일: " + file.name);
 // });
 
+/* ------------------------------
+5) 은행명 유효성 검사
+------------------------------ */
+$("input[name='bankName']").on('input', function () {
+    let v = $(this).val().trim();
+
+    const bankRegex = /^[가-힣]{2,10}$/;
+
+    if (!bankRegex.test(v)) {
+        $(this).css("border", "2px solid red");
+    } else {
+        $(this).css("border", "1px solid #ccc");
+    }
+});
 
 /* ------------------------------
-5) 최종 submit  AJAX 처리
+6) 계좌번호 유효성 검사 + 자동 정리
 ------------------------------ */
-$("form").submit(function(e) {
-e.preventDefault();  // 폼 기본 제출 막기
+$("input[name='accountNo']").on('input', function () {
+    let v = $(this).val()
+        .replace(/[^0-9\-]/g, '');
 
-// 클라이언트 유효성 검사
-if (!shopNameOk) {
-showErrorAlert("상점명 중복확인을 완료해주세요.");
-return false;
-}
+    // 연속 하이픈 제거
+    v = v.replace(/-+/g, '-');
 
-let addr = $("input[name='shopAddress']").val().trim();
-if (addr.length < 5) {
-showErrorAlert("사업장 주소를 입력해주세요.");
-return false;
-}
+    $(this).val(v);
 
-let biz = $("input[name='bizNo']").val().trim();
-if (biz.length !== 12) {
-showErrorAlert("올바른 사업자 등록번호 형식이 아닙니다.");
-return false;
-}
+    const accountRegex = /^[0-9\-]{8,20}$/;
 
-// 파일 포함 FormData
-let formData = new FormData(this);
-
-$.ajax({
-url: "/shop/register/step",
-type: "POST",
-data: formData,
-processData: false,
-contentType: false,
-beforeSend: function (xhr) { xhr.setRequestHeader(header, token); },
-success: function(res) {
-    console.log("서버 응답:", res);
-
-    // 서버 응답 검사
-    if (res.result !== "OK") {
-        showErrorAlert({
-            icon: "error",
-            title: "입점 신청 실패",
-            text: res.message || "입점 신청에 실패했습니다.",
-            confirmButtonText: "확인"
-        });
-        return;
+    if (!accountRegex.test(v)) {
+        $(this).css("border", "2px solid red");
+    } else {
+        $(this).css("border", "1px solid #ccc");
     }
-    Swal.fire({icon: 'success', title: '입점 신청이 완료되었습니다!', confirmButtonText: '확인'}).then(() => {
-        window.location.href = "/shop/login";
-    });
-    
-},
+});
 
-error: function(xhr) {
-    console.log("에러 응답:", xhr.responseJSON);
+/* ------------------------------
+7) 최종 submit AJAX 처리
+------------------------------ */
+$("form").submit(function (e) {
+    e.preventDefault();
 
-    showErrorAlert("서버 오류가 발생했습니다.");
+    /* 상점명 중복확인 */
+    if (!shopNameOk) {
+        showErrorAlert("상점명 중복확인을 완료해주세요.");
+        return false;
+    }
 
-        // form 내부 입력값 전체 초기화
-        $("form")[0].reset();
+    /* 주소 */
+    let addr = $("input[name='shopAddress']").val().trim();
+    if (addr.length < 5) {
+        showErrorAlert("사업장 주소를 입력해주세요.");
+        return false;
+    }
 
-        // 파일명 표시 영역도 초기화
-        $("#fileNameDisplay").text("");
+    /* 사업자 번호 */
+    let biz = $("input[name='bizNo']").val().trim();
+    if (biz.length !== 12) {
+        showErrorAlert("올바른 사업자 등록번호 형식이 아닙니다.");
+        return false;
+    }
 
-        // 중복확인 상태 초기화
-        shopNameOk = false;
+    /* 은행명 */
+    let bankName = $("input[name='bankName']").val().trim();
+    const bankRegex = /^[가-힣]{2,10}$/;
+    if (!bankRegex.test(bankName)) {
+        showErrorAlert("은행명은 한글 2~10자로 입력해주세요.");
+        return false;
+    }
 
-        // 페이지 다시 로드하여 완전 초기화
-        window.location.href = "/shop/register/step";
-}
+    /* 계좌번호 */
+    let accountNo = $("input[name='accountNo']").val().trim();
+    const accountRegex = /^[0-9\-]{8,20}$/;
+    if (!accountRegex.test(accountNo)) {
+        showErrorAlert("계좌번호 형식이 올바르지 않습니다.");
+        return false;
+    }
 
-//$('#fileNameDisplay').text('선택된 파일: ' + file.name);
+    /* FormData 생성 */
+    let formData = new FormData(this);
+
+    // 계좌번호 하이픈 제거 후 전송
+    formData.set("accountNo", accountNo.replaceAll("-", ""));
+
+    $.ajax({
+        url: "/shop/register/step",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader(header, token);
+        },
+        success: function (res) {
+            if (res.result !== "OK") {
+                showErrorAlert(res.message || "입점 신청에 실패했습니다.");
+                return;
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: '입점 신청이 완료되었습니다!',
+                confirmButtonText: '확인'
+            }).then(() => {
+                window.location.href = "/shop/login";
+            });
+        },
+        error: function () {
+            showErrorAlert("서버 오류가 발생했습니다.");
+            window.location.href = "/shop/register/step";
+        }
     });
 });
