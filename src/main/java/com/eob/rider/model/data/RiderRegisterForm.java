@@ -21,4 +21,13 @@ public class RiderRegisterForm {
     // input="file" 이기 때문에 MultipartFile 객체로 받아준다.
     private MultipartFile licenseFile;
 
+    @NotEmpty(message = "은행명은 필수 입력 항목입니다.")
+    private String bankName;
+
+    @NotEmpty(message = "예금주는 필수 입력 항목입니다.")
+    private String accountName;
+
+    @NotEmpty(message = "계좌번호는 필수 입력 항목입니다.")
+    private String accountNo;
+
 }

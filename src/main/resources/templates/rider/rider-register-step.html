@@ -202,6 +202,18 @@
                         <input type="file" id="realFile" th:field="*{licenseFile}" accept="image/*" hidden />
                     </div>
                 </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" maxlength="15" id="bankName" th:field="*{bankName}" class="form-control" placeholder="은행명" />
+                    <label for="bankName" class="form-label">은행명</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" maxlength="15" id="accountName" th:field="*{accountName}" class="form-control" placeholder="에금주" />
+                    <label for="accountName" class="form-label">예금주</label>
+                </div>
+                <div class="mb-3 form-floating">
+                    <input type="text" maxlength="15" id="accountNo" th:field="*{accountNo}" class="form-control" placeholder="계좌번호" />
+                    <label for="accountNo" class="form-label">계좌번호</label>
+                </div>
 
                 <div class="mb-3 d-flex justify-content-end">
                     <button type="button" id="backBtn" class="btn btn-primary mx-3">뒤로</button>

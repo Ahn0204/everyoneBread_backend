@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    // tab에 active 권한 부여
+
     // 스크롤이 발생하는 메인 콘텐츠 영역
     const $mainContent = $('.main-content');
 

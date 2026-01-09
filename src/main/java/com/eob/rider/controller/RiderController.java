@@ -1,7 +1,9 @@
 package com.eob.rider.controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,9 +23,16 @@ import com.eob.common.util.FileUtil;
 import com.eob.common.util.CustomFileException;
 import com.eob.common.util.StringUtil;
 import com.eob.member.model.data.MemberEntity;
+import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.data.OrderStatus;
+import com.eob.rider.model.data.CommunityEmotionsEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
+import com.eob.rider.model.data.OrderHistoryResponseDTO;
+import com.eob.rider.model.data.RiderCommunityEntity;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.data.RiderRegisterForm;
+import com.eob.rider.model.service.KakaoLocalService;
+import com.eob.rider.model.service.KakaoMobilityService;
 import com.eob.rider.model.service.RiderService;
 
 import jakarta.mail.Multipart;
@@ -40,11 +49,51 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class RiderController {
 
     private final RiderService riderService;
+    private final StringUtil stringUtil;
+    private final KakaoLocalService kakaoLocalService;
+
+    private final KakaoMobilityService kakaoMobilityService;
 
     // 메인 페이지 이동 메서드
     @GetMapping("/")
-    public String mainPage() {
+    public String mainPage(Model model, @AuthenticationPrincipal CustomSecurityDetail principal) {
+        List<OrderHistoryEntity> list = this.riderService.getOrderHistory("all", principal.getMember());
+        System.out.println(list.size());
+        model.addAttribute("list", list);
+
         return "rider/rider-main";
+    }
+
+    // 주문 관련 페이지 이동
+    @GetMapping("/order/{type}")
+    public String orderPage(@PathVariable(name = "type") String type,
+            @AuthenticationPrincipal CustomSecurityDetail principal, Model model) {
+        List<OrderHistoryEntity> list = this.riderService.getOrderHistory(type, principal.getMember());
+        model.addAttribute("list", list);
+
+        if (type.equals("request") || type.equals("myOrder")) {
+            // 라이더의 주문 목록과 내 주문 목록 요청일 경우
+            return "rider/rider-main";
+        } else {
+            // 그 외 모든 잘못된 요청
+            return "redirect:/rider/";
+        }
+    }
+
+    @GetMapping("/order/refresh/{type}")
+    public String orderRefreshPate(
+            @PathVariable(name = "type") String type,
+            @AuthenticationPrincipal CustomSecurityDetail principal, Model model) {
+        List<OrderHistoryEntity> list = this.riderService.getOrderHistory(type, principal.getMember());
+        model.addAttribute("list", list);
+
+        if (type.equals("request") || type.equals("myOrder") || type.equals("all")) {
+            // 라이더의 주문 목록과 내 주문 목록 요청일 경우
+            return " rider/fragment_order :: orderList";
+        } else {
+            // 그 외 모든 잘못된 요청
+            return "redirect:/rider/";
+        }
     }
 
     // 내정보 페이지 이동 메서드
@@ -97,20 +146,21 @@ public class RiderController {
 
     // 라이더 서류 정보 저장 메서드
     @PostMapping("/revision-request")
-    public String revisionRequest(RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
+    public String revisionRequest(@Valid RiderRegisterForm riderRegisterForm, BindingResult bindingResult,
             HttpSession session, Model model) {
+        System.out.println("rider/revision-request 실행");
         // TODO: process POST request
         Long riderNo = (Long) session.getAttribute("riderNo");
         if (bindingResult.hasErrors()) {
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         }
         try {
             this.riderService.updateRevisionRequest(riderRegisterForm, riderNo);
         } catch (CustomFileException e) {
             bindingResult.rejectValue("licenseFile", "empty", e.getMessage());
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         } catch (Exception e) {
-            return "redirect:/rider/revision-request/" + riderNo;
+            return "rider/rider-revision";
         }
 
         session.removeAttribute("riderNo");
@@ -258,4 +308,57 @@ public class RiderController {
         return "redirect:/rider/login";
     }
 
+    // ================================================================
+    // order 관련 로직
+    // OrderNo로 OrderHistory 조회
+    @PostMapping("/ajaxOrderDetail")
+    @ResponseBody
+    public OrderHistoryResponseDTO ajaxOrderDetail(
+            @RequestParam("orderNo") Long orderNo,
+            @AuthenticationPrincipal CustomSecurityDetail principal) {
+
+        OrderHistoryEntity entity = riderService.ajaxOrderDetail(orderNo);
+        return OrderHistoryResponseDTO.from(entity, principal.getMember());
+    }
+
+    // 최적의 이동 경로 가져오기 [배달]
+    @PostMapping("/ajaxGetKakaoMobilityDirections")
+    @ResponseBody
+    public Map<String, Object> ajaxGetKakaoMobilityDirections(
+            @RequestParam("riderLat") double riderLat,
+            @RequestParam("riderLng") double riderLng,
+            @RequestParam("destinationLat") double destinationLat,
+            @RequestParam("destinationLng") double destinationLng) {
+        // TODO: process POST request
+        Map<String, Object> result = this.kakaoMobilityService.getDirections(riderLng, riderLat, destinationLng,
+                destinationLat);
+        return result;
+    }
+
+    // 라이더 커뮤니티 페이지로 이동
+
+    // @GetMapping("/community")
+    // @PreAuthorize("isAuthenticated()")
+    // public String communityView(Model model) {
+    // System.out.println("커뮤니티 이동");
+    // List<RiderCommunityEntity> list = this.riderService.getCommunityList();
+
+    // for (RiderCommunityEntity community : list) {
+    // int likeCount = 0;
+    // int unlikeCount = 0;
+
+    // for (CommunityEmotionsEntity dto : community.getEmotions()) {
+    // if (dto.getEmotionsType() == 1) {
+    // likeCount++;
+    // } else if (dto.getEmotionsType() == 2) {
+    // unlikeCount++;
+    // }
+    // }
+    // community.setLikeCount(likeCount);
+    // community.setUnlikeCount(unlikeCount);
+    // }
+
+    // model.addAttribute("list", list);
+
+    // }
 }

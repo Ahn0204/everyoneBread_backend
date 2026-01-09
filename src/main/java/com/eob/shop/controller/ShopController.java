@@ -212,19 +212,19 @@ public class ShopController {
         // 예금주명 체크
         if (shop.getAccountName() == null || shop.getAccountName().isBlank()) {
             return ResponseEntity.badRequest()
-                .body(Map.of("result", "FAIL", "message", "ACCOUNT_NAME_REQUIRED"));
+                    .body(Map.of("result", "FAIL", "message", "ACCOUNT_NAME_REQUIRED"));
         }
 
         // 은행명 체크
         if (shop.getBankName() == null || shop.getBankName().isBlank()) {
             return ResponseEntity.badRequest()
-                .body(Map.of("result", "FAIL", "message", "BANK_NAME_REQUIRED"));
+                    .body(Map.of("result", "FAIL", "message", "BANK_NAME_REQUIRED"));
         }
 
         // 계좌번호 체크
         if (shop.getAccountNo() == null || shop.getAccountNo().isBlank()) {
             return ResponseEntity.badRequest()
-                .body(Map.of("result", "FAIL", "message", "ACCOUNT_NO_REQUIRED"));
+                    .body(Map.of("result", "FAIL", "message", "ACCOUNT_NO_REQUIRED"));
         }
 
         // 이미 가입 완료된 경우 중복 실행 방지
@@ -287,7 +287,6 @@ public class ShopController {
         System.out.println("accountName = " + shop.getAccountName());
         System.out.println("bankName    = " + shop.getBankName());
         System.out.println("accountNo   = " + shop.getAccountNo());
-
 
         // 저장
         shopService.saveShop(shop);

@@ -108,8 +108,9 @@ public class OrderHistoryEntity {
      * 주문 진행 상태
      */
     @Enumerated(EnumType.STRING)
+
     @Column(nullable = true)
-    private OrderStatus status = OrderStatus.WAIT; // 기본값 지정
+    private OrderStatus status = OrderStatus.ORDER; // 기본값 지정
 
     /**
      * 거절 사유

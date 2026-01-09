@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import com.eob.member.model.data.MemberEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,6 +42,7 @@ public class ShopEntity {
      */
     @OneToOne
     @JoinColumn(name = "MEMBER_NO", nullable = false)
+    @JsonIgnore
     private MemberEntity member;
 
     /**
