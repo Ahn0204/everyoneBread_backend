@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eob.common.websocket.shop.dto.ShopOrderSocketMessage;
+import com.eob.common.websocket.shop.sender.ShopSocketSender;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
 import com.eob.order.model.data.CartDTO;
@@ -41,6 +43,9 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ShopService shopService;
+
+    // 판매자에게 실시간 알림을 보내기 위한 WebSocket Sender
+    private final ShopSocketSender shopSocketSender;
 
     /**
      * [판매자]
@@ -83,6 +88,24 @@ public class OrderService {
 
         // 상태 변경
         order.setStatus(OrderStatus.PREPARE);
+
+        // WebSocket을 통한 실시간 알림 전송
+        // 추가 시각: 2026/01/09
+        /**
+         * 판매자에게 실시간 주문 알림 보내기
+         * ShopOrderSocketMessage : 판매자에게 보낼 웹소켓 메시지 데이터 상자
+         */
+        ShopOrderSocketMessage socketMessage = new ShopOrderSocketMessage(
+            order.getOrderNo(),                   // 주문 번호
+            order.getShop().getShopNo(),          // 가게 번호
+            "새로운 주문이 들어왔습니다!",  // 판매자에게 보여줄 메시지
+            order.getStatus().name()              // 주문 상태
+        );
+
+        // ShopSocketSender를 통해 해당 가게(shopNo)를 구독 중인 판매자 브라우저들에게 실시간으로 메시지 전송
+        shopSocketSender.sendNewOrder(
+            order.getShop().getShopNo(), socketMessage
+        );
     }
 
     /**
@@ -192,7 +215,6 @@ public class OrderService {
         // 1에서 insert된 주문 내역의 order가져오기-> orderNo로 넣은 merchantUid 사용
         OrderHistoryEntity ordered = orderHistoryRepository.save(order); // cascadeType.ALL 설정 => 주문 내역&주문시간 엔티티 동시 저장 +
                                                                          // 방금 저장한 주문내역 엔티티를 변수에 담기
-
         // 2.주문 상세 내역 insert
         System.out.println("장바구니 문자열 출력:" + orderForm.getCart());
         // 장바구니 내역에서 주문 상세에 넣을 상품 정보 조회
@@ -229,6 +251,24 @@ public class OrderService {
         // 생성된 List<상세내역>를 주문내역에 저장
         ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));
         orderHistoryRepository.save(ordered);
+
+        // WebSocket을 통한 실시간 알림 전송
+        // 추가 시각: 2026/01/09
+        /**
+         * 판매자에게 실시간 주문 알림 보내기
+         * ShopOrderSocketMessage : 판매자에게 보낼 웹소켓 메시지 데이터 상자
+         */
+        ShopOrderSocketMessage socketMessage = new ShopOrderSocketMessage(
+            ordered.getOrderNo(),                   // 주문 번호
+            ordered.getShop().getShopNo(),          // 가게 번호
+            "새로운 주문이 들어왔습니다!",  // 판매자에게 보여줄 메시지
+            ordered.getStatus().name()              // 주문 상태
+        );
+
+        // ShopSocketSender를 통해 해당 가게(shopNo)를 구독 중인 판매자 브라우저들에게 실시간으로 메시지 전송
+        shopSocketSender.sendNewOrder(
+            ordered.getShop().getShopNo(), socketMessage
+        );
     }
 
 }

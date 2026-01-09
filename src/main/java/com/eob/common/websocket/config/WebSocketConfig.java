@@ -1,4 +1,4 @@
-package com.eob.common.webSocket;
+package com.eob.common.websocket.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
         // 클라이언트가 접속할 웹소켓 URL 설정 (ws://localhost:8080/ws/alert)
         // .withSockJS(); 웹소켓을 지원하지 않는 브라우저를 위한 대체 통신을 허용함
-        registry.addEndpoint("ws/alert").withSockJS();
+        registry.addEndpoint("/ws/alert").setAllowedOriginPatterns("*").withSockJS();
     }
 
     // STOMP 규칙 설정(메세지를 보내는 경로)
