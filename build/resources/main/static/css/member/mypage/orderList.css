@@ -55,13 +55,13 @@
 }
 
 /* 상태별 색상 */
-.status-WAIT {
+.status-ORDER {
     background: #6c757d;
 }
-.status-PREPARE {
+.status-REQUEST {
     background: #ff9800;
 }
-.status-DELIVERING {
+.status-PICKUP {
     background: #2196f3;
 }
 .status-COMPLETE {

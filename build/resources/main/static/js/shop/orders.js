@@ -26,8 +26,8 @@ function loadOrderDashboard() {
         .then((response) => response.json())
         .then((data) => {
             document.getElementById('dash-today').innerText = data.today; // 오늘 주문 수
-            document.getElementById('dash-wait').innerText = data.wait; // 대기 주문 수
-            document.getElementById('dash-delivering').innerText = data.delivering; // 배송 중 주문 수
+            document.getElementById('dash-order').innerText = data.order; // 대기 주문 수
+            document.getElementById('dash-pickup').innerText = data.pickup; // 배송 중 주문 수
             document.getElementById('dash-complete').innerText = data.complete; // 완료 주문 수
         })
         // 에러 처리

@@ -63,8 +63,8 @@
 
                         <button class="order-btn" th:if="${order.canReorder}">재구매하기</button>
 
-                        <!-- 주문 상태가 WAIT(대기)일 때만 -->
-                        <button class="order-btn cancelOrderBtn" th:if="${order.status == T(com.eob.order.model.data.OrderStatus).WAIT}" th:data-orderno="${order.orderNo}">주문취소</button>
+                        <!-- 주문 상태가 ORDER(대기)일 때만 -->
+                        <button class="order-btn cancelOrderBtn" th:if="${order.status == T(com.eob.order.model.data.OrderStatus).ORDER}" th:data-orderno="${order.orderNo}">주문취소</button>
 
                         <button class="order-btn orderInquiry" th:data-orderno="${order.orderNo}">관리자 문의</button>
                     </div>

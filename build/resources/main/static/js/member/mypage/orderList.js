@@ -90,7 +90,7 @@ function renderOrderDetail(order) {
         `);
     });
 
-    if (order.status === 'WAIT') {
+    if (order.status === 'ORDER') {
         $('#modalCancelBtn')
             .show()
             .data('orderno', order.orderNo);

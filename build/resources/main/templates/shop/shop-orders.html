@@ -39,12 +39,12 @@
 
                 <div class="dashboard-box">
                     <div class="dash-title">대기 주문</div>
-                    <div class="dash-value" id="dash-wait">0</div>
+                    <div class="dash-value" id="dash-order">0</div>
                 </div>
 
                 <div class="dashboard-box">
                     <div class="dash-title">배송 중</div>
-                    <div class="dash-value" id="dash-delivering">0</div>
+                    <div class="dash-value" id="dash-pickup">0</div>
                 </div>
 
                 <div class="dashboard-box">
@@ -71,23 +71,23 @@
             </a>
 
             <!-- 대기 -->
-            <a th:href="@{/shop/orders(status=WAIT)}"
+            <a th:href="@{/shop/orders(status=ORDER)}"
             class="status-tab"
-            th:classappend="${status != null and status.name() == 'WAIT'} ? 'active'">
+            th:classappend="${status != null and status.name() == 'ORDER'} ? 'active'">
                 대기
             </a>
 
             <!-- 준비 -->
-            <a th:href="@{/shop/orders(status=PREPARE)}"
+            <a th:href="@{/shop/orders(status=REQUEST)}"
             class="status-tab"
-            th:classappend="${status != null and status.name() == 'PREPARE'} ? 'active'">
+            th:classappend="${status != null and status.name() == 'REQUEST'} ? 'active'">
                 준비
             </a>
 
             <!-- 배송중 -->
-            <a th:href="@{/shop/orders(status=DELIVERING)}"
+            <a th:href="@{/shop/orders(status=PICKUP)}"
             class="status-tab"
-            th:classappend="${status != null and status.name() == 'DELIVERING'} ? 'active'">
+            th:classappend="${status != null and status.name() == 'PICKUP'} ? 'active'">
                 배송중
             </a>
 
@@ -138,7 +138,7 @@
                 <div class="order-actions">
 
                     <!-- 대기 -->
-                    <th:block th:if="${order.status.name() == 'WAIT'}">
+                    <th:block th:if="${order.status.name() == 'ORDER'}">
                         <form th:action="@{/shop/orders/{orderNo}/accept(orderNo=${order.orderNo})}"
                             method="post" onclick="event.stopPropagation();">
                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
@@ -153,12 +153,12 @@
                     </th:block>
 
                     <!-- 준비 -->
-                    <th:block th:if="${order.status.name() == 'PREPARE'}">
+                    <th:block th:if="${order.status.name() == 'REQUEST'}">
                         <span>상품 준비 중</span>
                     </th:block>
 
                     <!-- 배송중 -->
-                    <th:block th:if="${order.status.name() == 'DELIVERING'}">
+                    <th:block th:if="${order.status.name() == 'PICKUP'}">
                         <span>배송 중</span>
                     </th:block>
 
