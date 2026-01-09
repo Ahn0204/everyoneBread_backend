@@ -1,4 +1,4 @@
-package com.eob.common.websocket.shop.dto;
+package com.eob.common.webSocket.shop.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

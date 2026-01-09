@@ -1,4 +1,4 @@
-package com.eob.common.websocket.admin.controller;
+package com.eob.common.webSocket.admin.controller;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;

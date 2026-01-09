@@ -8,9 +8,9 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.eob.common.websocket.shop.dto.ShopOrderSocketMessage;
-import com.eob.common.websocket.shop.sender.ShopSocketSender;
 import com.eob.alert.model.service.AlertService;
+import com.eob.common.webSocket.shop.dto.ShopOrderSocketMessage;
+import com.eob.common.webSocket.shop.sender.ShopSocketSender;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
 import com.eob.order.model.data.CartDTO;

@@ -1,9 +1,9 @@
-package com.eob.common.websocket.shop.sender;
+package com.eob.common.webSocket.shop.sender;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import com.eob.common.websocket.shop.dto.ShopOrderSocketMessage;
+import com.eob.common.webSocket.shop.dto.ShopOrderSocketMessage;
 
 import lombok.RequiredArgsConstructor;
 /**
