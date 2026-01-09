@@ -246,6 +246,10 @@ public class OrderService {
             // e.printStackTrace();
         }
 
+        // 생성된 List<상세내역>를 주문내역에 저장
+        ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));
+        orderHistoryRepository.save(ordered);
+
         // 3. 판매자에게 알림 insert,웹소켓으로 메세지전송
         // 판매자DB에 알림 INSERT
         MemberEntity shopMember = shop.getMember();
@@ -256,27 +260,6 @@ public class OrderService {
         String shopId = shopMember.getMemberId();
         messagingTemplat.convertAndSendToUser(shopId, "/to/order", "주문이 추가되었습니다.");
 
-        // 생성된 List<상세내역>를 주문내역에 저장
-        ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));
-        orderHistoryRepository.save(ordered);
-
-        // WebSocket을 통한 실시간 알림 전송
-        // 추가 시각: 2026/01/09
-        /**
-         * 판매자에게 실시간 주문 알림 보내기
-         * ShopOrderSocketMessage : 판매자에게 보낼 웹소켓 메시지 데이터 상자
-         */
-        ShopOrderSocketMessage socketMessage = new ShopOrderSocketMessage(
-            ordered.getOrderNo(),                   // 주문 번호
-            ordered.getShop().getShopNo(),          // 가게 번호
-            "새로운 주문이 들어왔습니다!",  // 판매자에게 보여줄 메시지
-            ordered.getStatus().name()              // 주문 상태
-        );
-
-        // ShopSocketSender를 통해 해당 가게(shopNo)를 구독 중인 판매자 브라우저들에게 실시간으로 메시지 전송
-        shopSocketSender.sendNewOrder(
-            ordered.getShop().getShopNo(), socketMessage
-        );
     }
 
 }

@@ -60,7 +60,7 @@ public class OrderController {
         // 토큰발급받기
         String token = portOneService.getToken();
         try {
-            // 결제 성공 시 DB에 주문내역 insert
+            // 결제 성공 시 DB에 주문내역 insert, 판매자에게 알림 출력시키기
             this.orderService.insertOrder(orderForm);
             // 주문내역으로 이동
             model.addAttribute("title", "주문 완료");
