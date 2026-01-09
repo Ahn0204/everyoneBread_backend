@@ -2,6 +2,7 @@ package com.eob.order.controller;
 
 import java.util.ArrayList;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ public class OrderController {
 
     private final PortOneService portOneService;
     private final OrderService orderService;
+    private final SimpMessagingTemplate messagingTemplat; // STOMP 메세지 발송 전용 객체
 
     // 주문 페이지 접속
     @PreAuthorize("isAuthenticated()")

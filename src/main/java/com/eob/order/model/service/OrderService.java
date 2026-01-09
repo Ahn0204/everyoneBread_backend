@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ShopService shopService;
+    private final SimpMessagingTemplate messagingTemplat; // STOMP 메세지 발송 전용 객체
 
     /**
      * [판매자]
@@ -219,6 +221,10 @@ public class OrderService {
                 orderDetail.setCreatedAt(LocalDateTime.now()); // insert일시
                 orderDetailRepository.save(orderDetail); // 주문 상세 내역 insert
             } // 결제한 장바구니의 상품 1개 꺼내는 반복문 종료
+
+            // 판매자에게 알림 주기
+            String shopId = shop.getMember().getMemberId();
+            messagingTemplat.convertAndSendToUser(shopId, "/to/order", "주문이 ");
 
         } catch (Exception e) {
             portOneService.getRefund(token, orderForm.getMerchantUid()); // 결제 취소
