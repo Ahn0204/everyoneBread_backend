@@ -60,9 +60,25 @@ public class RiderEntity {
     private LocalDate licenseCreatedAt;
 
     /**
-     * 운전면허 등록증 사
+     * 운전면허 등록증 사진
      */
     private String licenseFile;
+
+    /**
+     * 은행명
+     */
+    private String bankName;
+
+    /**
+     * 예금주명
+     */
+    private String accountName;
+
+    /**
+     * 계좌번호
+     */
+    private String accountNo;
+
     /**
      * 라이더 회원의 등록일
      */

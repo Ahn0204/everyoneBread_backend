@@ -12,6 +12,14 @@
         <!-- jQuery / SweetAlert -->
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
+
+        <!--웹소켓 알림 js-->
+        <!--SockJS 라이브러리 로드-->
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+        <!--STOMP 프로토콜 클라이언트 라이브러리 로드-->
+        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+        <script th:src="@{/js/shop/alert.js}"></script>
 
         <!-- 판매자 공통 CSS (파일 만들면 활성화) -->
         <!-- <link rel="stylesheet" th:href="@{/css/shop/shop-common.css}"> -->

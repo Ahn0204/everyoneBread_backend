@@ -1,7 +1,10 @@
 package com.eob.rider.model.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +16,20 @@ import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
 import com.eob.member.repository.MemberRepository;
+import com.eob.order.model.data.OrderDetailEntity;
+import com.eob.order.model.data.OrderHistoryEntity;
+import com.eob.order.model.data.OrderStatus;
+import com.eob.order.model.repository.OrderDetailRepository;
+import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.MemberRegisterForm;
+import com.eob.rider.model.data.RiderCommunityEntity;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
 import com.eob.rider.model.repository.RiderRepository;
+import com.eob.shop.model.data.ProductEntity;
+import com.eob.shop.repository.ProductRepository;
 
 import jakarta.persistence.Transient;
 import jakarta.transaction.Transactional;
@@ -33,6 +44,10 @@ public class RiderService {
 
     private final MemberRepository memberRepository;
     private final RiderRepository riderRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
+    private final OrderDetailRepository orderDetailRepository;
+    private final ProductRepository productRepository;
+    // private final RiderCommunityRepository riderCommunityRepository;
 
     @Transactional
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
@@ -55,14 +70,15 @@ public class RiderService {
 
         RiderEntity rider = RiderEntity.builder().member(member).aStatus(ApprovalStatus.PENDING)
                 .riderLicense(riderForm.getDriverLicense()).licenseCreatedAt(riderForm.getLicenseCreatedAt())
-                .licenseFile(saveFileName)
+                .licenseFile(saveFileName).accountName(riderForm.getAccountName()).accountNo(riderForm.getAccountNo())
+                .bankName(riderForm.getBankName())
                 .createdAt(LocalDateTime.now()).build();
 
         this.riderRepository.save(rider);
     }
 
     public void passwordChange() {
-        MemberEntity member = this.memberRepository.findByMemberId("test2");
+        MemberEntity member = this.memberRepository.findByMemberId("test3");
         member.setMemberPw(passwordEncoder.encode("1234"));
         this.memberRepository.save(member);
     }
@@ -127,5 +143,75 @@ public class RiderService {
 
         this.riderRepository.save(rider);
     }
+
+    public List<OrderHistoryEntity> getOrderHistory(String type, MemberEntity memberEntity) {
+
+        switch (type) {
+            // 모든 주문들
+            case "all":
+                return this.orderHistoryRepository.findTop10ByStatusInOrderByOrderTimeOrderedAtDesc(
+                        Arrays.asList(OrderStatus.REQUEST, OrderStatus.PICKUP, OrderStatus.COMPLETE));
+            // 라이더가 수락을 받지 않은 모든 주문
+            case "request":
+                return this.orderHistoryRepository.findTop10ByStatusOrderByOrderTimeOrderedAtDesc(
+                        OrderStatus.REQUEST);
+            // 라이더가 수락을 받았거나 배달을 완료한 모든 주문
+            case "myOrder":
+                List<OrderHistoryEntity> pickups = this.orderHistoryRepository
+                        .findByStatusAndRiderOrderByOrderTimeOrderedAtDesc(OrderStatus.PICKUP, memberEntity);
+                List<OrderHistoryEntity> completes = this.orderHistoryRepository
+                        .findTop10ByStatusAndRiderOrderByOrderTimeOrderedAtDesc(OrderStatus.COMPLETE, memberEntity);
+                List<OrderHistoryEntity> result = new ArrayList<>();
+                result.addAll(pickups);
+                result.addAll(completes);
+                return result;
+            // 그 외에 모든 주문들 출력
+            default:
+                return this.orderHistoryRepository.findTop10ByStatusInOrderByOrderTimeOrderedAtDesc(
+                        Arrays.asList(OrderStatus.REQUEST, OrderStatus.PICKUP, OrderStatus.COMPLETE));
+        }
+    }
+
+    // public OrderHistoryEntity ajaxOrderDetail(Long orderNo) {
+    // // TODO Auto-generated method stub
+    // Optional<OrderHistoryEntity> _dto =
+    // orderHistoryRepository.findByOrderNo(orderNo);
+    // if (_dto.isEmpty()) {
+    // return null;
+    // } else {
+    // List<OrderDetailEntity> detail =
+    // orderDetailRepository.findByOrderNo_OrderNo(_dto.get().getOrderNo());
+    // for (int i = 0; i < detail.size(); i++) {
+    // ProductEntity product =
+    // productRepository.findByProductNo(detail.get(i).getProductNo());
+    // detail.get(i).setProduct(product);
+    // }
+    // _dto.get().setOrderDetail(detail);
+    // return _dto.get();
+    // }
+    // }
+
+    public OrderHistoryEntity ajaxOrderDetail(Long orderNo) {
+
+        Optional<OrderHistoryEntity> _dto = orderHistoryRepository.findByOrderNo(orderNo);
+
+        if (_dto.isEmpty()) {
+            return null;
+        }
+
+        // System.out.println(_dto.get());
+        // List<OrderDetailEntity> detail =
+        // orderDetailRepository.findByOrderNo_OrderNo(orderNo);
+
+        // _dto.get().setOrderDetail(detail);
+
+        return _dto.get();
+    }
+
+    // // 게시글 10개 가져오기 (초기화면)
+    // public List<RiderCommunityEntity> getCommunityList() {
+    // // TODO Auto-generated method stub
+    // return riderCommunityRepository.findTop10ByOrderByCreateAtDesc();
+    // }
 
 }

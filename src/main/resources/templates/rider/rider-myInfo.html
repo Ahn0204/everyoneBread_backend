@@ -23,6 +23,12 @@
                         </div>
                     </div>
                     <div class="delivery_title">
+                        <span>전화번호</span>
+                        <div class="d-flex">
+                            <input type="text" name="sidebar-memberPhone" id="sidebar-memberEmail" class="custom-h-input" th:value="${maskInfo.memberPhone}" />
+                        </div>
+                    </div>
+                    <div class="delivery_title">
                         <span>주소</span>
                         <div id="shop_address" th:text="${#authentication.principal.member.memberAddress}"></div>
                     </div>
