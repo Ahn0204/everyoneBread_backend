@@ -187,22 +187,13 @@ public class OrderService {
         orderTime.setOrderedAt(LocalDateTime.now()); // 주문 insert되는 시간
         orderTime.setOrder(order); // order저장 시 동시에 insert되도록
         // orderTimeDTO를 order에 set
-        order.setOrderTime(orderTime); // 주문내역DTO의 컬럼값에 cascade설정 되어있으므로 동시 저장됨
-        // this.orderHistoryRepository.save(order); // cascadeType.ALL설정으로 주문 내역, 주문
-        // 시간내역 동시에 저장됨
+        order.setOrderTime(orderTime); // orderHistoryEntity의 컬럼값에 cascadeType.ALL 설정 => 주문 내역 저장 시 시간 엔티티가 동시 저장됨
+
+        // 1에서 insert된 주문 내역의 order가져오기-> orderNo로 넣은 merchantUid 사용
+        OrderHistoryEntity ordered = orderHistoryRepository.save(order); // cascadeType.ALL 설정 => 주문 내역&주문시간 엔티티 동시 저장 +
+                                                                         // 방금 저장한 주문내역 엔티티를 변수에 담기
 
         // 2.주문 상세 내역 insert
-        // 1에서 insert된 주문 내역의 order가져오기-> orderNo로 넣은 merchantUid 사용
-        OrderHistoryEntity ordered = orderHistoryRepository.save(order); // cascadeType.ALL설정으로 주문 내역, 주문
-        // 시간내역 동시에 저장됨
-        // 동시에 해당 엔티티를 변수에 담기
-        // Optional<OrderHistoryEntity> _ordered =
-        // orderHistoryRepository.findById(orderForm.getMerchantUid());
-        // if (_ordered.isEmpty()) { // 해당 주문 내역이 없다면
-        // portOneService.getRefund(token, orderForm.getMerchantUid()); // 결제 취소
-        // }
-        // OrderHistoryEntity ordered = _ordered.get();
-
         System.out.println("장바구니 문자열 출력:" + orderForm.getCart());
         // 장바구니 내역에서 주문 상세에 넣을 상품 정보 조회
         ObjectMapper mapper = new ObjectMapper();

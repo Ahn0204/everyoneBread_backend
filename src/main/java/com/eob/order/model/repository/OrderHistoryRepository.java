@@ -84,4 +84,8 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistoryEntity
         @Query("select coalesce(sum(o.orderPrice), 0) from OrderHistoryEntity o where o.shop.shopNo = :shopNo and o.status != 'REJECT'")
         long sumOrderPriceByShop(@Param("shopNo") Long shopNo);
 
+    /**
+     * 주문 번호로 주문 조회
+     */
+    Optional<OrderHistoryEntity> findByOrderNo(Long orderNo);
 }

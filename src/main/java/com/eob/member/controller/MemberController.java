@@ -20,6 +20,7 @@ import com.eob.member.model.dto.RegisterRequest;
 import com.eob.member.service.MemberService;
 import com.eob.member.service.MypageService;
 import com.eob.member.service.WishlistService;
+import com.eob.order.model.data.OrderDetailResponse;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -145,14 +146,15 @@ public class MemberController {
      */
     @PostMapping("find/phone/check")
     @ResponseBody
-    public ResponseEntity<?> findIdPhoneCheck(
-            @RequestBody SmsVerifyRequest request,
-            HttpSession session) {
+    public ResponseEntity<?> findIdPhoneCheck( @RequestBody SmsVerifyRequest request, HttpSession session) {
+        
+        // 인증번호 검증
         String result = smsService.verifyAuthCode(
-                request.getPhone(),
-                request.getAuthCode(),
-                session);
+            request.getPhone(),
+            request.getAuthCode(),
+            session);
 
+        // 인증 실패
         if (!"SUCCESS".equals(result)) {
             return ResponseEntity
                     .badRequest()
@@ -402,6 +404,40 @@ public class MemberController {
     }
 
     /**
+     * 마이페이지 - 주문 상세 모달
+     */
+    @GetMapping("mypage/order-detail")
+    public String orderDetailModal() {
+        return "member/mypage/order-detail";
+    }
+
+    /**
+     * 마이페이지 - 주문 상세 (AJAX)
+     */
+    @GetMapping("/orders/{orderNo}")
+    @ResponseBody
+    public OrderDetailResponse getOrderDetail(@PathVariable Long orderNo) {
+
+        return mypageService.getOrderDetail(orderNo);
+    }
+
+    /**
+     * 마이페이지 - 주문 취소 (AJAX)
+     */
+    @PostMapping("/orders/{orderNo}/cancel")
+    @ResponseBody
+    public ResponseEntity<?> cancelOrder(
+            @PathVariable Long orderNo,
+            @AuthenticationPrincipal CustomSecurityDetail principal
+    ) {
+        Long memberNo = principal.getMember().getMemberNo();
+
+        mypageService.cancelOrder(orderNo, memberNo);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * 마이페이지 - 즐겨찾기
      */
     @GetMapping("mypage/wishList")
@@ -501,9 +537,48 @@ public class MemberController {
     /**
      * 마이페이지 - 개인정보수정
      */
+    @GetMapping("mypage/info/check")
+    public String info(Model model, HttpSession session) {
+
+        // 개인정보수정 페이지 이동
+        return "member/mypage/info-check";
+    }
+
+    /**
+     * 마이페이지 - 개인정보수정 폼
+     */
     @GetMapping("mypage/info")
-    public String info(Model model) {
+    public String infoPage(Model model, HttpSession session) {
+
+        if (session.getAttribute("INFO_AUTH") == null) {
+            return "redirect:/member/mypage/info/check";
+        }
+
         model.addAttribute("menu", "info");
         return "member/mypage/info";
     }
+
+    /**
+     * 마이페이지 - 개인정보수정 - 비밀번호 확인 (AJAX)
+     */
+    @PostMapping("mypage/info/check")
+    @ResponseBody
+    public ResponseEntity<?> infoCheckConfirm(
+            @RequestBody Map<String, String> body,
+            @AuthenticationPrincipal CustomSecurityDetail principal,
+            HttpSession session
+    ) {
+        String password = body.get("password");
+
+        if (!memberService.checkPassword(principal.getMember(), password)) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("result", "FAIL", "message", "비밀번호가 일치하지 않습니다."));
+        }
+
+        // 인증 성공 → 세션 저장
+        session.setAttribute("INFO_AUTH", true);
+
+        return ResponseEntity.ok(Map.of("result", "OK"));
+    }
+
 }

@@ -103,10 +103,10 @@
         </div>
         <!-- 주문이 있을 때 -->
         <div th:each="order : ${orders}" class="order-card" >
-            <div class="order-row" th:onclick="|location.href='/shop/orders/${order.orderNo}'|" style="cursor:pointer;">
+            <div class="order-row">
 
                 <!-- 좌측: 주문 정보 -->
-                <div class="order-left">
+                <div class="order-left"  th:onclick="|location.href='/shop/orders/${order.orderNo}'|" style="cursor:pointer;">
                     <div class="order-img">상품</div>
 
                     <div class="order-info">
