@@ -121,7 +121,7 @@ public class OrderService {
         OrderHistoryEntity order = orderHistoryRepository.findById(orderNo)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 주문입니다."));
 
-        // 2. 상태 검증 (WAIT만 가능)
+        // 2. 상태 검증 (ORDER만 가능)
         if (order.getStatus() != OrderStatus.ORDER) {
             throw new IllegalStateException("대기 상태의 주문만 거절할 수 있습니다.");
         }

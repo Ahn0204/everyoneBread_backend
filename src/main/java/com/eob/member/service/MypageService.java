@@ -73,7 +73,7 @@ public class MypageService {
                     dto.setShopName(order.getShop().getShopName());
                     // 총 결제 금액
                     dto.setOrderPrice(order.getOrderPrice());
-                    // 주문 상태 (WAIT, PREPARE, COMPLETE 등)
+                    // 주문 상태 (ORDER, REQUEST, COMPLETE 등)
                     dto.setStatus(order.getStatus());
                     // 주문 시간
                     // OrderTimeEntity 내부의 orderedAt 사용
@@ -125,7 +125,7 @@ public class MypageService {
      *
      * 처리 규칙
      * - 본인 주문만 취소 가능
-     * - 상태가 WAIT(대기)인 주문만 취소 가능
+     * - 상태가 ORDER(대기)인 주문만 취소 가능
      * - 취소 시 상태를 CANCEL 또는 REJECT로 변경
      */
     @Transactional

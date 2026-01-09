@@ -77,7 +77,7 @@ public class ShopOrderController {
 
     /**
      * 주문 수락
-     * - WAIT -> PREPARE
+     * - ORDER -> REQUEST
      */
     @PostMapping("/{orderNo}/accept")
     public String acceptOrder(@PathVariable(name = "orderNo") Long orderNo,
@@ -88,7 +88,7 @@ public class ShopOrderController {
 
     /**
      * 주문 거절
-     * - WAIT -> REJECT
+     * - ORDER -> REJECT
      */
     @PostMapping("/{orderNo}/reject")
     public String rejectOrder(@PathVariable(name = "orderNo") Long orderNo,
@@ -115,12 +115,12 @@ public class ShopOrderController {
         // 4. 결과 맵 생성
         Map<String, Long> result = new HashMap<>();
         result.put("today", orderService.countTodayOrders(shopNo)); // 오늘 주문 수
-        // result.put("wait", orderService.countByStatus(shopNo, OrderStatus.WAIT)); //
+        // result.put("order", orderService.countByStatus(shopNo, OrderStatus.ORDER)); //
         // 대기 주문 수
         // result.put("delivering", orderService.countByStatus(shopNo,
         // OrderStatus.DELIVERING)); // 배송중 주문 수
-        result.put("wait", orderService.countByStatus(shopNo, OrderStatus.ORDER)); // 대기 주문 수
-        result.put("delivering", orderService.countByStatus(shopNo, OrderStatus.PICKUP)); // 배송중 주문 수
+        result.put("order", orderService.countByStatus(shopNo, OrderStatus.ORDER)); // 대기 주문 수
+        result.put("pickup", orderService.countByStatus(shopNo, OrderStatus.PICKUP)); // 배송중 주문 수
         result.put("complete", orderService.countByStatus(shopNo, OrderStatus.COMPLETE)); // 완료 주문 수
 
         return result;
