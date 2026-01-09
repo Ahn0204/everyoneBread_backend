@@ -163,4 +163,9 @@ public class OrderHistoryEntity {
      */
     @Column(nullable = true, length = 100)
     private String payAlert;
+
+    public void cancel() {
+        this.status = OrderStatus.REJECT;
+    }
+
 }

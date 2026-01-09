@@ -2,6 +2,14 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{member/mypage/mypage-layout}">
     <head>
         <meta charset="UTF-8" />
+
+        <meta name="_csrf" th:content="${_csrf.token}" />
+        <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-latest.min.js"></script>
+        <!-- SweetAlert2 CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
         <link rel="stylesheet" th:href="@{/css/member/mypage/orderList.css}" />
         <script th:src="@{/js/member/mypage/orderInquiry.js}"></script>
         <title>주문내역</title>
@@ -49,11 +57,15 @@
 
                     <!-- 버튼 -->
                     <div class="order-buttons">
-                        <button class="order-btn" th:attr="data-order-no=${order.orderNo}">주문상세</button>
+                        <button class="order-btn orderDetailBtn" th:data-orderno="${order.orderNo}">주문상세</button>
 
                         <button class="order-btn" th:if="${order.canWriteReview}">리뷰쓰기</button>
 
                         <button class="order-btn" th:if="${order.canReorder}">재구매하기</button>
+
+                        <!-- 주문 상태가 WAIT(대기)일 때만 -->
+                        <button class="order-btn cancelOrderBtn" th:if="${order.status == T(com.eob.order.model.data.OrderStatus).WAIT}" th:data-orderno="${order.orderNo}">주문취소</button>
+
                         <button class="order-btn orderInquiry" th:data-orderno="${order.orderNo}">관리자 문의</button>
                     </div>
                 </div>
@@ -61,6 +73,11 @@
 
             <!--관리자 문의 모달-->
             <div id="modal-order-inquiry"></div>
+
+            <!-- 주문 상세 모달 -->
+            <div id="modal-order-detail"></div>
+
+            <script th:src="@{/js/member/mypage/orderList.js}"></script>
         </div>
     </body>
 </html>

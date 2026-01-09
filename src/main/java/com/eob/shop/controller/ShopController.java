@@ -255,7 +255,8 @@ public class ShopController {
         MemberEntity member = memberService.createShopMember(temp);
 
         // member status값 지정
-        member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
+        // member.setStatus(MemberApprovalStatus.PENDING); // 승인대기 상태
+        member.setStatus(MemberApprovalStatus.ACTIVE); // 활성 상태 (일단 승인처리로 변경)
 
         System.out.println("저장된 MemberNo =" + member.getMemberNo());
 
@@ -265,7 +266,8 @@ public class ShopController {
         shop.setCreatedAt(LocalDateTime.now());
         // shop.setBizImg(fileName);
 
-        shop.setStatus(ShopApprovalStatus.APPLY_REVIEW); // 입점검토 상태
+        // shop.setStatus(ShopApprovalStatus.APPLY_REVIEW); // 입점검토 상태
+        shop.setStatus(ShopApprovalStatus.APPLY_APPROVED); // 입점승인 상태 (일단 승인처리로 변경)
         // location저장
         // Point location = geometryFactory
         // .createPoint(new Coordinate(Double.parseFloat(longitude),

@@ -2,6 +2,7 @@ package com.eob.order.model.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -63,4 +64,8 @@ public interface OrderHistoryRepository extends JpaRepository<OrderHistoryEntity
     @Query("select coalesce(sum(o.orderPrice), 0) from OrderHistoryEntity o where o.shop.shopNo = :shopNo and o.status != 'REJECT'")
     long sumOrderPriceByShop(@Param("shopNo") Long shopNo);
 
+    /**
+     * 주문 번호로 주문 조회
+     */
+    Optional<OrderHistoryEntity> findByOrderNo(Long orderNo);
 }

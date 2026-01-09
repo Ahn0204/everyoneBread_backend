@@ -30,6 +30,13 @@ public class AddressBookEntity {
     @Column(name = "ADDRESS_NO")
     private Long addressNo;
 
+    /**
+     * 회원 번호 FK
+     */
+    // 추가 2026.01.09
+    @Column(name = "MEMBER_NO", nullable = false)
+    private Long memberNo;
+
      /**
      * 별칭 (집/회사 등)
      */
