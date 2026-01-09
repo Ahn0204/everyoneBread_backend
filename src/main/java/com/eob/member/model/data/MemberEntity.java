@@ -1,11 +1,11 @@
 package com.eob.member.model.data;
 
-
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.shop.model.data.ShopEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -44,8 +44,8 @@ public class MemberEntity {
     private String memberId;
 
     /**
-     * 회원 비밀번호 
-     * */
+     * 회원 비밀번호
+     */
     @Column(name = "MEMBER_PW", nullable = false)
     private String memberPw;
 
@@ -82,7 +82,8 @@ public class MemberEntity {
 
     /**
      * 회원 상태
-     * PENDING=가입 대기 | ACTIVE=사용가능 | SUSPENDED=정지 | WITHDRAW=탈퇴 | INACTIVE=폐점 후 계정 존재
+     * PENDING=가입 대기 | ACTIVE=사용가능 | SUSPENDED=정지 | WITHDRAW=탈퇴 | INACTIVE=폐점 후 계정
+     * 존재
      */
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
@@ -115,17 +116,19 @@ public class MemberEntity {
     private Double longitude;
 
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    @JsonIgnore
     private RiderEntity rider;
 
     @OneToOne(mappedBy = "member", fetch = FetchType.LAZY)
+    @JsonIgnore
     private ShopEntity shop;
 
     @PrePersist
-    public void PrePersist(){
+    public void PrePersist() {
         // 생성일 자동 저장
         this.createdAt = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
-    
+
     public void changePassword(String encodedPassword) {
         this.memberPw = encodedPassword;
     }

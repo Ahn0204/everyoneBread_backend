@@ -25,9 +25,14 @@ import com.eob.common.util.StringUtil;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.order.model.data.OrderHistoryEntity;
 import com.eob.order.model.data.OrderStatus;
+import com.eob.rider.model.data.CommunityEmotionsEntity;
 import com.eob.rider.model.data.MemberRegisterForm;
+import com.eob.rider.model.data.OrderHistoryResponseDTO;
+import com.eob.rider.model.data.RiderCommunityEntity;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.data.RiderRegisterForm;
+import com.eob.rider.model.service.KakaoLocalService;
+import com.eob.rider.model.service.KakaoMobilityService;
 import com.eob.rider.model.service.RiderService;
 
 import jakarta.mail.Multipart;
@@ -45,6 +50,9 @@ public class RiderController {
 
     private final RiderService riderService;
     private final StringUtil stringUtil;
+    private final KakaoLocalService kakaoLocalService;
+
+    private final KakaoMobilityService kakaoMobilityService;
 
     // 메인 페이지 이동 메서드
     @GetMapping("/")
@@ -305,29 +313,52 @@ public class RiderController {
     // OrderNo로 OrderHistory 조회
     @PostMapping("/ajaxOrderDetail")
     @ResponseBody
-    public OrderHistoryEntity ajaxOrderDetail(@RequestParam("orderNo") Long orderNo,
+    public OrderHistoryResponseDTO ajaxOrderDetail(
+            @RequestParam("orderNo") Long orderNo,
             @AuthenticationPrincipal CustomSecurityDetail principal) {
 
-        OrderHistoryEntity dto = this.riderService.ajaxOrderDetail(orderNo);
-        MemberEntity rider = dto.getRider();
-        MemberEntity member = principal.getMember();
-        OrderStatus status = dto.getStatus();
-        System.out.println(rider);
-        System.out.println(member);
-        System.out.println(status);
-        System.out.println(dto);
-        // order 상태가 REQUEST 가 아닐때 즉 ASSIGN, PICKUP, COMPLETE 일때
-        if (!status.equals(OrderStatus.REQUEST)) {
-            if (rider.getMemberNo() != member.getMemberNo()) {
-                dto.setOrderAddress(stringUtil.maskAddress(dto.getOrderAddress()));
-                dto.setOrderPhone(stringUtil.maskPhone(dto.getOrderPhone()));
-            } else {
-                dto.setOrderPhone(stringUtil.formatPhone(dto.getOrderPhone()));
-            }
-        } else {
-            dto.setOrderPhone(stringUtil.formatPhone(dto.getOrderPhone()));
-        }
-
-        return dto;
+        OrderHistoryEntity entity = riderService.ajaxOrderDetail(orderNo);
+        return OrderHistoryResponseDTO.from(entity, principal.getMember());
     }
+
+    // 최적의 이동 경로 가져오기 [배달]
+    @PostMapping("/ajaxGetKakaoMobilityDirections")
+    @ResponseBody
+    public Map<String, Object> ajaxGetKakaoMobilityDirections(
+            @RequestParam("riderLat") double riderLat,
+            @RequestParam("riderLng") double riderLng,
+            @RequestParam("destinationLat") double destinationLat,
+            @RequestParam("destinationLng") double destinationLng) {
+        // TODO: process POST request
+        Map<String, Object> result = this.kakaoMobilityService.getDirections(riderLng, riderLat, destinationLng,
+                destinationLat);
+        return result;
+    }
+
+    // 라이더 커뮤니티 페이지로 이동
+
+    // @GetMapping("/community")
+    // @PreAuthorize("isAuthenticated()")
+    // public String communityView(Model model) {
+    // System.out.println("커뮤니티 이동");
+    // List<RiderCommunityEntity> list = this.riderService.getCommunityList();
+
+    // for (RiderCommunityEntity community : list) {
+    // int likeCount = 0;
+    // int unlikeCount = 0;
+
+    // for (CommunityEmotionsEntity dto : community.getEmotions()) {
+    // if (dto.getEmotionsType() == 1) {
+    // likeCount++;
+    // } else if (dto.getEmotionsType() == 2) {
+    // unlikeCount++;
+    // }
+    // }
+    // community.setLikeCount(likeCount);
+    // community.setUnlikeCount(unlikeCount);
+    // }
+
+    // model.addAttribute("list", list);
+
+    // }
 }

@@ -16,24 +16,26 @@ function timeFormat(date) {
 }
 
 function timeSet(response) {
+    console.log('response : ');
+    console.log(response);
     $('.step').eq(1).find('.time').text('');
     $('.step').eq(2).find('.time').text('');
     $('.step').eq(3).find('.time').text('');
     $('.step').eq(0).addClass('done');
     $('.step').eq(0).find('.time').text(timeFormat(response.orderTime.requestedAt));
-    if (response.status == 2) {
+    if (response.status == 'ASSIGNED') {
         $('.step').eq(1).addClass('active');
     } else if (response.status == 3) {
         $('.step').eq(1).addClass('done');
         $('.step').eq(2).addClass('active');
         $('.step').eq(1).find('.time').text(timeFormat(response.orderTime.assignedAt));
-    } else if (response.status == 4) {
+    } else if (response.status == 'PICKUPAT') {
         $('.step').eq(1).addClass('done');
         $('.step').eq(2).addClass('done');
         $('.step').eq(3).addClass('active');
         $('.step').eq(1).find('.time').text(timeFormat(response.orderTime.assignedAt));
         $('.step').eq(2).find('.time').text(timeFormat(response.orderTime.pickupAt));
-    } else if (response.status == 5) {
+    } else if (response.status == 'COMPLETED') {
         $('.step').eq(1).addClass('done');
         $('.step').eq(2).addClass('done');
         $('.step').eq(3).addClass('done');
@@ -55,12 +57,12 @@ $(document).on('click', '.order-card', function () {
     // 클릭된 카드의 data 속성의 orderNo 가지고 ajax로 상세 정보 조회
     let orderNo = $(this).data('order-no');
     console.log(orderNo);
+    console.log('ajax 실행');
     $.ajax({
         url: '/rider/ajaxOrderDetail',
         type: 'POST',
         data: { orderNo },
         success: function (response) {
-            console.log(response);
             // 가격 요소
             let priceElement = $('#orderPrice');
             // 전화번호 요소
@@ -76,6 +78,7 @@ $(document).on('click', '.order-card', function () {
 
             let status = response.status;
 
+            console.log('response 출력 ->');
             console.log(response);
 
             // 데이터 반영
@@ -96,7 +99,11 @@ $(document).on('click', '.order-card', function () {
                 orderDetailElement.append(`<p> ${productName} ${quantity}개 ${totalPrice.toLocaleString()}원</p>`);
             }
         },
-        error: function (xhr, status, message) {},
+        error: function (xhr, status, message) {
+            console.error('xhr : ' + xhr);
+            console.error('status : ' + status);
+            console.error('message : ' + message);
+        },
     });
 });
 

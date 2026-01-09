@@ -23,6 +23,7 @@ import com.eob.order.model.repository.OrderDetailRepository;
 import com.eob.order.model.repository.OrderHistoryRepository;
 import com.eob.rider.model.data.ApprovalStatus;
 import com.eob.rider.model.data.MemberRegisterForm;
+import com.eob.rider.model.data.RiderCommunityEntity;
 import com.eob.rider.model.data.RiderEntity;
 import com.eob.rider.model.data.RiderEntity.RiderEntityBuilder;
 import com.eob.rider.model.data.RiderRegisterForm;
@@ -46,6 +47,7 @@ public class RiderService {
     private final OrderHistoryRepository orderHistoryRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final ProductRepository productRepository;
+    // private final RiderCommunityRepository riderCommunityRepository;
 
     @Transactional
     public void registerMember(MemberRegisterForm memberForm, RiderRegisterForm riderForm) {
@@ -76,7 +78,7 @@ public class RiderService {
     }
 
     public void passwordChange() {
-        MemberEntity member = this.memberRepository.findByMemberId("test2");
+        MemberEntity member = this.memberRepository.findByMemberId("test3");
         member.setMemberPw(passwordEncoder.encode("1234"));
         this.memberRepository.save(member);
     }
@@ -197,11 +199,19 @@ public class RiderService {
             return null;
         }
 
+        // System.out.println(_dto.get());
         // List<OrderDetailEntity> detail =
         // orderDetailRepository.findByOrderNo_OrderNo(orderNo);
 
         // _dto.get().setOrderDetail(detail);
+
         return _dto.get();
     }
+
+    // // 게시글 10개 가져오기 (초기화면)
+    // public List<RiderCommunityEntity> getCommunityList() {
+    // // TODO Auto-generated method stub
+    // return riderCommunityRepository.findTop10ByOrderByCreateAtDesc();
+    // }
 
 }

@@ -16,7 +16,7 @@ public class StringUtil {
      * @param address
      * @return
      */
-    public String maskAddress(String address) {
+    public static String maskAddress(String address) {
         if (address == null)
             return "";
         // 숫자 뒤에 오는 문자열을 마스킹처리
@@ -29,7 +29,7 @@ public class StringUtil {
      * @param phone : 전화번호 (예: 01000000000)
      * @return 마스킹 처리된 전화번호 (예: 010-0000-****)
      */
-    public String maskPhone(String phone) {
+    public static String maskPhone(String phone) {
         // 전화번호가 null이거나 비어있을 경우 빈값 반환
         if (phone == null || phone.isBlank()) {
             return "";
@@ -66,7 +66,7 @@ public class StringUtil {
      * @param riderLicense : 회원의
      * @return
      */
-    public String maskLicense(String riderLicense) {
+    public static String maskLicense(String riderLicense) {
         if (riderLicense == null || riderLicense.length() != 15) {
             return riderLicense; // 형식이 다르면 그대로 반환
         }
@@ -79,7 +79,7 @@ public class StringUtil {
         return first + masked + last;
     }
 
-    public String maskEmail(String email) {
+    public static String maskEmail(String email) {
         if (email == null || email.isBlank()) {
             return "";
         }
@@ -116,7 +116,7 @@ public class StringUtil {
      * @return String "***-****-****"
      * 
      */
-    public String formatPhone(String phone) {
+    public static String formatPhone(String phone) {
         if (phone == null) {
             return "";
         }
