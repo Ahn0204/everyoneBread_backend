@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +32,7 @@ import com.eob.admin.model.repository.FeeHistoryRepository;
 import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.repository.SettleHistoryRepository;
 import com.eob.admin.model.service.AdminService;
+import com.eob.common.security.CustomSecurityDetail;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
 import com.eob.rider.model.data.ApprovalStatus;
@@ -614,9 +616,13 @@ public class AdminController {
     @PostMapping("/inquiry/updateAnswer")
     @ResponseBody
     public boolean ajaxUpdateAnswer(@RequestParam(name = "inquiryNo") long inquiryNo,
-            @RequestParam(name = "answer") String answer) {
+            @RequestParam(name = "answer") String answer, @AuthenticationPrincipal CustomSecurityDetail userDetails) {
         boolean result = false;
-        result = adminService.updateAnswer(inquiryNo, answer);
+        MemberEntity admin = null;
+        if (userDetails != null) {
+            admin = userDetails.getMember();
+        }
+        result = adminService.updateAnswer(admin, inquiryNo, answer);
 
         return result;
     }

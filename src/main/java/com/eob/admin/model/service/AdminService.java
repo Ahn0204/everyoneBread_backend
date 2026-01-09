@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import com.eob.admin.model.repository.BanInquiryRepository;
 import com.eob.admin.model.repository.FeeHistoryRepository;
 import com.eob.admin.model.repository.InquiryRepository;
 import com.eob.admin.model.repository.SettleHistoryRepository;
+import com.eob.alert.model.service.AlertService;
 import com.eob.member.model.data.MemberApprovalStatus;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.model.data.MemberRoleStatus;
@@ -55,6 +57,9 @@ public class AdminService {
     private final BanInquiryRepository baninquiryRepository;
     private final OrderHistoryRepository orderHistoryRepository;
     private final BanInquiryRepository banInquiryRepository;
+
+    private final AlertService alertService;
+    private final SimpMessagingTemplate messagingTemplat; // STOMP 메세지 발송 전용 객체
 
     public boolean insertAdmin(InsertAdminForm form) {
 
@@ -289,9 +294,10 @@ public class AdminService {
      */
 
     /**
-     * 일반 문의 답변 완료 처리
+     * 일반 문의 답변 작성 처리
      */
-    public boolean updateAnswer(long inquiryNo, String answer) {
+    @Transactional
+    public boolean updateAnswer(MemberEntity admin, long inquiryNo, String answer) {
         try {
             // 문의 조회
             Optional<InquiryEntity> _i = inquiryRepository.findById(inquiryNo);
@@ -302,10 +308,18 @@ public class AdminService {
             i.setStatus("y");
             inquiryRepository.save(i);
 
+            // 작성자에 알림DB추가
+            MemberEntity writer = i.getMember();
+            // (보내는멤버Entity, 받는멤버No, 대분류String, 소분류String)
+            alertService.sendAlert(admin, writer.getMemberNo(), "INQUIRY", "ANSWERED");
+
+            // 작성자에 웹소켓 알림 전송
+            messagingTemplat.convertAndSendToUser(writer.getMemberId(), "/to/inquiry", "문의에 답변이 작성되었습니다.");
             return true;
         } catch (Exception e) {
             return false;
         }
+
     }
 
     /**

@@ -22,7 +22,12 @@
         <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b4fd57268b42b0698df77c27d1c4e78c&libraries=services"></script>
         <!-- Daum 주소 API -->
         <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-        <script th:src="@{/js/common/alert.js}"></script>
+        <!--웹소켓 알림 js-->
+        <!--SockJS 라이브러리 로드-->
+        <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+        <!--STOMP 프로토콜 클라이언트 라이브러리 로드-->
+        <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+        <script th:src="@{/js/comm/alert.js}"></script>
         <!--자식페이지에서 추가로 삽입될 head내용-->
         <th:block layout:fragment="head-link"></th:block>
         <style>

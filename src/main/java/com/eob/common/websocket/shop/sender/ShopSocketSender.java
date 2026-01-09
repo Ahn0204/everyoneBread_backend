@@ -1,11 +1,12 @@
-package com.eob.common.websocket.shop.sender;
+package com.eob.common.webSocket.shop.sender;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import com.eob.common.websocket.shop.dto.ShopOrderSocketMessage;
+import com.eob.common.webSocket.shop.dto.ShopOrderSocketMessage;
 
 import lombok.RequiredArgsConstructor;
+
 /**
  * ShopSocketSender
  *
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
  * ✔ Service에서 호출되어 실시간 알림을 전송하는 역할
  *
  * 👉 쉽게 말해
- *    "판매자에게 실시간 알림을 뿌려주는 전담 직원"
+ * "판매자에게 실시간 알림을 뿌려주는 전담 직원"
  */
 @Component
 @RequiredArgsConstructor
@@ -32,13 +33,14 @@ public class ShopSocketSender {
 
     /**
      * 판매자(상점)에게 "새 주문 알림"을 전송하는 메서드
-     * @param shopNo    알림을 받을 가게 번호
-     * @param message   실제로 전송할 메시지 데이터 (DTO)
      * 
-     * 호출 시점
-     * - 소비자가 주문을 생성했을 때 OrderService에서 호출됨
+     * @param shopNo  알림을 받을 가게 번호
+     * @param message 실제로 전송할 메시지 데이터 (DTO)
+     * 
+     *                호출 시점
+     *                - 소비자가 주문을 생성했을 때 OrderService에서 호출됨
      */
-    public void sendNewOrder(Long shopNo, ShopOrderSocketMessage message){
+    public void sendNewOrder(Long shopNo, ShopOrderSocketMessage message) {
         /**
          * convertAndSend()
          * 특정 STOMP 주소로 메시지를 전송하는 메서드

@@ -294,8 +294,9 @@ public class AlertService {
             case "INQUIRY":
                 title = "문의";
                 switch (typeCode) {
-                    case "":
-
+                    case "ANSWERED":
+                        url = "/customerCenter/inquiry";
+                        content = "주문이 수락되었습니다.";
                         break;
 
                     default:

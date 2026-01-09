@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{main/main-layout}">
+    <head>
+        <th:block layout:fragment="head">
+            <link rel="stylesheet" th:href="@{/css/admin/comm/list-comm.css}" />
+            <style>
+                /*항목 너비 설정하는 레이아웃css*/
+                .div-cols {
+                    /*항목을 담는 div에 지정*/
+                    display: flex;
+                    flex-direction: row;
+                    width: 100%;
+                    padding: 10px;
+                }
+                .div-col-1 {
+                    flex: 0.7;
+                }
+                .div-col-2 {
+                    flex: 1.2;
+                }
+                .div-col-3 {
+                    flex: 1;
+                }
+                .div-col-4 {
+                    flex: 1.5;
+                }
+            </style>
+        </th:block>
+    </head>
+    <body>
+        <!--레이아웃의 content 부분에 아래 내용이 출력됨-->
+        <div layout:fragment="content">
+            <div class="listAndList-header m-2">
+                <div th:replace="~{customerCenter/inquiry-header}"></div>
+                <div th:if="${noI}" class="text-center p-3" style="max-width: 1000px; min-width: 800px">
+                    <h4 th:text="${noI}"></h4>
+                </div>
+                <div th:unless="${noI}" class="inquiry-detail">
+                    <div class="inquiry-question border p-2 mb-2" style="max-width: 1000px; min-width: 800px">
+                        <div class="question-title mb-2">
+                            <div class="d-flex justify-content-start">
+                                <div th:text="${#strings.abbreviate(i.question, 10)}"></div>
+                                <button th:if="${i.status=='n'}" class="badge text-bg-secondary p-1 ms-1" th:text="미답변"></button>
+                                <button th:if="${i.status=='y'}" class="badge text-bg-secondary p-1 ms-1" th:text="답변"></button>
+                            </div>
+                            <div th:text="${#temporals.format(i.createdAt, 'YY-MM-dd HH:mm')}"></div>
+                        </div>
+                        <div class="inquiry-object mb-3">
+                            <h5>참조 대상</h5>
+                            <div class="border rounded p-2 object-box">
+                                <div class="border-bottom d-flex flex-row">
+                                    <div class="p-1 pe-2 me-2 gap-1 d-flex flex-row">
+                                        <div><b>상점명</b></div>
+                                        <div th:text="${i.order.shop.shopName}"></div>
+                                    </div>
+                                    <div class="p-1 mb-2 gap-1 d-flex flex-row">
+                                        <div><b>주문자명</b></div>
+                                        <div th:text="${i.order.member.memberName}"></div>
+                                    </div>
+                                </div>
+                                <div class="border-bottom p-1 mb-2">
+                                    <div><b>상품 내역</b></div>
+                                    <div th:each=" o : ${i.order.orderDetail}">
+                                        <div class="p-1" th:text="${o.productNo.productName}+' | '+${o.quantity}+'개 &times;'+${o.price}+'원'"></div>
+                                    </div>
+                                    <div class="p-1 gap-1 d-flex flex-row">
+                                        <div><b>배송비</b></div>
+                                        <div th:text="${i.order.deliveryFee}"></div>
+                                    </div>
+                                </div>
+                                <div class="border-bottom p-1 mb-2 gap-1 d-flex flex-row">
+                                    <b>총 결제 금액</b>
+                                    <b th:text="${i.order.orderPrice}"></b>
+                                </div>
+                            </div>
+                        </div>
+                        <h5>내용</h5>
+                        <div class="border rounded p-2" th:text="${i.question}"></div>
+                    </div>
+                    <div class="inquiry-answer border p-2 mb-3">
+                        <h5>답변</h5>
+                        <div th:if="${i.answer}">
+                            <div></div>
+                            <div class="answer border rounded" th:text="${i.answer}"></div>
+                        </div>
+                        <div th:unless="${i.answer}" class="no-answer border rounded p-2">답변 대기 중입니다.</div>
+                    </div>
+                </div>
+                <div class="btns d-flex justify-content-between">
+                    <a class="btn btn-outline-dark goList" th:href="@{/customerCenter/inquiry(page=${page})}">목록으로</a>
+                    <sec:authorize access="principal.member.memberId == ${i.member.memberId}">
+                        <button type="button" class="btn btn-secondary delete">삭제</button>
+                        <input type="hidden" name="banInquiryNo" class="banInquiryNo" th:value="${i.banInquiryNo}" />
+                    </sec:authorize>
+                </div>
+            </div>
+        </div>
+
+        <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
+        <script layout:fragment="script" text="javascript">
+            $(function () {
+                const inquiryNo = $('.inquiryNo').val();
+                console.log(inquiryNo);
+                //삭제
+                $('.delete').on('click', function () {
+                    showConfirmAlert(
+                        '문의를 삭제하겠습니까?',
+                        () => {
+                            $.ajax({
+                                url: '/customerCenter/inquiry/delete',
+                                type: 'DELETE',
+                                data: { inquiryNo: inquiryNo },
+                                success: function (success) {
+                                    if (success == true) {
+                                        showToast('문의가 삭제되었습니다.', 'success');
+                                    } else {
+                                        showToast('다시 시도해주세요.', 'error');
+                                    }
+                                },
+                                error: function (error) {
+                                    showToast('다시 시도해주세요.', 'error');
+                                },
+                            });
+                        },
+                        () => {}
+                    );
+                });
+            });
+        </script>
+    </body>
+</html>

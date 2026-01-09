@@ -24,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.eob.admin.model.data.BanInquiryEntity;
 import com.eob.admin.model.data.InquiryEntity;
+import com.eob.admin.model.repository.BanInquiryRepository;
 import com.eob.admin.model.repository.CategoryRepository;
 import com.eob.admin.model.repository.DistanceFeeRepository;
 import com.eob.admin.model.repository.InquiryRepository;
@@ -58,6 +60,7 @@ public class mainController {
     private final InquiryRepository inquiryRepository;
     private final AdminService adminService;
     private final OrderHistoryRepository orderHistoryRepository;
+    private final BanInquiryRepository banInquiryRepository;
 
     // 메인 페이지
     @GetMapping("")
@@ -174,7 +177,7 @@ public class mainController {
         return "customerCenter/notice";
     }
 
-    // 일반 문의 - 내역 출력 / 문의하기 버튼
+    // 고객센터 1:1문의 - 일반/신고문의 내역 출력 / 문의하기 버튼
     @PreAuthorize("isAuthenticated()")
     @GetMapping("customerCenter/inquiry")
     public String getInquiryP(@RequestParam(name = "page", defaultValue = "0") int page, Model model,
@@ -187,10 +190,10 @@ public class mainController {
         // 페이징 설정 객체 초기화
         // (현재 페이지int, 한 페이지당 보여줄 레코드의 수int, [정렬기준]);
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-        // 문의 내역 - 페이징 객체로 리턴
+        // 일반 문의 내역 - 페이징 객체로 리턴
         Page<InquiryEntity> inquiryP = inquiryRepository.findByMember_MemberNo(memberNo, pageable);
 
-        // 문의 내역이 존재 하지 않을 때
+        // 일반 문의 내역이 존재 하지 않을 때
         if (inquiryP.getTotalElements() == 0) { // adminP 요소의 총 갯수가 0이면
             model.addAttribute("noList", "조회된 내역이 없습니다.");
         } else {
@@ -201,6 +204,21 @@ public class mainController {
         }
         // 페이징 정보 전달
         model.addAttribute("inquiryP", inquiryP);
+
+        // 신고 문의 내역 - 페이징 객체로 리턴
+        Page<BanInquiryEntity> banInquiryP = banInquiryRepository.findByMember_MemberNo(memberNo, pageable);
+
+        // 신고 문의 내역이 존재하지 않을 때
+        if (banInquiryP.getTotalElements() == 0) {
+            model.addAttribute("noBList", "조회된 내역이 없습니다.");
+        } else {
+            // 글번호 시작값 계산
+            int start = banInquiryP.getSize();
+            // 뷰에 글번호 시작값 전달
+            model.addAttribute("start", start);
+        }
+        // 페이징 정보 전달
+        model.addAttribute("banInquiryP", banInquiryP);
 
         return "customerCenter/inquiry";
     }
@@ -238,6 +256,28 @@ public class mainController {
             model.addAttribute("noI", "조회 가능한 문의가 없습니다.");
         }
         return "customerCenter/inquiry-detail";
+    }
+
+    /**
+     * 신고 문의 - 상세보기
+     */
+    @GetMapping("customerCenter/inquiry/ban/{page}/{banInquiryNo}")
+    public String getBanInquiryDetails(@PathVariable(name = "page", required = false) String page,
+            @PathVariable("banInquiryNo") long banInquiryNo,
+            Model model) {
+        if (page == null) {
+            page = "0";
+        }
+        model.addAttribute("page", page);
+
+        Optional<BanInquiryEntity> _i = banInquiryRepository.findById(banInquiryNo);
+        if (_i.isPresent()) {
+            BanInquiryEntity i = _i.get();
+            model.addAttribute("i", i);
+        } else {
+            model.addAttribute("noI", "조회 가능한 문의가 없습니다.");
+        }
+        return "customerCenter/banInquiry-detail";
     }
 
     // 일반 문의 삭제

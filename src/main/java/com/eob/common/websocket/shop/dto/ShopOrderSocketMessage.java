@@ -1,4 +1,4 @@
-package com.eob.common.websocket.shop.dto;
+package com.eob.common.webSocket.shop.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,14 +9,14 @@ import lombok.Setter;
  * ShopOrderSocketMessage
  *
  * 📌 이 클래스는 "판매자(Shop)에게 전달되는
- *     주문 관련 WebSocket 메시지"를 담는 DTO(Data Transfer Object)이다.
+ * 주문 관련 WebSocket 메시지"를 담는 DTO(Data Transfer Object)이다.
  *
  * ✔ HTTP Controller에서 사용하는 요청/응답 DTO와 완전히 분리된 객체
  * ✔ STOMP(WebSocket) 통신에서만 사용
  * ✔ 서버 → 판매자 브라우저 방향으로 메시지를 보낼 때 사용
  *
  * 👉 즉,
- *    "주문이 발생했을 때 판매자 화면에 실시간으로 알려주기 위한 데이터 묶음"
+ * "주문이 발생했을 때 판매자 화면에 실시간으로 알려주기 위한 데이터 묶음"
  */
 
 @Getter
