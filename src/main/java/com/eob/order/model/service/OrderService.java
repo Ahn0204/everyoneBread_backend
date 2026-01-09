@@ -1,7 +1,6 @@
 package com.eob.order.model.service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.eob.alert.model.service.AlertService;
 import com.eob.member.model.data.MemberEntity;
 import com.eob.member.repository.MemberRepository;
 import com.eob.order.model.data.CartDTO;
@@ -23,10 +23,7 @@ import com.eob.shop.model.data.ProductEntity;
 import com.eob.shop.model.data.ShopEntity;
 import com.eob.shop.repository.ProductRepository;
 import com.eob.shop.repository.ShopRepository;
-import com.eob.shop.service.ShopService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -41,7 +38,7 @@ public class OrderService {
     private final ShopRepository shopRepository;
     private final ProductRepository productRepository;
     private final OrderDetailRepository orderDetailRepository;
-    private final ShopService shopService;
+    private final AlertService alertService;
     private final SimpMessagingTemplate messagingTemplat; // STOMP 메세지 발송 전용 객체
 
     /**
@@ -84,7 +81,7 @@ public class OrderService {
         }
 
         // 상태 변경
-        order.setStatus(OrderStatus.ASSIGN);
+        order.setStatus(OrderStatus.REQUEST);
     }
 
     /**
@@ -152,7 +149,7 @@ public class OrderService {
         // 문제발생 시 결제 취소용
         String token = portOneService.getToken();
 
-        // 1. 주문 내역, 주문 시간 내역 insert 2.주문 상세 내역 insert
+        // 1. 주문 내역, 주문 시간 내역 insert 2.주문 상세 내역 insert 3.판매자에게 알림 insert,웹소켓으로 메세지전송
 
         // 1. 주문내역, 주문 시간 내역 insert
         // 주문 내역 엔티티 생성
@@ -181,7 +178,6 @@ public class OrderService {
         order.setOrderPhone(orderForm.getOrderPhone());
         order.setOrderRequest(orderForm.getOrderRequest());
         order.setRiderRequest(orderForm.getRiderRequest());
-        // order.setOrderName(orderForm.getOrderName());
         order.setShop(shop); // 판매자(가게) 정보
 
         // 주문 시간 엔티티 생성
@@ -196,7 +192,7 @@ public class OrderService {
                                                                          // 방금 저장한 주문내역 엔티티를 변수에 담기
 
         // 2.주문 상세 내역 insert
-        System.out.println("장바구니 문자열 출력:" + orderForm.getCart());
+        // System.out.println("장바구니 문자열 출력:" + orderForm.getCart());
         // 장바구니 내역에서 주문 상세에 넣을 상품 정보 조회
         ObjectMapper mapper = new ObjectMapper();
         List<CartDTO> cartList;
@@ -221,16 +217,21 @@ public class OrderService {
                 orderDetail.setCreatedAt(LocalDateTime.now()); // insert일시
                 orderDetailRepository.save(orderDetail); // 주문 상세 내역 insert
             } // 결제한 장바구니의 상품 1개 꺼내는 반복문 종료
-
-            // 판매자에게 알림 주기
-            String shopId = shop.getMember().getMemberId();
-            messagingTemplat.convertAndSendToUser(shopId, "/to/order", "주문이 ");
-
         } catch (Exception e) {
             portOneService.getRefund(token, orderForm.getMerchantUid()); // 결제 취소
             throw new RuntimeException("장바구니 JSON 파싱 실패", e);
             // e.printStackTrace();
         }
+
+        // 3. 판매자에게 알림 insert,웹소켓으로 메세지전송
+        // 판매자DB에 알림 INSERT
+        MemberEntity shopMember = shop.getMember();
+        // (보내는멤버Entity, 받는멤버No, 대분류String, 소분류String)
+        // =(구매자memberEntity, 상점memberNo, 타입:주문 관련, 타입코드:주문 추가)
+        alertService.sendAlert(member, shopMember.getMemberNo(), "ORDER", "INSERTED");
+        // 판매자 뷰에 알림 출력시키기
+        String shopId = shopMember.getMemberId();
+        messagingTemplat.convertAndSendToUser(shopId, "/to/order", "주문이 추가되었습니다.");
 
         // 생성된 List<상세내역>를 주문내역에 저장
         ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));

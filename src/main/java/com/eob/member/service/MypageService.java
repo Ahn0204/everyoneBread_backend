@@ -57,35 +57,35 @@ public class MypageService {
      * @param memberNo 로그인한 회원 번호
      * @return 회원 주문 목록 (마이페이지 출력용)
      */
-    public List<MyOrderDTO> getMyOrders(Long memberNo){
+    public List<MyOrderDTO> getMyOrders(Long memberNo) {
 
         // 회원 기준 주문 이력 조회 (최신순)
         List<OrderHistoryEntity> orders = orderHistoryRepository.findMyOrders(memberNo);
 
         // Entity -> DTO 변환
         return orders.stream()
-            .map(order -> {
-                MyOrderDTO dto = new MyOrderDTO();
+                .map(order -> {
+                    MyOrderDTO dto = new MyOrderDTO();
 
-                // 주문 번호
-                dto.setOrderNo(order.getOrderNo());
-                // 상점명
-                dto.setShopName(order.getShop().getShopName());
-                // 총 결제 금액
-                dto.setOrderPrice(order.getOrderPrice());
-                // 주문 상태 (WAIT, PREPARE, COMPLETE 등)
-                dto.setStatus(order.getStatus());
-                // 주문 시간
-                // OrderTimeEntity 내부의 orderedAt 사용
-                if(order.getOrderTime() != null){
-                    dto.setOrderTime(order.getOrderTime().getOrderedAt());
-                }
-                // 대표 상품 이름 dto.setMainProductName()
-                // 상품 카운트 dto.setProductCount()
-                // 썸네일 dto.setThumbnail()
+                    // 주문 번호
+                    dto.setOrderNo(order.getOrderNo());
+                    // 상점명
+                    dto.setShopName(order.getShop().getShopName());
+                    // 총 결제 금액
+                    dto.setOrderPrice(order.getOrderPrice());
+                    // 주문 상태 (WAIT, PREPARE, COMPLETE 등)
+                    dto.setStatus(order.getStatus());
+                    // 주문 시간
+                    // OrderTimeEntity 내부의 orderedAt 사용
+                    if (order.getOrderTime() != null) {
+                        dto.setOrderTime(order.getOrderTime().getOrderedAt());
+                    }
+                    // 대표 상품 이름 dto.setMainProductName()
+                    // 상품 카운트 dto.setProductCount()
+                    // 썸네일 dto.setThumbnail()
 
-                return dto;
-            }).toList();
+                    return dto;
+                }).toList();
     }
 
     /**
@@ -101,26 +101,23 @@ public class MypageService {
      */
     public OrderDetailResponse getOrderDetail(Long orderNo) {
 
-        OrderHistoryEntity order =
-            orderHistoryRepository.findByOrderNo(orderNo)
+        OrderHistoryEntity order = orderHistoryRepository.findByOrderNo(orderNo)
                 .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
 
         List<OrderItemDTO> items = order.getOrderDetail().stream()
-            .map(detail -> new OrderItemDTO(
-                detail.getProductNo().getProductName(),
-                detail.getQuantity(),
-                detail.getPrice()
-            ))
-            .toList();
+                .map(detail -> new OrderItemDTO(
+                        detail.getProductNo().getProductName(),
+                        detail.getQuantity(),
+                        detail.getPrice()))
+                .toList();
 
         return new OrderDetailResponse(
-            order.getOrderNo(),
-            order.getStatus(),
-            order.getOrderPrice(),
-            order.getDeliveryFee(),
-            order.getOrderAddress(),
-            items
-        );
+                order.getOrderNo(),
+                order.getStatus(),
+                order.getOrderPrice(),
+                order.getDeliveryFee(),
+                order.getOrderAddress(),
+                items);
     }
 
     /**
@@ -133,17 +130,15 @@ public class MypageService {
      */
     @Transactional
     public void cancelOrder(Long orderNo, Long memberNo) {
-        OrderHistoryEntity order =
-            orderHistoryRepository.findByOrderNo(orderNo)
-            .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
+        OrderHistoryEntity order = orderHistoryRepository.findByOrderNo(orderNo)
+                .orElseThrow(() -> new IllegalArgumentException("주문 없음"));
 
-        if (order.getStatus() != OrderStatus.WAIT) {
+        if (order.getStatus() != OrderStatus.ORDER) {
             throw new IllegalStateException("취소 불가 상태");
         }
 
         order.cancel(); // status = REJECT or CANCEL
     }
-
 
     /**
      * [마이페이지 - 내 후기 목록 조회]
@@ -159,50 +154,46 @@ public class MypageService {
     public List<ReviewListResponse> getMyReviews(Long memberNo) {
 
         // 1️. 리뷰 엔티티 조회 (POSTED 상태만)
-        List<ReviewEntity> reviews =
-                reviewRepository.findMyReviews(memberNo, ReviewStatus.POSTED);
+        List<ReviewEntity> reviews = reviewRepository.findMyReviews(memberNo, ReviewStatus.POSTED);
 
         // 2️. Entity → DTO 변환
         return reviews.stream()
-            .map(review -> {
+                .map(review -> {
 
-                ReviewListResponse dto = new ReviewListResponse();
+                    ReviewListResponse dto = new ReviewListResponse();
 
-                dto.setReviewNo(review.getReviewNo());
-                dto.setContent(review.getContent());
-                dto.setCreatedAt(review.getCreatedAt());
+                    dto.setReviewNo(review.getReviewNo());
+                    dto.setContent(review.getContent());
+                    dto.setCreatedAt(review.getCreatedAt());
 
-                // 별점 (Integer → Double 변환)
-                dto.setRating(
-                    review.getRating() != null
-                        ? review.getRating().doubleValue()
-                        : 0.0
-                );
+                    // 별점 (Integer → Double 변환)
+                    dto.setRating(
+                            review.getRating() != null
+                                    ? review.getRating().doubleValue()
+                                    : 0.0);
 
-                // 주문 정보
-                dto.setOrderNo(review.getOrder().getOrderNo());
+                    // 주문 정보
+                    dto.setOrderNo(review.getOrder().getOrderNo());
 
-                /**
-                 * 상품 정보 주의
-                 * - Order ↔ Product 관계에 따라 접근 경로가 다를 수 있음
-                 * - 아래는 "주문에 상품이 여러 개 있는 구조" 기준 예시
-                 */
-                if (review.getOrder().getOrderDetail() != null
-                    && !review.getOrder().getOrderDetail().isEmpty()) {
-                    var orderDetail = review.getOrder().getOrderDetail().get(0);
-                    dto.setProductName(
-                        orderDetail.getProductNo().getProductName()
-                    );
-                    dto.setProductImg(
-                        orderDetail.getProductNo().getImgUrl()
-                    );
-                }
+                    /**
+                     * 상품 정보 주의
+                     * - Order ↔ Product 관계에 따라 접근 경로가 다를 수 있음
+                     * - 아래는 "주문에 상품이 여러 개 있는 구조" 기준 예시
+                     */
+                    if (review.getOrder().getOrderDetail() != null
+                            && !review.getOrder().getOrderDetail().isEmpty()) {
+                        var orderDetail = review.getOrder().getOrderDetail().get(0);
+                        dto.setProductName(
+                                orderDetail.getProductNo().getProductName());
+                        dto.setProductImg(
+                                orderDetail.getProductNo().getImgUrl());
+                    }
 
-                return dto;
-            })
-            .collect(Collectors.toList());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
-    
+
     /**
      * [마이페이지 - 내 후기 목록 페이징 조회]
      *
@@ -212,17 +203,15 @@ public class MypageService {
     public Page<ReviewListResponse> getMyReviews(Long memberNo, int page) {
 
         // 1️. 페이지 요청 객체 생성
-        PageRequest pageable =
-            PageRequest.of(page, 5, Sort.by("createdAt").descending());
+        PageRequest pageable = PageRequest.of(page, 5, Sort.by("createdAt").descending());
 
         // 2️. 페이징 조회
-        Page<ReviewEntity> reviewPage =
-            reviewRepository.findMyReviews(memberNo, ReviewStatus.POSTED, pageable);
+        Page<ReviewEntity> reviewPage = reviewRepository.findMyReviews(memberNo, ReviewStatus.POSTED, pageable);
 
         // 3️. Entity → DTO 변환 (Page.map 사용)
         return reviewPage.map(this::convertToReviewDto);
-    }    
-    
+    }
+
     /**
      * [마이페이지 - 후기 삭제]
      *
@@ -236,9 +225,7 @@ public class MypageService {
 
         // 1️. 리뷰 단건 조회
         ReviewEntity review = reviewRepository.findByReviewNo(reviewNo)
-            .orElseThrow(() ->
-                new IllegalArgumentException("존재하지 않는 리뷰입니다.")
-            );
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 리뷰입니다."));
 
         // 2️. 본인 리뷰인지 검증 (보안 핵심)
         if (!review.getMember().getMemberNo().equals(memberNo)) {
@@ -267,23 +254,20 @@ public class MypageService {
 
         // 별점 (Integer → Double 변환)
         dto.setRating(
-            review.getRating() != null
-                ? review.getRating().doubleValue()
-                : 0.0
-        );        
+                review.getRating() != null
+                        ? review.getRating().doubleValue()
+                        : 0.0);
 
         if (review.getOrder().getOrderDetail() != null
-            && !review.getOrder().getOrderDetail().isEmpty()) {
+                && !review.getOrder().getOrderDetail().isEmpty()) {
 
             var orderDetail = review.getOrder().getOrderDetail().get(0);
 
             dto.setProductName(
-                orderDetail.getProductNo().getProductName()
-            );
+                    orderDetail.getProductNo().getProductName());
 
             dto.setProductImg(
-                orderDetail.getProductNo().getImgUrl()
-            );
+                    orderDetail.getProductNo().getImgUrl());
         }
 
         return dto;

@@ -169,18 +169,22 @@ public class AlertService {
             case "ORDER":
                 title = "주문";
                 switch (typeCode) {
-                    case "ACCEPTED":
-                        url = "/order/";
-                        content = "주문이 수락되었습니다.";
+                    case "INSERTED":
+                        url = "/shop/orders";
+                        content = "주문이 추가되었습니다.";
                         break;
+                    // case "ACCEPTED":
+                    // url = "/order/";
+                    // content = "주문이 수락되었습니다.";
+                    // break;
                     case "CANCELED":
                         url = "/order/";
                         content = "주문이 취소되었습니다.";
                         break;
-                    case "REJECTED":
-                        url = "/order/";
-                        content = "주문이 거절되었습니다.";
-                        break;
+                    // case "REJECTED":
+                    // url = "/order/";
+                    // content = "주문이 거절되었습니다.";
+                    // break;
 
                     default:
                         break;
