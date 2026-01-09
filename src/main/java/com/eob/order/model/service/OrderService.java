@@ -223,6 +223,10 @@ public class OrderService {
             // e.printStackTrace();
         }
 
+        // 생성된 List<상세내역>를 주문내역에 저장
+        ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));
+        orderHistoryRepository.save(ordered);
+
         // 3. 판매자에게 알림 insert,웹소켓으로 메세지전송
         // 판매자DB에 알림 INSERT
         MemberEntity shopMember = shop.getMember();
@@ -233,9 +237,6 @@ public class OrderService {
         String shopId = shopMember.getMemberId();
         messagingTemplat.convertAndSendToUser(shopId, "/to/order", "주문이 추가되었습니다.");
 
-        // 생성된 List<상세내역>를 주문내역에 저장
-        ordered.setOrderDetail(orderDetailRepository.findByOrderNo_OrderNo(ordered.getOrderNo()));
-        orderHistoryRepository.save(ordered);
     }
 
 }
