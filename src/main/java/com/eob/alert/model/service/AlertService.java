@@ -233,11 +233,12 @@ public class AlertService {
                         break;
                 }
                 break;
-            case "SYSTEM":
-                title = "시스템";
+            case "SETTLEMENT":
+                title = "정산";
                 switch (typeCode) {
-                    case "":
-
+                    case "COMPLETED":
+                        url = "/shop/mypage/settlement";
+                        content = "정산이 완료되었습니다.";
                         break;
 
                     default:

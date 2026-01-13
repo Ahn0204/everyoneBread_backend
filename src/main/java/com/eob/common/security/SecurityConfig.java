@@ -237,7 +237,7 @@ public class SecurityConfig {
                                                                 "/shop/orders/dashboard", // 주문 대시보드 AJAX
                                                                 "/css/**", "/js/**", "/image/**", "/fonts/**",
                                                                 "/lib/**",
-                                                                "/shop/insertBanInquiry")
+                                                                "/shop/insertBanInquiry", "/alert/**")
                                                 .permitAll()
 
                                                 /*
@@ -283,7 +283,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/admin/login", "/admin/logout", "/css/**", "/js/**",
                                                                 "/image/**",
                                                                 "/fonts/**", "/lib/**", "/admin/register",
-                                                                "/admin/user/insertAdmin")
+                                                                "/admin/user/insertAdmin", "/alert/**")
                                                 .permitAll()
                                                 // .anyRequest().permitAll())
                                                 // 이외 모든 경로 관리자만 접근 허용
@@ -354,13 +354,6 @@ public class SecurityConfig {
                                  */
 
                                 .securityMatcher("/member/**", "/**")
-                                // .securityMatcher("/member/**", "/**")
-
-                                // 예솔: 메인 페이지에서는 securityMatcher를 안쓰려고 하는데 어떤가요
-                                // /**이라고 경로를 지정하는게 보안에 의미가 없고,
-                                // 위에서 체인에 걸리지 않은 url은 다 여기로 오게된다고 g가 그랬어요.
-                                // .securityMatcher("/member/**", "/", "/main", "/css/**", "/js/**",
-                                // "/image/**")
                                 /**
                                  * 성진
                                  * securityMatcher 없는 체인은 모든 URL을 대상으로 하기 때문에
@@ -369,16 +362,9 @@ public class SecurityConfig {
                                  * 모든 FilterChain에 대해 securityMatcher를 명시적으로 지정하는 것이 좋음
                                  * 그러지 않으면 defaultChain이 전체 URL 보안을 가져가서 대부분의 요청이 로그인으로 튕긴다.
                                  * 
-                                 * 2025/12/04
-                                 * 회원가입 - 일반/비즈니스 계정 선택 시 지속적으로 로그인 페이지로 튕기는 문제 발생
-                                 */
-
-                                /*
                                  * 병주
                                  * 시큐리티 에 "/**" 해당 매처가 없으면 sec:authorize를 사용 못해요..
-                                 * 그래서 해당 securityMatcher가 있어야 함니다..
                                  */
-
                                 .authenticationProvider(customAuthenticationProvider())
 
                                 /**
@@ -411,13 +397,13 @@ public class SecurityConfig {
                                                                 "/image/**",
                                                                 "/fonts/**",
                                                                 "/lib/**",
-                                                                "/shop/**")
+                                                                "/shop/**", "/alert/**")
                                                 .permitAll()
 
                                                 /* 위에서 허용한 URL 외 모든 요청은 로그인 필요 */
-                                                .anyRequest().permitAll())
-                                // 예솔: role='user'인 사용자만 로그인되도록 나중에 변경
-                                // .anyRequest().hasRole("USER"))
+                                                // .anyRequest().permitAll())
+                                                // 예솔: role='user'인 사용자만 로그인되도록 나중에 변경
+                                                .anyRequest().hasRole("USER"))
 
                                 /* 로그인 설정 */
                                 .formLogin(login -> login

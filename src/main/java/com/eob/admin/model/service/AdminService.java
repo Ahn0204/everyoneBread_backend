@@ -161,7 +161,7 @@ public class AdminService {
      * 상점 정산 처리
      */
     @Transactional
-    public void shopSettlement() {
+    public void shopSettlement(MemberEntity admin) {
         // SHOP_FEE에서 상점별 최근 잔액 조회
         Optional<List<ShopFeeEntity>> _shopFee = shopFeeRepository
                 .findLatestPerShop();
@@ -208,10 +208,16 @@ public class AdminService {
                     newS.setCreatedAt(LocalDateTime.now());
                     shopFeeRepository.save(newS);
 
-                    // 대상에게 알림(웹소켓..?)
+                    // 상점에 알림DB추가
+                    // (보내는멤버Entity, 받는멤버No, 대분류String, 소분류String)
+                    alertService.sendAlert(admin, member.getMemberNo(), "SETTLEMENT", "COMPLETED");
+                    // 대상에게 알림(정산받은 사람 memberId, 웹소켓 경로, "전달할 메세지")
+                    messagingTemplat.convertAndSendToUser(member.getMemberId(), "/to/settlement",
+                            "정산이 완료되었습니다.");
                     // 입금명, 입금계좌, 정산 금액, 정산일시 출력 처리(입금 기능 대안)
-                    System.out.println("정산 완료:" + member.getMemberName() + ", " + s.getFeeBalance() + "원에서 "
-                            + settleAmount + "정산");
+                    // System.out.println("정산 완료:" + member.getMemberName() + ", " +
+                    // s.getFeeBalance() + "원에서 "
+                    // + settleAmount + "정산");
                 }
                 return;
             }

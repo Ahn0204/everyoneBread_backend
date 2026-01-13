@@ -14,6 +14,11 @@ stompClient.connect({}, () => {
         showAlert(msg);
     });
 
+    //판매자에게 정산 완료 알림 출력
+    stompClient.subscribe('/member/to/settlement', (msg) => {
+        showAlert(msg);
+    });
+
     //소비자에게 문의 답변 알림 출력
     stompClient.subscribe('/member/to/inquiry', (msg) => {
         showAlert(msg);
