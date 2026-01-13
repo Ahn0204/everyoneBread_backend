@@ -11,7 +11,7 @@
         <script src="https://code.jquery.com/jquery-latest.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script th:src="@{/js/comm/sweetalert.noah.js}"></script>
-        <!--csrf토근 헤더 추가-->
+        <!--csrf토큰 헤더 추가-->
         <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}" />
         <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}" />
         <!-- BootStrap CDN -->
@@ -28,6 +28,8 @@
         <!--STOMP 프로토콜 클라이언트 라이브러리 로드-->
         <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
         <script th:src="@{/js/comm/alert.js}"></script>
+        <!--메인 헤더 css-->
+        <link rel="stylesheet" th:href="@{/css/main/main-header.css}" />
         <!--자식페이지에서 추가로 삽입될 head내용-->
         <th:block layout:fragment="head-link"></th:block>
         <style>

@@ -99,17 +99,17 @@
         <!--레이아웃의 script 부분에 아래 내용이 출력됨-->
         <script layout:fragment="script" text="javascript">
             $(function () {
-                const inquiryNo = $('.inquiryNo').val();
-                console.log(inquiryNo);
+                const banInquiryNo = $('.banInquiryNo').val();
+                console.log(banInquiryNo);
                 //삭제
                 $('.delete').on('click', function () {
                     showConfirmAlert(
                         '문의를 삭제하겠습니까?',
                         () => {
                             $.ajax({
-                                url: '/customerCenter/inquiry/delete',
+                                url: '/customerCenter/banInquiry/delete',
                                 type: 'DELETE',
-                                data: { inquiryNo: inquiryNo },
+                                data: { banInquiryNo: banInquiryNo },
                                 success: function (success) {
                                     if (success == true) {
                                         showToast('문의가 삭제되었습니다.', 'success');

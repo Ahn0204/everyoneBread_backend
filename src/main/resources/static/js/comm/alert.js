@@ -9,12 +9,12 @@ const stompClient = Stomp.over(socket);
 stompClient.connect({}, () => {
     //stompClient.서버로부터 전달받음('웹소켓경로',람다식 실행부)
 
-    //판매자에게 알림 출력
+    //판매자에게 주문 알림 출력
     stompClient.subscribe('/member/to/order', (msg) => {
         showAlert(msg);
     });
 
-    //소비자에게 알림 출력
+    //소비자에게 문의 답변 알림 출력
     stompClient.subscribe('/member/to/inquiry', (msg) => {
         showAlert(msg);
     });

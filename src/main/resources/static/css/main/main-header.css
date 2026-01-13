@@ -1,0 +1,121 @@
+.alert-wrapper {
+    position: relative;
+}
+
+#alertList {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.alert-panel {
+    margin-top: 5px;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 320px;
+    max-height: 400px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    /* overflow-y: auto; */
+}
+
+.alert-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.alert-row {
+    display: flex;
+    justify-content: space-between; /* 좌우 끝 정렬 */
+    align-items: center;
+    gap: 12px;
+}
+
+.alert-text {
+    flex: 1; /* 왼쪽 영역 최대 확장 */
+    font-size: 15px;
+}
+.alert-text a {
+    color: #545455;
+    text-decoration: none;
+}
+
+.alert-actions {
+    display: flex;
+    gap: 10px; /* 읽음 / 삭제 간격 */
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+.alert-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.alert-btn:hover {
+    text-decoration: underline;
+}
+
+/* 읽지 않은 알림 강조 */
+.alert-item.unread .alert-link {
+    font-weight: 600;
+    color: black;
+}
+
+.alert-tab {
+    flex: 1;
+    padding: 8px 0;
+    border: none;
+    background: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.alert-tab.active {
+    font-weight: 600;
+    border-bottom: 2px solid #0d6efd;
+}
+.alert-link {
+    font-weight: 400;
+    color: #545455;
+    text-decoration: none;
+}
+.alert-time {
+    font-size: 14px;
+}
+#alertBtn {
+    position: relative;
+    padding: 10px 18px;
+    background: #6c7075;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.alert-badge-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+
+    background: #e55b5b;
+    color: #fff;
+
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px; /* 원 → 캡슐 자동 전환 */
+    white-space: nowrap;
+}

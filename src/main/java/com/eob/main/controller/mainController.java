@@ -292,6 +292,18 @@ public class mainController {
         }
     }
 
+    // 신고 문의 삭제
+    @DeleteMapping("/customerCenter/banInquiry/delete")
+    @ResponseBody
+    public boolean deleteBanInquiry(@RequestParam("banInquiryNo") Long banInquiryNo) {
+        try {
+            banInquiryRepository.deleteById(banInquiryNo);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     /**
      * 마이페이지 - 주문내역 - 관리자에 문의
      */
