@@ -7,9 +7,25 @@ const stompClient = Stomp.over(socket);
 
 //stompClient 연결
 stompClient.connect({}, () => {
-    //판매자에게 알림 출력
     //stompClient.서버로부터 전달받음('웹소켓경로',람다식 실행부)
+
+    //판매자에게 주문 알림 출력
     stompClient.subscribe('/member/to/order', (msg) => {
-        showToast(msg.body);
+        showAlert(msg);
+    });
+
+    //판매자에게 정산 완료 알림 출력
+    stompClient.subscribe('/member/to/settlement', (msg) => {
+        showAlert(msg);
+    });
+
+    //소비자에게 문의 답변 알림 출력
+    stompClient.subscribe('/member/to/inquiry', (msg) => {
+        showAlert(msg);
     });
 });
+
+function showAlert(msg) {
+    showToast(msg.body);
+    //알림함에 빨간 점 달기
+}

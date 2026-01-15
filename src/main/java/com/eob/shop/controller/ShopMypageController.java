@@ -32,7 +32,7 @@ public class ShopMypageController {
 
     // 기본 마이페이지 진입
     @GetMapping("")
-    public String shopMypage(){
+    public String shopMypage() {
         return "redirect:/shop/mypage/manage";
     }
 
@@ -59,7 +59,8 @@ public class ShopMypageController {
      */
     @PostMapping("/update/{type}")
     @ResponseBody
-    public Map<String, String> updateShopInfo( @PathVariable String type, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
+    public Map<String, String> updateShopInfo(@PathVariable(name = "type") String type,
+            @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal) {
         // 상점 본인 확인
         Long memberNo = principal.getMember().getMemberNo();
         
@@ -71,9 +72,8 @@ public class ShopMypageController {
         return Map.of("result", "OK");
     }
 
-
     /**
-     *  개인 정보 페이지
+     * 개인 정보 페이지
      */
     @GetMapping("/info")
     public String shopInfo(@AuthenticationPrincipal CustomSecurityDetail principal, Model model) {
@@ -110,9 +110,8 @@ public class ShopMypageController {
     @ResponseBody
     @Transactional
     public Map<String, String> requestClose(
-        @AuthenticationPrincipal CustomSecurityDetail principal,
-        @RequestBody Map<String, String> body
-    ) {
+            @AuthenticationPrincipal CustomSecurityDetail principal,
+            @RequestBody Map<String, String> body) {
         Long memberNo = principal.getMember().getMemberNo();
         String reason = body.get("reason");
 
@@ -120,7 +119,7 @@ public class ShopMypageController {
 
         // 이미 폐점 관련 상태면 차단
         if (shop.getStatus() == ShopApprovalStatus.CLOSE_REVIEW ||
-            shop.getStatus() == ShopApprovalStatus.CLOSE_APPROVED) {
+                shop.getStatus() == ShopApprovalStatus.CLOSE_APPROVED) {
             return Map.of("result", "FAIL", "message", "이미 폐점 처리 중입니다.");
         }
 
@@ -131,8 +130,6 @@ public class ShopMypageController {
         return Map.of("result", "OK");
     }
 
-
-    
     /**
      * 정산 관리 페이지
      * URL : /shop/mypage/settlement
@@ -140,8 +137,7 @@ public class ShopMypageController {
     @GetMapping("/settlement")
     public String shopSettlement(
             @AuthenticationPrincipal CustomSecurityDetail principal,
-            Model model
-    ) {
+            Model model) {
         Long memberNo = principal.getMember().getMemberNo();
 
         // 1. 상점 조회

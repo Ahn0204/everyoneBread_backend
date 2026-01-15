@@ -95,16 +95,15 @@ public class OrderService {
          * ShopOrderSocketMessage : 판매자에게 보낼 웹소켓 메시지 데이터 상자
          */
         ShopOrderSocketMessage socketMessage = new ShopOrderSocketMessage(
-            order.getOrderNo(),                   // 주문 번호
-            order.getShop().getShopNo(),          // 가게 번호
-            "새로운 주문이 들어왔습니다!",  // 판매자에게 보여줄 메시지
-            order.getStatus().name()              // 주문 상태
+                order.getOrderNo(), // 주문 번호
+                order.getShop().getShopNo(), // 가게 번호
+                "새로운 주문이 들어왔습니다!", // 판매자에게 보여줄 메시지
+                order.getStatus().name() // 주문 상태
         );
 
         // ShopSocketSender를 통해 해당 가게(shopNo)를 구독 중인 판매자 브라우저들에게 실시간으로 메시지 전송
         shopSocketSender.sendNewOrder(
-            order.getShop().getShopNo(), socketMessage
-        );
+                order.getShop().getShopNo(), socketMessage);
         order.setStatus(OrderStatus.REQUEST);
     }
 
