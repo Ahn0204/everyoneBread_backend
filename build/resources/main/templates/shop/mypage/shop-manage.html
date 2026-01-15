@@ -35,6 +35,13 @@
         <button type="button" onclick="toggleEdit(this, 'shopName','name')">변경</button>
     </div>
 
+    <!-- 상점 전화번호 -->
+    <div class="info-row">
+        <label>전화번호</label>
+        <input id="shopPhone" th:value="${shop.shopPhone}" readonly>
+        <button type="button" onclick="toggleEdit(this, 'shopPhone','phone')">변경</button>
+    </div>
+
     <!-- 소개글 -->
     <div class="info-row">
         <label>소개글</label>
@@ -47,6 +54,19 @@
         <label>주소</label>
         <input id="shopAddress" th:value="${shop.shopAddress}" readonly>
         <button type="button" onclick="openAddress()">변경</button>
+    </div>
+
+    <!-- 상점 이미지 -->
+    <div class="info-row image-row">
+        <label>상점 이미지</label>
+
+        <div class="shop-image-box">
+            <img id="shopImagePreview"
+                th:src="${shop.shopImg != null ? shop.shopImg : '/image/common/no-image.png'}"
+                alt="상점 이미지">
+        </div>
+        <input type="file" id="shopImageInput" accept="image/*" style="display:none" onchange="previewShopImage(this)">
+        <button type="button" onclick="openImageSelect()">변경</button>
     </div>
 
     <!-- 휴무일 -->

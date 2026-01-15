@@ -165,3 +165,23 @@ function toggleTimeEdit() {
     })
     .catch(() => showErrorAlert('서버 오류로 영업시간 변경에 실패했습니다.'));
 }
+
+/* 이미지 선택 */
+function openImageSelect() {
+    document.getElementById('shopImageInput').click();
+}
+
+/* 이미지 미리보기 */
+function previewShopImage(input) {
+    if (!input.files || !input.files[0]) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('shopImagePreview').src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+/* 이미지 업로드 */
+function uploadShopImage() {
+    const input = document.getElementById('shopImageInput');
+}

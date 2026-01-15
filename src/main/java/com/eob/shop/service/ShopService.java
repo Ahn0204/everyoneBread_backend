@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +75,24 @@ public class ShopService {
                 shop.setCloseTime(t[1].trim());
             }
         }
+    }
+    
+    /**
+     * 상점 마이페이지 - 상점 정보 전체 수정
+     */
+    @Transactional
+    public void updateShopInfo(Long memberNo, Map<String, String> body) {
+
+        ShopEntity shop = shopRepository.findByMember_MemberNo(memberNo)
+                .orElseThrow(() -> new IllegalArgumentException("상점 정보를 찾을 수 없습니다."));
+
+        shop.setShopName(body.get("shopName"));
+        shop.setShopPhone(body.get("shopPhone"));
+        shop.setShopIntro(body.get("shopIntro"));
+        shop.setShopAddress(body.get("shopAddress"));
+        shop.setHoliday(body.get("holiday"));
+        shop.setOpenTime(body.get("openTime"));
+        shop.setCloseTime(body.get("closeTime"));
     }
 
     /**

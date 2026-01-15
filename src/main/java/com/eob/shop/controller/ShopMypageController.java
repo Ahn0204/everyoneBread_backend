@@ -62,7 +62,12 @@ public class ShopMypageController {
     public Map<String, String> updateShopInfo( @PathVariable String type, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomSecurityDetail principal ) {
         // 상점 본인 확인
         Long memberNo = principal.getMember().getMemberNo();
-        shopService.updateShopInfo(memberNo, type, body.get("value"));
+        
+        if ("saveAll".equals(type)) {
+            shopService.updateShopInfo(memberNo, body);
+        } else {
+            shopService.updateShopInfo(memberNo, type, body.get("value"));
+        }
         return Map.of("result", "OK");
     }
 

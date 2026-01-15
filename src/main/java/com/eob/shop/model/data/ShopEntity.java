@@ -70,6 +70,11 @@ public class ShopEntity {
     private String shopAddress;
 
     /**
+     * 상점 전화번호
+     */
+    private String shopPhone;
+
+    /**
      * 상점 대표 이미지
      */
     private String shopImg;

@@ -165,3 +165,56 @@ function toggleTimeEdit() {
     })
     .catch(() => showErrorAlert('서버 오류로 영업시간 변경에 실패했습니다.'));
 }
+
+/* 이미지 선택 */
+function openImageSelect() {
+    document.getElementById('shopImageInput').click();
+}
+
+/* 이미지 미리보기 */
+function previewShopImage(input) {
+    if (!input.files || !input.files[0]) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('shopImagePreview').src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+/* 이미지 업로드 */
+function uploadShopImage() {
+    const input = document.getElementById('shopImageInput');
+}
+
+/* 전체 상점 정보 저장 */
+function saveAllShopInfo() {
+
+    const data = {
+        shopName: document.getElementById('shopName').value,
+        shopPhone: document.getElementById('shopPhone').value,
+        shopIntro: document.getElementById('shopIntro').value,
+        shopAddress: document.getElementById('shopAddress').value,
+        holiday: document.getElementById('savedHoliday').value,
+        openTime: document.getElementById('openTime').value,
+        closeTime: document.getElementById('closeTime').value
+    };
+
+    fetch('/shop/mypage/update/saveAll', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            [header]: token
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.result === 'OK') {
+            showSuccessAlert('상점 정보가 저장되었습니다.');
+        } else {
+            showErrorAlert(result.message || '저장에 실패했습니다.');
+        }
+    })
+    .catch(() => showErrorAlert('서버 오류로 저장에 실패했습니다.'));
+}
