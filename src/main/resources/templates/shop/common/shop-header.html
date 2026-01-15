@@ -18,26 +18,20 @@
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
 
-            <!-- =========================
-                 왼쪽 : 상점 정보
-            ========================== -->
+            <!-- 왼쪽 : 상점 정보 -->
             <div class="shop-header-left" onclick="location.href='/shop/'">
                 <div class="shop-img-box">상점</div>
                 <div class="shop-name">상점명</div>
             </div>
 
-            <!-- =========================
-                 가운데 : 메뉴 (정중앙)
-            ========================== -->
+            <!-- 가운데 : 메뉴 (정중앙) -->
             <div class="shop-menu">
                 <a href="/shop/products">상품 관리</a>
                 <a href="/shop/orders">주문 관리</a>
                 <a href="/shop/reviews">후기 · 문의</a>
             </div>
 
-            <!-- =========================
-                 오른쪽 : 유저 영역
-            ========================== -->
+            <!-- 오른쪽 : 유저 영역 -->
             <div class="user-util" sec:authorize="isAuthenticated()">
 
                 <!-- 🔔 알림 -->
@@ -78,96 +72,6 @@
         </div>
     </nav>
 
-    <!-- =========================
-         알림 JS
-    ========================== -->
-    <script>
-        let currentTab = 'all';
-
-        $(function () {
-            getAlertCount();
-
-            $('#alertBtn').on('click', function (e) {
-                e.stopPropagation();
-                $('#alertPanel').toggle();
-                loadAlerts();
-            });
-
-            $('#alertCloseBtn').on('click', function () {
-                $('#alertPanel').hide();
-            });
-
-            $(document).on('click', function () {
-                $('#alertPanel').hide();
-            });
-
-            $('#alertPanel').on('click', function (e) {
-                e.stopPropagation();
-            });
-        });
-
-        // 탭 클릭
-        $('.alert-tab').on('click', function () {
-            $('.alert-tab').removeClass('active');
-            $(this).addClass('active');
-            currentTab = $(this).data('tab');
-            loadAlerts();
-        });
-
-        // 알림 목록
-        function loadAlerts() {
-            $('#alertList').empty();
-
-            $.get('/alert/recent', { tab: currentTab }, function (alerts) {
-                if (!alerts || alerts.length === 0) {
-                    $('#alertList').append('<li class="alert-empty">새 알림이 없습니다.</li>');
-                    return;
-                }
-                alerts.forEach(a => $('#alertList').append(renderAlertItem(a)));
-            });
-        }
-
-        function renderAlertItem(alert) {
-            const li = $('<li>').addClass('alert-item').attr('data-alert-no', alert.alertNo);
-            if (alert.readYn === 'N') li.addClass('unread');
-
-            const row = $('<div>').addClass('alert-row');
-
-            const text = $('<span>').addClass('alert-text')
-                .append($('<a>').addClass('alert-link').attr('href', alert.linkUrl || '#').text(alert.content));
-
-            const actions = $('<div>').addClass('alert-actions');
-
-            if (alert.readYn === 'N') {
-                actions.append($('<button>').addClass('alert-btn read').text('읽음'));
-            }
-            actions.append($('<button>').addClass('alert-btn delete').text('삭제'));
-
-            row.append(text, actions);
-            li.append(row);
-            return li;
-        }
-
-        $('#alertPanel').on('click', '.alert-btn.read', function () {
-            const item = $(this).closest('.alert-item');
-            $.post('/alert/readAlert', { alertNo: item.data('alert-no') }, ok => {
-                if (ok) item.removeClass('unread').find('.read').remove();
-            });
-        });
-
-        $('#alertPanel').on('click', '.alert-btn.delete', function () {
-            const item = $(this).closest('.alert-item');
-            $.post('/alert/deleteAlert', { alertNo: item.data('alert-no') }, ok => {
-                if (ok) item.remove();
-            });
-        });
-
-        function getAlertCount() {
-            const badge = $('.alert-badge-count');
-            $.post('/alert/ajaxCount', cnt => {
-                if (cnt > 0) badge.text(cnt > 99 ? '99+' : cnt).show();
-                else badge.hide();
-            });
-        }
-    </script>
+    <!-- 알림 JS-->
+    <script th:src="@{/js/shop/comm/header.js}"></script>
 </header>
