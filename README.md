@@ -100,12 +100,12 @@
 
 ## 📁 프로젝트 구조
 com.eob
-├─ member
-├─ shop
-├─ rider
-├─ order
-├─ admin
-└─ common (security / websocket / util)
+  - member
+  - shop
+  - rider
+  - order
+  - admin
+  - common (security / websocket / util)
 
 → 도메인 중심 패키지 분리
 
